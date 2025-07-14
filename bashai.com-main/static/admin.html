@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - DrM Hope</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo h1 {
+            color: #667eea;
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .subtitle {
+            color: #666;
+            margin: 5px 0 0 0;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .error {
+            color: #e74c3c;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .success {
+            color: #27ae60;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+        }
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e1e5e9;
+        }
+        .divider span {
+            background: white;
+            padding: 0 15px;
+            color: #666;
+        }
+        .google-btn {
+            width: 100%;
+            background: white;
+            color: #333;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+        .google-btn:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        .google-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+    <script
+        async
+        crossorigin="anonymous"
+        data-clerk-publishable-key="pk_live_Y2xlcmsuYmhhc2hhaS5jb20k"
+        src="https://unpkg.com/@clerk/clerk-js@latest/dist/clerk.browser.js"
+        onload="window.Clerk?.load()"
+    ></script>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>DrM Hope</h1>
+            <p class="subtitle">Admin Access Portal</p>
+        </div>
+
+        <!-- Email/Password Login -->
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" value="admin@bhashai.com" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="login-btn" id="loginBtn">
+                Sign In
+            </button>
+        </form>
+
+        <div class="divider">
+            <span>or</span>
+        </div>
+
+        <!-- Google OAuth Button -->
+        <button class="google-btn" id="googleBtn">
+            <svg width="18" height="18" viewBox="0 0 18 18">
+                <path fill="#4285F4" d="M18 9.2c0-.6-.1-1.2-.2-1.8H9.2v3.4h4.9c-.2 1.1-.9 2-1.8 2.6v2.2h2.9c1.7-1.6 2.8-3.9 2.8-6.4z"/>
+                <path fill="#34A853" d="M9.2 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.6-1.8.9-3.1.9-2.4 0-4.4-1.6-5.1-3.8H1.1v2.3C2.6 15.9 5.7 18 9.2 18z"/>
+                <path fill="#FBBC04" d="M4.1 10.7c-.2-.6-.3-1.2-.3-1.8s.1-1.2.3-1.8V4.8H1.1C.4 6.1 0 7.5 0 9s.4 2.9 1.1 4.2l3-2.5z"/>
+                <path fill="#EA4335" d="M9.2 3.6c1.3 0 2.5.4 3.4 1.3L15.5 2C13.7.4 11.4-.5 9.2-.5 5.7-.5 2.6 1.6 1.1 4.8l3 2.3c.7-2.2 2.7-3.8 5.1-3.8z"/>
+            </svg>
+            Continue with Google
+        </button>
+
+        <div id="message"></div>
+    </div>
+
+    <script>
+        let clerk;
+
+        window.addEventListener('load', async () => {
+            try {
+                clerk = window.Clerk;
+                await clerk.load();
+                console.log('Clerk initialized');
+
+                // Check if already authenticated
+                if (clerk.user) {
+                    window.location.href = '/admin/dashboard';
+                    return;
+                }
+
+            } catch (error) {
+                console.error('Clerk initialization error:', error);
+                showMessage('Authentication system error. Please try again later.', 'error');
+            }
+        });
+
+        // Email/Password Login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+
+            if (!email || !password) {
+                showMessage('Please enter both email and password.', 'error');
+                return;
+            }
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Signing in...';
+
+            try {
+                if (!clerk) {
+                    throw new Error('Authentication system not ready');
+                }
+
+                // Try to sign in with email/password
+                const signInAttempt = await clerk.client.signIn.create({
+                    identifier: email,
+                    password: password,
+                });
+
+                if (signInAttempt.status === 'complete') {
+                    showMessage('Login successful! Redirecting...', 'success');
+                    await clerk.setActive({ session: signInAttempt.createdSessionId });
+                    window.location.href = '/admin/dashboard';
+                } else {
+                    throw new Error('Login incomplete');
+                }
+
+            } catch (error) {
+                console.error('Login error:', error);
+                
+                if (error.message.includes('password')) {
+                    showMessage('Invalid email or password. Please try again.', 'error');
+                } else if (error.message.includes('identifier')) {
+                    showMessage('Account not found. Please check your email address.', 'error');
+                } else {
+                    showMessage('Login failed: ' + error.message, 'error');
+                }
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Sign In';
+            }
+        });
+
+        // Google OAuth Login
+        document.getElementById('googleBtn').addEventListener('click', async () => {
+            const googleBtn = document.getElementById('googleBtn');
+            
+            googleBtn.disabled = true;
+            googleBtn.textContent = 'Connecting to Google...';
+
+            try {
+                if (!clerk) {
+                    throw new Error('Authentication system not ready');
+                }
+
+                // Try Google OAuth
+                await clerk.authenticateWithRedirect({
+                    strategy: 'oauth_google',
+                    redirectUrl: window.location.origin + '/admin/dashboard',
+                    redirectUrlComplete: window.location.origin + '/admin/dashboard'
+                });
+
+            } catch (error) {
+                console.error('Google OAuth error:', error);
+                showMessage('Google sign-in failed: ' + error.message, 'error');
+                
+                googleBtn.disabled = false;
+                googleBtn.innerHTML = `
+                    <svg width="18" height="18" viewBox="0 0 18 18">
+                        <path fill="#4285F4" d="M18 9.2c0-.6-.1-1.2-.2-1.8H9.2v3.4h4.9c-.2 1.1-.9 2-1.8 2.6v2.2h2.9c1.7-1.6 2.8-3.9 2.8-6.4z"/>
+                        <path fill="#34A853" d="M9.2 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.6-1.8.9-3.1.9-2.4 0-4.4-1.6-5.1-3.8H1.1v2.3C2.6 15.9 5.7 18 9.2 18z"/>
+                        <path fill="#FBBC04" d="M4.1 10.7c-.2-.6-.3-1.2-.3-1.8s.1-1.2.3-1.8V4.8H1.1C.4 6.1 0 7.5 0 9s.4 2.9 1.1 4.2l3-2.5z"/>
+                        <path fill="#EA4335" d="M9.2 3.6c1.3 0 2.5.4 3.4 1.3L15.5 2C13.7.4 11.4-.5 9.2-.5 5.7-.5 2.6 1.6 1.1 4.8l3 2.3c.7-2.2 2.7-3.8 5.1-3.8z"/>
+                    </svg>
+                    Continue with Google
+                `;
+            }
+        });
+
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = type;
+        }
+    </script>
+</body>
+</html>
