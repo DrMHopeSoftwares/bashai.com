@@ -459,6 +459,14 @@
             </div>
 
             <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" id="password" name="password" placeholder="Create a strong password" required minlength="6">
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label for="enterpriseType">Enterprise Type</label>
                 <div class="input-wrapper">
                     <i class="fas fa-industry input-icon"></i>
@@ -528,6 +536,7 @@
                 owner_name: formData.get('ownerName'),
                 contact_email: formData.get('email'),
                 contact_phone: formData.get('phone'),
+                password: formData.get('password'),
                 type: formData.get('enterpriseType'),
                 status: 'trial'
             };

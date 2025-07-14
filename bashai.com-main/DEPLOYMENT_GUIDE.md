@@ -5,7 +5,7 @@
 2. Vercel account (free tier available)
 3. GoDaddy domain: bhashai.com
 4. Supabase account for database
-5. Clerk account for authentication
+5. Local authentication system (already configured)
 
 ## Step 1: Prepare Your Repository
 
@@ -42,9 +42,7 @@ In Vercel dashboard, go to Settings > Environment Variables and add:
 SUPABASE_URL=your_supabase_project_url
 SUPABASE_SERVICE_KEY=your_supabase_service_role_key
 SUPABASE_ANON_KEY=your_supabase_anon_key
-CLERK_PUBLISHABLE_KEY=pk_live_your_clerk_publishable_key
-CLERK_SECRET_KEY=sk_live_your_clerk_secret_key
-CLERK_WEBHOOK_SECRET=whsec_your_webhook_secret
+# Clerk environment variables removed - using local auth system
 FLASK_ENV=production
 FLASK_DEBUG=False
 ```

@@ -10,7 +10,7 @@ from datetime import datetime, timezone, timedelta
 from flask import Flask, request, jsonify, send_from_directory, g, redirect
 from flask_cors import CORS
 from dotenv import load_dotenv
-from clerk_auth import clerk_auth, require_auth, optional_auth
+from auth import auth_manager, login_required
 from trial_middleware import check_trial_limits, log_trial_activity, get_trial_usage_summary
 from bolna_integration import BolnaAPI, get_agent_config_for_voice_agent
 from razorpay_integration import RazorpayIntegration, calculate_credits_from_amount, get_predefined_recharge_options
@@ -31,8 +31,7 @@ def redirect_non_www():
     if host.startswith("bhashai.com"):
         return redirect(request.url.replace("://bhashai.com", "://www.bhashai.com"), code=301)
 
-# Initialize Clerk authentication
-clerk_auth.init_app(app)
+# Auth system already initialized via auth_routes.py
 
 # Register authentication blueprint
 app.register_blueprint(auth_bp)
@@ -245,401 +244,39 @@ def enterprise_signup():
         traceback.print_exc()
         return jsonify({'message': 'Enterprise registration failed'}), 500
 
-@app.route('/auth/clerk-trial-signup', methods=['POST'])
-def clerk_trial_signup():
-    """Handle trial signup with Clerk integration"""
-    data = request.json
+# Clerk trial signup route removed - using local auth system instead
 
-    # Required fields
-    required_fields = ['firstName', 'lastName', 'email', 'password', 'company', 'industry', 'useCase']
-    for field in required_fields:
-        if not data.get(field):
-            return jsonify({'message': f'{field} is required'}), 400
+# Clerk webhook route removed - using local auth system instead
 
-    try:
-        # Create user in Clerk via API (fallback method)
-        clerk_secret_key = os.getenv('CLERK_SECRET_KEY')
-        if not clerk_secret_key:
-            return jsonify({'message': 'Clerk configuration missing'}), 500
-
-        # Create user via Clerk Backend API
-        clerk_headers = {
-            'Authorization': f'Bearer {clerk_secret_key}',
-            'Content-Type': 'application/json'
-        }
-
-        clerk_user_data = {
-            'email_address': [data['email']],
-            'password': data['password'],
-            'first_name': data['firstName'],
-            'last_name': data['lastName'],
-            'unsafe_metadata': {
-                'trial': True,
-                'company': data['company'],
-                'industry': data['industry'],
-                'useCase': data['useCase'],
-                'employees': data.get('employees', ''),
-                'phone': data.get('phone', ''),
-                'source': 'trial_signup',
-                'trial_start_date': datetime.now(timezone.utc).isoformat(),
-                'trial_end_date': (datetime.now(timezone.utc) + timedelta(days=14)).isoformat()
-            }
-        }
-
-        # Create user in Clerk
-        clerk_response = requests.post(
-            'https://api.clerk.com/v1/users',
-            headers=clerk_headers,
-            json=clerk_user_data
-        )
-
-        if clerk_response.status_code == 200:
-            clerk_user = clerk_response.json()
-            user_id = clerk_user['id']
-
-            # Create user record in Supabase
-            user_data = {
-                'id': user_id,
-                'email': data['email'],
-                'name': f"{data['firstName']} {data['lastName']}",
-                'role': 'trial_user',
-                'organization': data['company'],
-                'status': 'trial',
-                'trial_start_date': datetime.now(timezone.utc).isoformat(),
-                'trial_end_date': (datetime.now(timezone.utc) + timedelta(days=14)).isoformat()
-            }
-
-            try:
-                user_response = supabase_request('POST', 'users', data=user_data)
-                print(f"User creation successful: {user_response}")
-            except Exception as e:
-                print(f"User creation error: {e}")
-                # Continue even if Supabase fails, as Clerk user is created
-
-            # Create enterprise record for trial
-            enterprise_data = {
-                'name': data['company'],
-                'type': data['industry'],
-                'contact_email': data['email'],
-                'status': 'trial',
-                'owner_id': user_id,
-                'trial_start_date': datetime.now(timezone.utc).isoformat(),
-                'trial_end_date': (datetime.now(timezone.utc) + timedelta(days=14)).isoformat()
-            }
-
-            try:
-                enterprise_response = supabase_request('POST', 'enterprises', data=enterprise_data)
-                print(f"Enterprise creation successful: {enterprise_response}")
-            except Exception as e:
-                print(f"Enterprise creation error: {e}")
-
-            return jsonify({
-                'message': 'Trial account created successfully!',
-                'user': {
-                    'id': user_id,
-                    'email': data['email'],
-                    'name': f"{data['firstName']} {data['lastName']}",
-                    'company': data['company'],
-                    'trial': True
-                },
-                'trial_days': 14
-            }), 201
-
-        else:
-            error_data = clerk_response.json()
-            return jsonify({'message': error_data.get('errors', [{}])[0].get('message', 'Account creation failed')}), 400
-
-    except Exception as e:
-        print(f"Clerk trial signup error: {e}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({'message': 'Trial account creation failed'}), 500
-
-@app.route('/webhooks/clerk', methods=['POST'])
-def clerk_webhook():
-    """Handle Clerk webhooks for user events"""
-    try:
-        # Verify webhook signature (you should implement this for production)
-        # webhook_secret = os.getenv('CLERK_WEBHOOK_SECRET')
-
-        event_data = request.json
-        event_type = event_data.get('type')
-
-        if event_type == 'user.created':
-            # Handle new user creation
-            user_data = event_data.get('data')
-            user_id = user_data.get('id')
-            user_email = user_data.get('email_addresses', [{}])[0].get('email_address', '')
-
-            # Check if this is a trial user or regular signup
-            unsafe_metadata = user_data.get('unsafe_metadata', {})
-            is_trial = unsafe_metadata.get('trial', False)
-
-            # For Google OAuth or regular signups, create a default enterprise
-            if not is_trial and not unsafe_metadata.get('company'):
-                # Create a default enterprise for the user based on their email domain
-                email_domain = user_email.split('@')[1] if '@' in user_email else 'unknown'
-                company_name = f"{user_data.get('first_name', 'User')} {user_data.get('last_name', '')}'s Enterprise".strip()
-                
-                # Check if enterprise already exists for this email domain
-                existing_enterprises = supabase_request('GET', 'enterprises', params={'contact_email': f'eq.{user_email}'})
-                
-                if not existing_enterprises:
-                    # Create new enterprise for this user
-                    enterprise_data = {
-                        'name': company_name,
-                        'type': 'trial',
-                        'contact_email': user_email,
-                        'status': 'trial',
-                        'owner_id': user_id,
-                        'trial_start_date': datetime.now(timezone.utc).isoformat(),
-                        'trial_end_date': (datetime.now(timezone.utc) + timedelta(days=14)).isoformat()
-                    }
-
-                    try:
-                        enterprise_response = supabase_request('POST', 'enterprises', data=enterprise_data)
-                        enterprise_id = enterprise_response[0]['id'] if enterprise_response else None
-                        print(f"Created default enterprise for user {user_email}: {company_name}")
-                    except Exception as e:
-                        print(f"Error creating default enterprise: {e}")
-                        enterprise_id = None
-                else:
-                    enterprise_id = existing_enterprises[0]['id']
-                    print(f"Using existing enterprise for user {user_email}")
-
-                # Create user record in Supabase with enterprise_id
-                supabase_user_data = {
-                    'id': user_id,
-                    'email': user_email,
-                    'name': f"{user_data.get('first_name', '')} {user_data.get('last_name', '')}".strip(),
-                    'role': 'trial_user',
-                    'organization': company_name,
-                    'status': 'trial',
-                    'enterprise_id': enterprise_id,
-                    'trial_start_date': datetime.now(timezone.utc).isoformat(),
-                    'trial_end_date': (datetime.now(timezone.utc) + timedelta(days=14)).isoformat()
-                }
-
-                try:
-                    supabase_request('POST', 'users', data=supabase_user_data)
-                    print(f"Default trial user created with enterprise_id: {user_id}")
-                except Exception as e:
-                    print(f"Error creating default trial user: {e}")
-
-            elif is_trial:
-                # Handle custom trial signup with company info
-                company_name = unsafe_metadata.get('company', f"{user_data.get('first_name', 'User')}'s Company")
-                
-                # Create enterprise record first
-                enterprise_data = {
-                    'name': company_name,
-                    'type': unsafe_metadata.get('industry', 'other'),
-                    'contact_email': user_email,
-                    'status': 'trial',
-                    'owner_id': user_id,
-                    'trial_start_date': datetime.now(timezone.utc).isoformat(),
-                    'trial_end_date': (datetime.now(timezone.utc) + timedelta(days=14)).isoformat()
-                }
-
-                enterprise_id = None
-                try:
-                    enterprise_response = supabase_request('POST', 'enterprises', data=enterprise_data)
-                    enterprise_id = enterprise_response[0]['id'] if enterprise_response else None
-                    print(f"Trial enterprise created: {company_name}")
-                except Exception as e:
-                    print(f"Error creating trial enterprise: {e}")
-
-                # Create trial user in Supabase with enterprise_id
-                supabase_user_data = {
-                    'id': user_id,
-                    'email': user_email,
-                    'name': f"{user_data.get('first_name', '')} {user_data.get('last_name', '')}".strip(),
-                    'role': 'trial_user',
-                    'organization': company_name,
-                    'status': 'trial',
-                    'enterprise_id': enterprise_id,
-                    'trial_start_date': datetime.now(timezone.utc).isoformat(),
-                    'trial_end_date': (datetime.now(timezone.utc) + timedelta(days=14)).isoformat()
-                }
-
-                try:
-                    supabase_request('POST', 'users', data=supabase_user_data)
-                    print(f"Trial user synced to Supabase with enterprise_id: {user_id}")
-                except Exception as e:
-                    print(f"Error syncing trial user to Supabase: {e}")
-
-        elif event_type == 'user.updated':
-            # Handle user updates
-            user_data = event_data.get('data')
-            user_id = user_data.get('id')
-
-            # Update user in Supabase if needed
-            print(f"User updated: {user_id}")
-
-        elif event_type == 'user.deleted':
-            # Handle user deletion
-            user_data = event_data.get('data')
-            user_id = user_data.get('id')
-
-            # Delete or deactivate user in Supabase
-            try:
-                supabase_request('PATCH', f'users?id=eq.{user_id}', data={'status': 'deleted'})
-                print(f"User marked as deleted: {user_id}")
-            except Exception as e:
-                print(f"Error marking user as deleted: {e}")
-
-        return jsonify({'status': 'success'}), 200
-
-    except Exception as e:
-        print(f"Clerk webhook error: {e}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({'error': 'Webhook processing failed'}), 500
+@app.route('/api/config/supabase')
+def get_supabase_config():
+    """Get Supabase configuration for frontend"""
+    return jsonify({
+        'url': SUPABASE_URL,
+        'anon_key': SUPABASE_ANON_KEY,
+        'available': SUPABASE_AVAILABLE
+    })
 
 @app.route('/auth/me', methods=['GET'])
-@require_auth
+@login_required
 def get_current_user():
-    """Get current authenticated user information"""
+    """Get current authenticated user information from local auth system"""
     try:
-        user_id = g.user_id
-        clerk_user = g.current_user
-
-        # Get user from Supabase
-        users = supabase_request('GET', 'users', params={'id': f'eq.{user_id}'})
-
-        if users and len(users) > 0:
-            user = users[0]
-
-            # Check trial status
-            trial_status = check_trial_status(user)
-
-            return jsonify({
-                'user': user,
-                'trial_status': trial_status,
-                'clerk_data': clerk_user
-            })
-        else:
-            # User exists in Clerk but not in Supabase - check if they exist by email first
-            print(f"User {user_id} not found in Supabase, checking for existing user by email...")
-            
-            # Extract user info from Clerk
-            user_email = clerk_user.get('email_addresses', [{}])[0].get('email_address', '')
-            first_name = clerk_user.get('first_name', '')
-            last_name = clerk_user.get('last_name', '')
-            full_name = f"{first_name} {last_name}".strip()
-            
-            # Check if user exists by email (for admin users who signed up via Clerk)
-            existing_users_by_email = supabase_request('GET', 'users', params={'email': f'eq.{user_email}'})
-            
-            if existing_users_by_email and len(existing_users_by_email) > 0:
-                existing_user = existing_users_by_email[0]
-                
-                # If it's an admin user, update their ID to match Clerk user_id
-                if existing_user.get('role') == 'admin':
-                    print(f"Linking existing admin user {user_email} to Clerk ID {user_id}")
-                    
-                    # Update the existing admin user with Clerk user_id
-                    update_data = {
-                        'id': user_id,  # Update to Clerk user_id
-                        'status': 'active'  # Ensure they're active
-                    }
-                    
-                    # Update by email since ID is changing
-                    result = supabase_request('PATCH', f'users?email=eq.{user_email}', data=update_data)
-                    
-                    if result and len(result) > 0:
-                        updated_user = result[0]
-                        trial_status = check_trial_status(updated_user)
-                        
-                        print(f"Successfully linked admin user {user_email} to Clerk")
-                        
-                        return jsonify({
-                            'user': updated_user,
-                            'trial_status': trial_status,
-                            'clerk_data': clerk_user,
-                            'admin_linked': True
-                        })
-                    else:
-                        print(f"Failed to link admin user {user_email}")
-                
-                # If it's any other existing user, link them to Clerk ID
-                else:
-                    print(f"Linking existing user {user_email} to Clerk ID {user_id}")
-                    
-                    update_data = {
-                        'id': user_id,
-                        'status': 'active'
-                    }
-                    
-                    result = supabase_request('PATCH', f'users?email=eq.{user_email}', data=update_data)
-                    
-                    if result and len(result) > 0:
-                        updated_user = result[0]
-                        trial_status = check_trial_status(updated_user)
-                        
-                        return jsonify({
-                            'user': updated_user,
-                            'trial_status': trial_status,
-                            'clerk_data': clerk_user,
-                            'user_linked': True
-                        })
-            
-            # If no existing user found by email, create new trial user
-            print(f"Creating new trial user for {user_email}...")
-            
-            # Create a default enterprise for this user
-            company_name = f"{first_name}'s Enterprise" if first_name else "User's Enterprise"
-            
-            # Create enterprise first
-            enterprise_data = {
-                'name': company_name,
-                'type': 'trial',
-                'contact_email': user_email,
-                'status': 'trial',
-                'owner_id': user_id,
-                'trial_start_date': datetime.now(timezone.utc).isoformat(),
-                'trial_end_date': (datetime.now(timezone.utc) + timedelta(days=14)).isoformat()
-            }
-
-            enterprise_id = None
-            try:
-                enterprise_response = supabase_request('POST', 'enterprises', data=enterprise_data)
-                enterprise_id = enterprise_response[0]['id'] if enterprise_response else None
-                print(f"Created enterprise for Clerk user: {company_name}")
-            except Exception as e:
-                print(f"Error creating enterprise for Clerk user: {e}")
-
-            # Create user in Supabase
-            user_data = {
-                'id': user_id,
-                'email': user_email,
-                'name': full_name,
-                'role': 'trial_user',
-                'organization': company_name,
-                'status': 'trial',
-                'enterprise_id': enterprise_id,
-                'trial_start_date': datetime.now(timezone.utc).isoformat(),
-                'trial_end_date': (datetime.now(timezone.utc) + timedelta(days=14)).isoformat()
-            }
-
-            try:
-                supabase_request('POST', 'users', data=user_data)
-                print(f"Created Supabase user from Clerk data: {user_id}")
-                
-                # Return the newly created user
-                trial_status = check_trial_status(user_data)
-                
-                return jsonify({
-                    'user': user_data,
-                    'trial_status': trial_status,
-                    'clerk_data': clerk_user,
-                    'created': True
-                })
-                
-            except Exception as e:
-                print(f"Error creating Supabase user from Clerk data: {e}")
-                return jsonify({'message': 'Failed to create user in database'}), 500
-
+        # Get user from local auth system (request.current_user is set by @login_required)
+        user_data = request.current_user
+        
+        if not user_data:
+            return jsonify({'message': 'User not found'}), 404
+        
+        # Check trial status
+        trial_status = check_trial_status(user_data)
+        
+        return jsonify({
+            'user': user_data,
+            'trial_status': trial_status,
+            'authenticated': True
+        })
+        
     except Exception as e:
         print(f"Get current user error: {e}")
         return jsonify({'message': 'Failed to get user information'}), 500
@@ -671,7 +308,7 @@ def check_trial_status(user):
         return {'is_trial': True, 'status': 'trial', 'expired': True}
 
 @app.route('/api/trial-status', methods=['GET'])
-@require_auth
+@login_required
 def get_trial_status():
     """Get detailed trial status for current user"""
     try:
@@ -693,7 +330,7 @@ def get_trial_status():
         return jsonify({'message': 'Failed to get trial status'}), 500
 
 @app.route('/api/trial-usage', methods=['GET'])
-@require_auth
+@login_required
 @check_trial_limits()
 def get_trial_usage():
     """Get detailed trial usage information"""
@@ -711,7 +348,7 @@ def get_trial_usage():
         return jsonify({'message': 'Failed to get trial usage'}), 500
 
 @app.route('/api/enterprises', methods=['GET'])
-@require_auth
+@login_required
 @check_trial_limits(feature='basic_analytics')
 def get_enterprises():
     """Get enterprises with trial limitations"""
@@ -731,7 +368,7 @@ def get_enterprises():
         return jsonify({'message': 'Failed to get enterprises'}), 500
 
 @app.route('/api/enterprises', methods=['POST'])
-@require_auth
+@login_required
 @check_trial_limits(feature='basic_analytics', usage_type='enterprise_creation')
 def create_enterprise():
     """Create enterprise with trial limitations"""
@@ -771,7 +408,7 @@ def create_enterprise():
         return jsonify({'message': 'Failed to create enterprise'}), 500
 
 @app.route('/api/voice-agents', methods=['POST'])
-@require_auth
+@login_required
 @require_enterprise_context
 @check_trial_limits(feature='basic_voice_agent', usage_type='voice_agent_creation')
 def create_voice_agent():
@@ -821,7 +458,7 @@ def create_voice_agent():
         return jsonify({'message': 'Failed to create voice agent'}), 500
 
 @app.route('/api/enterprises/<enterprise_id>', methods=['PUT'])
-@require_auth
+@login_required
 def update_enterprise(enterprise_id):
     """Update an enterprise"""
     try:
@@ -858,7 +495,7 @@ def update_enterprise(enterprise_id):
         return jsonify({'message': 'Failed to update enterprise'}), 500
 
 @app.route('/api/voice-agents', methods=['GET'])
-@require_auth
+@login_required
 @require_enterprise_context
 def get_voice_agents():
     """Get voice agents for the current user's enterprise"""
@@ -875,7 +512,7 @@ def get_voice_agents():
         return jsonify({'message': 'Failed to get voice agents'}), 500
 
 @app.route('/api/voice-agents/<agent_id>/contacts', methods=['GET'])
-@require_auth
+@login_required
 @require_enterprise_context
 def get_agent_contacts(agent_id):
     """Get contacts for a specific voice agent"""
@@ -897,7 +534,7 @@ def get_agent_contacts(agent_id):
         return jsonify({'message': 'Failed to get contacts'}), 500
 
 @app.route('/api/voice-agents/<agent_id>/contacts', methods=['POST'])
-@require_auth
+@login_required
 @require_enterprise_context
 def create_contact(agent_id):
     """Create a new contact for a voice agent"""
@@ -937,7 +574,7 @@ def create_contact(agent_id):
         return jsonify({'message': 'Failed to create contact'}), 500
 
 @app.route('/api/contacts/<contact_id>', methods=['PUT'])
-@require_auth
+@login_required
 @require_enterprise_context
 def update_contact(contact_id):
     """Update a contact"""
@@ -968,7 +605,7 @@ def update_contact(contact_id):
         return jsonify({'message': 'Failed to update contact'}), 500
 
 @app.route('/api/contacts/<contact_id>', methods=['DELETE'])
-@require_auth
+@login_required
 @require_enterprise_context
 def delete_contact(contact_id):
     """Delete a contact"""
@@ -992,7 +629,7 @@ def delete_contact(contact_id):
 # Bolna AI Voice Agent Integration Endpoints
 
 @app.route('/api/voice-agents/<agent_id>/contacts/bulk-call', methods=['POST'])
-@require_auth
+@login_required
 @check_trial_limits(feature='voice_calls', usage_type='outbound_calls')
 def start_bulk_calls(agent_id):
     """Start outbound calls to selected contacts using Bolna AI"""
@@ -1142,7 +779,7 @@ def start_bulk_calls(agent_id):
         return jsonify({'message': f'Failed to initiate bulk calls: {str(e)}'}), 500
 
 @app.route('/api/call-logs', methods=['GET'])
-@require_auth
+@login_required
 def get_call_logs():
     """Get call logs for the user's enterprise"""
     try:
@@ -1180,7 +817,7 @@ def get_call_logs():
         return jsonify({'message': 'Failed to get call logs'}), 500
 
 @app.route('/api/call-logs/<call_log_id>/status', methods=['GET'])
-@require_auth
+@login_required
 def get_call_status(call_log_id):
     """Get real-time status of a call from Bolna API"""
     try:
@@ -2383,7 +2020,7 @@ def search_phone_numbers_production():
         }), 500
 
 @app.route('/api/phone-numbers/purchase', methods=['POST'])
-@require_auth
+@login_required
 @require_enterprise_context
 def purchase_phone_number_production():
     """Purchase a phone number (Production endpoint)"""
@@ -2517,7 +2154,7 @@ def purchase_phone_number_production():
         }), 500
 
 @app.route('/api/phone-numbers/owned', methods=['GET'])
-@require_auth
+@login_required
 @require_enterprise_context
 def get_owned_phone_numbers():
     """Get owned phone numbers for the enterprise"""
@@ -2561,7 +2198,7 @@ def get_owned_phone_numbers():
         }), 500
 
 @app.route('/api/phone-numbers/<phone_id>/release', methods=['DELETE'])
-@require_auth
+@login_required
 @require_enterprise_context
 def release_phone_number(phone_id):
     """Release a phone number"""
@@ -2620,7 +2257,7 @@ def release_phone_number(phone_id):
         }), 500
 
 @app.route('/api/phone-numbers/<phone_id>/assign-agent', methods=['POST'])
-@require_auth
+@login_required
 @require_enterprise_context
 def assign_phone_to_agent(phone_id):
     """Assign a phone number to a voice agent for outbound calling"""
@@ -2960,7 +2597,7 @@ def serve_admin_login():
 @app.route('/admin/dashboard')
 @app.route('/admin/dashboard.html')
 def serve_admin_dashboard():
-    """Serve superadmin dashboard - authentication is handled by Clerk on frontend"""
+    """Serve superadmin dashboard - authentication is handled by local auth system"""
     return send_from_directory(app.static_folder, 'admin-dashboard.html')
 
 @app.route('/temp-admin.html')
@@ -3063,7 +2700,7 @@ def get_voice_sample(language_code):
 # ============================================================================
 
 @app.route('/api/admin/stats', methods=['GET'])
-@require_auth
+@login_required
 def get_admin_stats():
     """Get system statistics for superadmin dashboard"""
     try:
@@ -3099,7 +2736,7 @@ def get_admin_stats():
         return jsonify({'message': 'Failed to get system statistics'}), 500
 
 @app.route('/api/admin/enterprises', methods=['GET'])
-@require_auth
+@login_required
 def get_admin_enterprises():
     """Get all enterprises for superadmin management"""
     try:
@@ -3121,7 +2758,7 @@ def get_admin_enterprises():
         return jsonify({'message': 'Failed to get enterprises'}), 500
 
 @app.route('/api/admin/enterprises', methods=['POST'])
-@require_auth
+@login_required
 def create_admin_enterprise():
     """Create a new enterprise (superadmin only)"""
     try:
@@ -3187,7 +2824,7 @@ def create_admin_enterprise():
         return jsonify({'message': 'Failed to create enterprise'}), 500
 
 @app.route('/api/admin/enterprises/<enterprise_id>', methods=['GET'])
-@require_auth
+@login_required
 def get_admin_enterprise(enterprise_id):
     """Get specific enterprise details (superadmin only)"""
     try:
@@ -3225,7 +2862,7 @@ def get_admin_enterprise(enterprise_id):
         return jsonify({'message': 'Failed to get enterprise'}), 500
 
 @app.route('/api/admin/enterprises/<enterprise_id>', methods=['PATCH'])
-@require_auth
+@login_required
 def update_admin_enterprise(enterprise_id):
     """Update enterprise (superadmin only)"""
     try:
@@ -3263,7 +2900,7 @@ def update_admin_enterprise(enterprise_id):
         return jsonify({'message': 'Failed to update enterprise'}), 500
 
 @app.route('/api/admin/users', methods=['GET'])
-@require_auth
+@login_required
 def get_admin_users():
     """Get all users for superadmin management"""
     try:
@@ -3300,9 +2937,16 @@ def serve_landing():
 
 @app.route('/dashboard.html')
 def serve_dashboard():
-    """Serve dashboard - authentication is handled by Clerk on frontend"""
-    # Always serve dashboard.html - Clerk will handle authentication on the frontend
+    """Serve dashboard - authentication is handled by local auth system"""
+    # Always serve dashboard.html - local auth will handle authentication on the frontend
     return send_from_directory(app.static_folder, 'dashboard.html')
+
+@app.route('/signup.html')
+@app.route('/signup')
+@app.route('/register')
+def serve_signup():
+    """Serve signup/registration page"""
+    return send_from_directory(app.static_folder, 'signup.html')
 
 @app.route('/agent-setup.html')
 def serve_agent_setup():

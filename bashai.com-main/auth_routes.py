@@ -69,36 +69,95 @@ def register():
         organization = data.get('organization')
         password = data.get('password')
         role = data.get('role', 'user')
-        
+
         if not all([email, name, organization, password]):
             return jsonify({'error': 'All fields required'}), 400
-        
+
         # Only admin can create admin/manager users
         if role in ['admin', 'manager']:
             token = request.headers.get('Authorization') or request.cookies.get('auth_token')
             if token and token.startswith('Bearer '):
                 token = token[7:]
-            
+
             if not token:
                 return jsonify({'error': 'Admin access required to create admin/manager users'}), 403
-            
+
             user_data = auth_manager.verify_token(token)
             if not user_data or user_data['role'] != 'admin':
                 return jsonify({'error': 'Admin access required'}), 403
-        
+
         user_id, error = auth_manager.create_user(email, name, organization, password, role)
-        
+
         if error:
             return jsonify({'error': error}), 400
-        
+
         return jsonify({
             'success': True,
             'message': 'User created successfully',
             'user_id': user_id
         }), 201
-        
+
     except Exception as e:
         return jsonify({'error': 'Registration failed', 'details': str(e)}), 500
+
+@auth_bp.route('/api/public/signup', methods=['POST'])
+def public_signup():
+    """Public signup endpoint for enterprise registration"""
+    try:
+        data = request.get_json()
+
+        # Extract data from signup form
+        enterprise_name = data.get('name')  # Enterprise name
+        owner_name = data.get('owner_name')  # Owner's name
+        email = data.get('contact_email')
+        phone = data.get('contact_phone')
+        password = data.get('password')
+        enterprise_type = data.get('type')
+
+        if not all([enterprise_name, owner_name, email, password]):
+            return jsonify({'error': 'Enterprise name, owner name, email, and password are required'}), 400
+
+        if len(password) < 6:
+            return jsonify({'error': 'Password must be at least 6 characters long'}), 400
+
+        # Create user with admin role for enterprise owner
+        user_data, error = auth_manager.register_user(
+            email=email,
+            password=password,
+            name=owner_name,
+            organization=enterprise_name,
+            role='admin',  # Enterprise owner gets admin role
+            status='active'
+        )
+
+        if error:
+            return jsonify({'success': False, 'message': error}), 400
+
+        # Generate token for immediate login
+        token = auth_manager.generate_token(user_data)
+
+        # Create response
+        response = make_response(jsonify({
+            'success': True,
+            'message': f'Enterprise "{enterprise_name}" created successfully!',
+            'user': {
+                'id': user_data['id'],
+                'email': user_data['email'],
+                'name': user_data['name'],
+                'role': user_data['role'],
+                'organization': user_data['organization']
+            },
+            'token': token
+        }))
+
+        # Set HTTP-only cookie for web clients
+        response.set_cookie('auth_token', token, httponly=True, secure=False, max_age=86400)
+
+        return response
+
+    except Exception as e:
+        print(f"Signup error: {e}")
+        return jsonify({'success': False, 'message': 'Registration failed. Please try again.'}), 500
 
 @auth_bp.route('/api/auth/profile', methods=['GET'])
 @login_required
@@ -109,7 +168,7 @@ def get_profile():
         return jsonify({'error': 'User not found'}), 404
     
     # Remove sensitive data
-    user_data.pop('password_hash', None)
+    user_data.pop('password', None)
     
     return jsonify({
         'success': True,
@@ -459,12 +518,56 @@ def login_page():
 
         <div id="message"></div>
 
+        <!-- Debug Panel -->
+        <div id="debugPanel" style="
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        ">
+            <h4 style="margin: 0 0 10px 0; color: #495057;">🐛 Debug Console:</h4>
+            <div id="debugLog" style="color: #6c757d;"></div>
+        </div>
+
         <div class="back-link">
             <a href="/">← Back to Home</a>
         </div>
     </div>
 
     <script>
+        // Debug logging function
+        function debugLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const debugDiv = document.getElementById('debugLog');
+            const colors = {
+                'info': '#17a2b8',
+                'success': '#28a745',
+                'error': '#dc3545',
+                'warning': '#ffc107'
+            };
+
+            const logEntry = document.createElement('div');
+            logEntry.style.color = colors[type] || '#6c757d';
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            debugDiv.appendChild(logEntry);
+            debugDiv.scrollTop = debugDiv.scrollHeight;
+
+            // Also log to browser console
+            console.log(`[DEBUG] ${message}`);
+        }
+
+        // Initialize debug
+        document.addEventListener('DOMContentLoaded', function() {
+            debugLog('🚀 Login page loaded', 'info');
+            debugLog('📱 User Agent: ' + navigator.userAgent.substring(0, 50) + '...', 'info');
+            debugLog('🌐 Current URL: ' + window.location.href, 'info');
+        });
+
         function showLogin() {
             document.querySelector('.tab.active').classList.remove('active');
             document.querySelectorAll('.tab')[0].classList.add('active');
@@ -480,38 +583,72 @@ def login_page():
         }
 
         function fillLoginCredentials(email, password) {
+            debugLog(`🎯 Filling demo credentials: ${email}`, 'info');
             document.getElementById('email').value = email;
             document.getElementById('password').value = password;
+            debugLog('✅ Demo credentials filled', 'success');
         }
 
         // Login Form Handler
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            debugLog('🔄 Form submitted, preventing default', 'info');
 
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const messageDiv = document.getElementById('message');
 
+            debugLog(`📧 Email: ${email}`, 'info');
+            debugLog(`🔒 Password length: ${password.length}`, 'info');
+
             messageDiv.innerHTML = '<div class="success">Logging in...</div>';
+            debugLog('🔄 Starting login API call...', 'info');
 
             try {
+                debugLog('📡 Sending POST request to /api/auth/login', 'info');
                 const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
 
+                debugLog(`📡 Response status: ${response.status}`, response.ok ? 'success' : 'error');
                 const data = await response.json();
+                debugLog(`📊 Response data: ${JSON.stringify(data)}`, 'info');
 
                 if (data.success) {
+                    debugLog('✅ Login successful!', 'success');
                     messageDiv.innerHTML = '<div class="success">✅ Login successful! Redirecting to dashboard...</div>';
-                    setTimeout(() => {
-                        window.location.href = '/dashboard';
-                    }, 1500);
+
+                    // Store token in localStorage
+                    if (data.token) {
+                        debugLog(`💾 Storing token: ${data.token.substring(0, 20)}...`, 'success');
+                        localStorage.setItem('auth_token', data.token);
+
+                        // Verify token was stored
+                        const storedToken = localStorage.getItem('auth_token');
+                        if (storedToken) {
+                            debugLog('✅ Token verified in localStorage', 'success');
+                        } else {
+                            debugLog('❌ Token NOT found in localStorage!', 'error');
+                        }
+
+                        // Immediate redirect after token storage
+                        debugLog('🚀 Redirecting to dashboard in 2 seconds...', 'info');
+                        setTimeout(() => {
+                            debugLog('🚀 Executing redirect now...', 'info');
+                            window.location.href = '/dashboard.html';
+                        }, 2000);
+                    } else {
+                        debugLog('❌ No token received in response!', 'error');
+                        messageDiv.innerHTML = '<div class="error">❌ Login failed: No token received</div>';
+                    }
                 } else {
+                    debugLog(`❌ Login failed: ${data.error}`, 'error');
                     messageDiv.innerHTML = '<div class="error">❌ ' + data.error + '</div>';
                 }
             } catch (error) {
+                debugLog(`❌ Login error: ${error.message}`, 'error');
                 messageDiv.innerHTML = '<div class="error">❌ Login failed: ' + error.message + '</div>';
             }
         });

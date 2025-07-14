@@ -48,7 +48,7 @@ def supabase_request(method, endpoint, data=None, params=None):
         return None
 
 def check_and_fix_admin_access():
-    """Check if admin user is properly configured for Clerk authentication"""
+    """Check if admin user is properly configured for local authentication"""
     
     print("=" * 60)
     print(" Fixing Admin Authentication Access")
@@ -66,7 +66,7 @@ def check_and_fix_admin_access():
         print(f"   Current ID: {user.get('id', 'None')}")
         print(f"   Enterprise ID: {user.get('enterprise_id', 'None')}")
         
-        # 2. The issue: When Clerk creates a user, it uses a different user_id
+        # 2. Using local authentication system instead of Clerk
         # We need to update the authentication flow to handle this
         print("\n2. Issue identified:")
         print("   - Admin user exists in database with local ID")

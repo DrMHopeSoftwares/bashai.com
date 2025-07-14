@@ -8,6 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --primary: #6366f1;
@@ -426,8 +427,9 @@
                         <i class="fas fa-user text-white"></i>
                     </div>
                     <div>
-                        <p class="text-gray-800 font-medium" id="userEmail">user@example.com</p>
-                        <p class="text-gray-600 text-sm">Premium Plan</p>
+                        <p class="text-gray-800 font-medium user-name">Loading...</p>
+                        <p class="text-gray-600 text-sm user-email">Loading...</p>
+                        <span class="user-role px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800">USER</span>
                     </div>
                 </div>
                 <button onclick="signOut()" class="w-full py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
@@ -2204,22 +2206,141 @@
     </div>
 
     <script>
-        // API helper function
+        // Authentication state
+        let currentUser = null;
+        let authToken = null;
+
+        // Initialize Authentication
+        async function initializeAuth() {
+            try {
+                // Check authentication
+                authToken = localStorage.getItem('auth_token') || getCookie('auth_token');
+
+                if (!authToken) {
+                    console.log('❌ No auth token found, redirecting to login');
+                    window.location.href = '/login';
+                    return false;
+                }
+
+                // Verify token with server
+                const response = await fetch('/api/auth/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    currentUser = await response.json();
+                    console.log('✅ User authenticated:', currentUser.user.email);
+                    updateUserInterface();
+                    return true;
+                } else {
+                    console.log('❌ Token invalid, redirecting to login');
+                    localStorage.removeItem('auth_token');
+                    window.location.href = '/login';
+                    return false;
+                }
+
+            } catch (error) {
+                console.error('❌ Authentication error:', error);
+                window.location.href = '/login';
+                return false;
+            }
+        }
+
+        // Update UI with user information
+        function updateUserInterface() {
+            if (currentUser && currentUser.user) {
+                const user = currentUser.user;
+
+                // Update user name in header
+                const userNameElements = document.querySelectorAll('.user-name');
+                userNameElements.forEach(el => {
+                    el.textContent = user.name || user.email;
+                });
+
+                // Update user email
+                const userEmailElements = document.querySelectorAll('.user-email');
+                userEmailElements.forEach(el => {
+                    el.textContent = user.email;
+                });
+
+                // Update user role badge
+                const userRoleElements = document.querySelectorAll('.user-role');
+                userRoleElements.forEach(el => {
+                    el.textContent = user.role.toUpperCase();
+                    el.className = `user-role px-2 py-1 rounded text-xs font-medium ${getRoleColor(user.role)}`;
+                });
+
+                // Show/hide admin features based on role
+                if (user.role === 'admin') {
+                    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+                } else {
+                    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+                }
+            }
+        }
+
+        // Get role color class
+        function getRoleColor(role) {
+            switch(role) {
+                case 'admin': return 'bg-red-100 text-red-800';
+                case 'manager': return 'bg-blue-100 text-blue-800';
+                case 'user': return 'bg-green-100 text-green-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        // Helper function to get cookie
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        // Logout function
+        async function logout() {
+            try {
+                await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+
+            localStorage.removeItem('auth_token');
+            window.location.href = '/login';
+        }
+
+        // API helper function with authentication
         async function apiRequest(url, options = {}) {
             const defaultOptions = {
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`,
                     ...options.headers
                 }
             };
-            
+
             const response = await fetch(url, { ...defaultOptions, ...options });
-            
+
+            if (response.status === 401) {
+                // Token expired or invalid
+                localStorage.removeItem('auth_token');
+                window.location.href = '/login';
+                return;
+            }
+
             if (!response.ok) {
                 const error = await response.json();
                 throw new Error(error.message || 'API request failed');
             }
-            
+
             return response.json();
         }
 
@@ -2329,17 +2450,18 @@
         }
 
         // Initialize dashboard
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             console.log('BhashAI Modern Dashboard loaded successfully!');
-            
-            // Get user info
-            const urlParams = new URLSearchParams(window.location.search);
-            const userEmail = urlParams.get('email') || localStorage.getItem('userEmail') || 'user@example.com';
-            
-            localStorage.setItem('userEmail', userEmail);
-            document.getElementById('userEmail').textContent = userEmail;
 
-            // Fetch real data
+            // Initialize authentication first
+            const isAuthenticated = await initializeAuth();
+            if (!isAuthenticated) {
+                return; // Will redirect to login
+            }
+
+            console.log('✅ Authentication successful, loading dashboard data...');
+
+            // Fetch real data after authentication
             fetchDashboardData();
 
             // Initialize charts
@@ -2990,8 +3112,9 @@
 
         // Sign out
         function signOut() {
-            localStorage.clear();
-            window.location.href = '/';
+            if (confirm('Are you sure you want to sign out?')) {
+                logout();
+            }
         }
 
         // Organization management variables
@@ -4197,8 +4320,7 @@
         // Authentication Functions
         function signOut() {
             if (confirm('Are you sure you want to sign out?')) {
-                localStorage.clear();
-                window.location.href = '/landing.html';
+                logout();
             }
         }
 

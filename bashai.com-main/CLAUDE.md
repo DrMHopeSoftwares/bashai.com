@@ -15,14 +15,13 @@ pip install -r requirements.txt
 
 # Configure environment
 cp .env.example .env
-# Edit .env with Supabase and Clerk credentials
+# Edit .env with Supabase credentials (Clerk removed)
 
 # Test database connection
 python test_connection.py
 
-# Test Clerk authentication
-python test_clerk_config.py
-python test_clerk_integration.py
+# Test local authentication (Clerk removed)
+python -c "from auth import auth_manager; print('Auth system ready')"
 ```
 
 ### Running the Application
@@ -38,7 +37,7 @@ gunicorn -w 4 -b 0.0.0.0:5000 main:app
 ```bash
 # No formal test suite - use individual test scripts:
 python test_connection.py      # Test Supabase connection
-python test_clerk_integration.py  # Test Clerk auth
+python -c "from auth_routes import auth_bp; print('Local auth ready')"  # Test local auth
 python test_contact_tables.py   # Test database tables
 python test_google_oauth.py     # Test OAuth flow
 ```
@@ -48,7 +47,7 @@ python test_google_oauth.py     # Test OAuth flow
 ### Monolithic Flask Application
 - Single `main.py` file containing all routes and business logic
 - Direct Supabase API calls via requests library (no ORM)
-- Dual authentication system: Supabase Auth + Clerk Auth
+- Local SQLite authentication system (Clerk removed)
 - Static frontend files served by Flask (no build process)
 
 ### Database Hierarchy
@@ -69,7 +68,7 @@ Enterprise (Trial Owner)
 - Channels: `/api/channels/*` - Communication channels
 
 ### Middleware Components
-- `clerk_auth.py` - Clerk authentication middleware
+- `auth.py` - Local authentication system
 - `trial_middleware.py` - Trial account limitations
 
 ### Environment Variables Required
@@ -78,14 +77,14 @@ SUPABASE_URL=https://your-project-id.supabase.co
 SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_KEY=your-service-key
 SECRET_KEY=your-secret-key
-CLERK_SECRET_KEY=your-clerk-secret-key
+# CLERK_SECRET_KEY removed - using local auth
 ```
 
 ### Current Implementation Status
 - Phase 1: Core Functionality ✅
 - Phase 2: Supabase Integration ✅
 - Phase 3: Advanced AI Integration (In Progress)
-- Using Clerk Auth integration for enterprise authentication
+- Using local SQLite authentication for all users
 
 ### Database Schema
 Apply schema using Supabase SQL Editor:

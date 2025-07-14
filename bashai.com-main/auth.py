@@ -96,34 +96,59 @@ class AuthManager:
             return None
     
     def authenticate_user(self, email, password):
-        """Authenticate user with email and password"""
-        conn = sqlite3.connect(self.db_path)
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-        
-        cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
-        user = cursor.fetchone()
-        
-        if not user:
-            conn.close()
-            return None, "User not found"
-        
-        if user['status'] != 'active':
-            conn.close()
-            return None, f"Account is {user['status']}"
-        
-        if not self.verify_password(password, user['password_hash']):
-            conn.close()
-            return None, "Invalid password"
-        
-        # Update last login
-        cursor.execute('UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?', (user['id'],))
-        conn.commit()
-        
-        user_data = dict(user)
-        conn.close()
-        
-        return user_data, None
+        """Authenticate user with email and password - Updated for Supabase"""
+        import requests
+
+        # Supabase configuration
+        SUPABASE_URL = os.getenv("SUPABASE_URL")
+        SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
+
+        if not SUPABASE_URL or not SUPABASE_SERVICE_KEY:
+            return None, "Database configuration error"
+
+        headers = {
+            'apikey': SUPABASE_SERVICE_KEY,
+            'Authorization': f'Bearer {SUPABASE_SERVICE_KEY}',
+            'Content-Type': 'application/json'
+        }
+
+        try:
+            # Get user from Supabase
+            response = requests.get(
+                f"{SUPABASE_URL}/rest/v1/users",
+                headers=headers,
+                params={'email': f'eq.{email}', 'select': '*'}
+            )
+
+            if response.status_code != 200:
+                return None, "Database connection error"
+
+            users = response.json()
+            if not users or len(users) == 0:
+                return None, "Invalid email or password"
+
+            user = users[0]
+
+            # Check password using bcrypt verification
+            stored_password = user.get('password')
+            if not stored_password:
+                return None, "Password not set for this account"
+
+            # Verify password using bcrypt
+            if not self.verify_password(password, stored_password):
+                return None, "Invalid email or password"
+
+            # Check status
+            if user['status'] != 'active':
+                return None, f"Account is {user['status']}"
+
+            # Remove password from returned data
+            user.pop('password', None)
+
+            return user, None
+
+        except Exception as e:
+            return None, f"Authentication failed: {str(e)}"
     
     def get_user_by_id(self, user_id):
         """Get user by ID"""
@@ -162,6 +187,67 @@ class AuthManager:
             return user_id, None
         except Exception as e:
             conn.close()
+            return None, str(e)
+
+    def register_user(self, email, password, name, organization, role='user', status='active', enterprise_id=None):
+        """Register new user and return user data - Updated for Supabase"""
+        import requests
+        import uuid
+
+        # Supabase configuration
+        SUPABASE_URL = os.getenv("SUPABASE_URL")
+        SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
+
+        if not SUPABASE_URL or not SUPABASE_SERVICE_KEY:
+            return None, "Database configuration error"
+
+        headers = {
+            'apikey': SUPABASE_SERVICE_KEY,
+            'Authorization': f'Bearer {SUPABASE_SERVICE_KEY}',
+            'Content-Type': 'application/json'
+        }
+
+        try:
+            # Check if user already exists
+            response = requests.get(
+                f"{SUPABASE_URL}/rest/v1/users",
+                headers=headers,
+                params={'email': f'eq.{email}', 'select': 'id'}
+            )
+
+            if response.status_code == 200 and response.json():
+                return None, "User with this email already exists"
+
+            # Hash the password before storing
+            password_hash = self.hash_password(password)
+
+            # Create user data
+            user_data = {
+                'id': str(uuid.uuid4()),
+                'email': email,
+                'name': name,
+                'organization': organization,
+                'password': password_hash,  # Store hashed password
+                'role': role,
+                'status': status,
+                'enterprise_id': enterprise_id
+            }
+
+            # Insert user into Supabase
+            response = requests.post(
+                f"{SUPABASE_URL}/rest/v1/users",
+                headers=headers,
+                json=user_data
+            )
+
+            if response.status_code == 201:
+                # Remove password from returned data
+                user_data.pop('password', None)
+                return user_data, None
+            else:
+                return None, f"Registration failed: {response.text}"
+
+        except Exception as e:
             return None, str(e)
 
 # Initialize global auth manager
