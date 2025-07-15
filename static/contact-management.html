@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Management - BhashAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Sidebar specific glassmorphism with dark background for better contrast */
+        .sidebar .glassmorphism {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Enhanced sidebar stats styling */
+        .sidebar .glassmorphism h3 {
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .sidebar .glassmorphism .text-white {
+            color: #ffffff !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .sidebar .glassmorphism .text-white\/80 {
+            color: rgba(255, 255, 255, 0.9) !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Progress ring text styling */
+        .sidebar .glassmorphism .progress-ring-text {
+            color: #ffffff !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Enhanced visual styling for sidebar stats */
+        .sidebar .glassmorphism {
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+        }
+
+        /* Ensure all text in sidebar glassmorphism is visible */
+        .sidebar .glassmorphism * {
+            color: inherit;
+        }
+
+        .sidebar .glassmorphism .text-lg,
+        .sidebar .glassmorphism .text-xs {
+            color: #ffffff !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            margin: 4px 0;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid #fff;
+        }
+
+        .contact-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .contact-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .contact-card:hover::before {
+            left: 100%;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.15);
+            border-color: var(--primary);
+        }
+
+        .contact-card.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.2);
+        }
+
+        .quick-action {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-action::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .quick-action:hover::before {
+            left: 100%;
+        }
+
+        .quick-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 16px 20px;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            padding: 16px 24px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .filter-chip {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 8px 16px;
+            margin: 4px;
+            cursor: pointer;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .filter-chip:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .filter-chip.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .contact-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            margin-right: 16px;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-active { background: #10b981; }
+        .status-inactive { background: #6b7280; }
+        .status-pending { background: #f59e0b; }
+
+        .action-button {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 8px 12px;
+            margin: 2px;
+            cursor: pointer;
+            color: #374151;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .action-button:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .bulk-action-bar {
+            background: linear-gradient(135deg, var(--success), #059669);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 16px 24px;
+            color: white;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .bulk-action-bar.show {
+            transform: translateY(0);
+        }
+
+        .stats-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .stats-card:hover::before {
+            left: 100%;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            stroke-dasharray: 251.2;
+            stroke-dashoffset: 251.2;
+            transition: stroke-dashoffset 0.5s ease-in-out;
+        }
+
+        .table-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .table-row {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .table-row:hover {
+            transform: translateX(4px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.1);
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="fixed left-0 top-0 h-full w-72 sidebar z-50">
+        <div class="p-6">
+            <div class="flex items-center mb-8">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center mr-3">
+                    <i class="fas fa-microphone-alt text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-white text-xl font-bold">BhashAI</h1>
+                    <p class="text-white/70 text-sm">Contact Management</p>
+                </div>
+            </div>
+
+            <nav class="space-y-2 mb-8">
+                <a href="/dashboard.html" class="nav-item flex items-center p-3 text-white/80">
+                    <i class="fas fa-chart-pie mr-3"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/create-agent.html" class="nav-item flex items-center p-3 text-white/80">
+                    <i class="fas fa-plus mr-3"></i>
+                    <span>Create Agent</span>
+                </a>
+                <a href="/agent-setup.html" class="nav-item flex items-center p-3 text-white/80">
+                    <i class="fas fa-robot mr-3"></i>
+                    <span>Voice Agents</span>
+                </a>
+                <a href="#" class="nav-item active flex items-center p-3 text-white">
+                    <i class="fas fa-address-book mr-3"></i>
+                    <span>Contacts</span>
+                </a>
+            </nav>
+
+            <!-- Contact Statistics -->
+            <div class="glassmorphism rounded-xl p-4 mb-6">
+                <h3 class="text-white font-semibold mb-4">📊 Contact Stats</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between text-white/80">
+                        <span>Total Contacts:</span>
+                        <span class="font-bold text-white">247</span>
+                    </div>
+                    <div class="flex justify-between text-white/80">
+                        <span>Active:</span>
+                        <span class="font-bold text-green-400">198</span>
+                    </div>
+                    <div class="flex justify-between text-white/80">
+                        <span>Pending:</span>
+                        <span class="font-bold text-yellow-400">34</span>
+                    </div>
+                    <div class="flex justify-between text-white/80">
+                        <span>Inactive:</span>
+                        <span class="font-bold text-gray-400">15</span>
+                    </div>
+                </div>
+                
+                <!-- Progress Ring for Contact Health -->
+                <div class="mt-4 flex justify-center">
+                    <svg class="progress-ring w-20 h-20">
+                        <circle cx="40" cy="40" r="35" stroke="rgba(255,255,255,0.2)" stroke-width="6" fill="transparent"/>
+                        <circle cx="40" cy="40" r="35" stroke="url(#gradient)" stroke-width="6" fill="transparent"
+                                class="progress-ring-circle" style="stroke-dashoffset: 50.24;"/>
+                        <defs>
+                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#10b981"/>
+                                <stop offset="100%" style="stop-color:#06b6d4"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <div class="absolute mt-6 text-white text-center">
+                        <div class="text-lg font-bold">80%</div>
+                        <div class="text-xs">Health</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="glassmorphism rounded-xl p-4">
+                <h3 class="text-white font-semibold mb-4">⚡ Quick Actions</h3>
+                <div class="space-y-3">
+                    <button class="quick-action w-full" onclick="addContact()">
+                        <i class="fas fa-plus mr-2"></i>Add Contact
+                    </button>
+                    <button class="quick-action w-full" onclick="importContacts()">
+                        <i class="fas fa-upload mr-2"></i>Import CSV
+                    </button>
+                    <button class="quick-action w-full" onclick="exportContacts()">
+                        <i class="fas fa-download mr-2"></i>Export Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="ml-72 min-h-screen">
+        <!-- Header -->
+        <header class="glassmorphism border-b border-white/20 p-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">📇 Contact Management</h1>
+                    <p class="text-gray-600">Manage your customer and patient contact database</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="quick-action" onclick="syncContacts()">
+                        <i class="fas fa-sync mr-2"></i>Sync
+                    </button>
+                    <button class="quick-action" onclick="addContact()">
+                        <i class="fas fa-plus mr-2"></i>Add Contact
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Bulk Action Bar -->
+        <div id="bulkActionBar" class="bulk-action-bar mx-6 mt-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle mr-3"></i>
+                    <span id="selectedCount">0</span> contacts selected
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="bulkEdit()" class="action-button bg-blue-500 text-white">
+                        <i class="fas fa-edit mr-2"></i>Edit
+                    </button>
+                    <button onclick="bulkDelete()" class="action-button bg-red-500 text-white">
+                        <i class="fas fa-trash mr-2"></i>Delete
+                    </button>
+                    <button onclick="clearSelection()" class="action-button bg-gray-500 text-white">
+                        <i class="fas fa-times mr-2"></i>Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="p-6">
+            <div class="glassmorphism rounded-2xl p-6 mb-6">
+                <div class="flex flex-col lg:flex-row gap-4 items-center">
+                    <div class="relative flex-1">
+                        <i class="fas fa-search absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="searchInput" placeholder="Search contacts by name, phone, or email..." 
+                               class="search-box w-full pl-14" oninput="searchContacts()">
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <div class="filter-chip active" onclick="filterContacts('all')">
+                            <i class="fas fa-users mr-2"></i>All
+                        </div>
+                        <div class="filter-chip" onclick="filterContacts('active')">
+                            <i class="fas fa-check-circle mr-2"></i>Active
+                        </div>
+                        <div class="filter-chip" onclick="filterContacts('pending')">
+                            <i class="fas fa-clock mr-2"></i>Pending
+                        </div>
+                        <div class="filter-chip" onclick="filterContacts('inactive')">
+                            <i class="fas fa-times-circle mr-2"></i>Inactive
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="stats-card floating">
+                    <div class="text-3xl mb-2">👥</div>
+                    <div class="text-2xl font-bold text-gray-800">247</div>
+                    <div class="text-gray-600">Total Contacts</div>
+                </div>
+                <div class="stats-card floating" style="animation-delay: 0.2s;">
+                    <div class="text-3xl mb-2">✅</div>
+                    <div class="text-2xl font-bold text-green-600">198</div>
+                    <div class="text-gray-600">Active</div>
+                </div>
+                <div class="stats-card floating" style="animation-delay: 0.4s;">
+                    <div class="text-3xl mb-2">📞</div>
+                    <div class="text-2xl font-bold text-blue-600">1,247</div>
+                    <div class="text-gray-600">Calls This Month</div>
+                </div>
+                <div class="stats-card floating" style="animation-delay: 0.6s;">
+                    <div class="text-3xl mb-2">⭐</div>
+                    <div class="text-2xl font-bold text-purple-600">4.8</div>
+                    <div class="text-gray-600">Avg Rating</div>
+                </div>
+            </div>
+
+            <!-- Contacts List -->
+            <div class="glassmorphism rounded-2xl p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Contact List</h3>
+                    <div class="flex space-x-2">
+                        <button onclick="toggleView('grid')" class="action-button" id="gridViewBtn">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button onclick="toggleView('list')" class="action-button active" id="listViewBtn">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- List View -->
+                <div id="listView" class="space-y-4">
+                    <!-- Table Header -->
+                    <div class="table-header">
+                        <div class="grid grid-cols-12 gap-4 text-white font-semibold text-sm">
+                            <div class="col-span-1">
+                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll()" class="w-4 h-4">
+                            </div>
+                            <div class="col-span-3">Contact</div>
+                            <div class="col-span-2">Phone</div>
+                            <div class="col-span-2">Email</div>
+                            <div class="col-span-2">Status</div>
+                            <div class="col-span-2">Actions</div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Rows -->
+                    <div class="table-row slide-in" data-contact-id="1">
+                        <div class="grid grid-cols-12 gap-4 items-center">
+                            <div class="col-span-1">
+                                <input type="checkbox" class="contact-checkbox w-4 h-4" onchange="updateSelection()">
+                            </div>
+                            <div class="col-span-3 flex items-center">
+                                <div class="contact-avatar">R</div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">राजेश कुमार</div>
+                                    <div class="text-sm text-gray-500">Patient ID: P001</div>
+                                </div>
+                            </div>
+                            <div class="col-span-2">
+                                <div class="font-medium">+91 98765 43210</div>
+                                <div class="text-sm text-gray-500">Mobile</div>
+                            </div>
+                            <div class="col-span-2">
+                                <div class="font-medium">rajesh@example.com</div>
+                                <div class="text-sm text-gray-500">Verified</div>
+                            </div>
+                            <div class="col-span-2">
+                                <div class="flex items-center">
+                                    <div class="status-indicator status-active"></div>
+                                    <span class="text-sm font-medium text-green-600">Active</span>
+                                </div>
+                                <div class="text-xs text-gray-500">Last call: 2 days ago</div>
+                            </div>
+                            <div class="col-span-2 flex space-x-2">
+                                <button class="action-button" onclick="editContact(1)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-button" onclick="callContact(1)">
+                                    <i class="fas fa-phone"></i>
+                                </button>
+                                <button class="action-button" onclick="viewContact(1)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-row slide-in" data-contact-id="2" style="animation-delay: 0.1s;">
+                        <div class="grid grid-cols-12 gap-4 items-center">
+                            <div class="col-span-1">
+                                <input type="checkbox" class="contact-checkbox w-4 h-4" onchange="updateSelection()">
+                            </div>
+                            <div class="col-span-3 flex items-center">
+                                <div class="contact-avatar">P</div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">प्रिया शर्मा</div>
+                                    <div class="text-sm text-gray-500">Patient ID: P002</div>
+                                </div>
+                            </div>
+                            <div class="col-span-2">
+                                <div class="font-medium">+91 87654 32109</div>
+                                <div class="text-sm text-gray-500">Mobile</div>
+                            </div>
+                            <div class="col-span-2">
+                                <div class="font-medium">priya@example.com</div>
+                                <div class="text-sm text-gray-500">Verified</div>
+                            </div>
+                            <div class="col-span-2">
+                                <div class="flex items-center">
+                                    <div class="status-indicator status-pending"></div>
+                                    <span class="text-sm font-medium text-yellow-600">Pending</span>
+                                </div>
+                                <div class="text-xs text-gray-500">Awaiting callback</div>
+                            </div>
+                            <div class="col-span-2 flex space-x-2">
+                                <button class="action-button" onclick="editContact(2)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-button" onclick="callContact(2)">
+                                    <i class="fas fa-phone"></i>
+                                </button>
+                                <button class="action-button" onclick="viewContact(2)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-row slide-in" data-contact-id="3" style="animation-delay: 0.2s;">
+                        <div class="grid grid-cols-12 gap-4 items-center">
+                            <div class="col-span-1">
+                                <input type="checkbox" class="contact-checkbox w-4 h-4" onchange="updateSelection()">
+                            </div>
+                            <div class="col-span-3 flex items-center">
+                                <div class="contact-avatar">A</div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">अमित गुप्ता</div>
+                                    <div class="text-sm text-gray-500">Patient ID: P003</div>
+                                </div>
+                            </div>
+                            <div class="col-span-2">
+                                <div class="font-medium">+91 76543 21098</div>
+                                <div class="text-sm text-gray-500">Mobile</div>
+                            </div>
+                            <div class="col-span-2">
+                                <div class="font-medium">amit@example.com</div>
+                                <div class="text-sm text-gray-500">Unverified</div>
+                            </div>
+                            <div class="col-span-2">
+                                <div class="flex items-center">
+                                    <div class="status-indicator status-active"></div>
+                                    <span class="text-sm font-medium text-green-600">Active</span>
+                                </div>
+                                <div class="text-xs text-gray-500">Last call: 1 hour ago</div>
+                            </div>
+                            <div class="col-span-2 flex space-x-2">
+                                <button class="action-button" onclick="editContact(3)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-button" onclick="callContact(3)">
+                                    <i class="fas fa-phone"></i>
+                                </button>
+                                <button class="action-button" onclick="viewContact(3)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid View (Hidden by default) -->
+                <div id="gridView" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style="display: none;">
+                    <div class="contact-card slide-in">
+                        <div class="flex items-center mb-4">
+                            <div class="contact-avatar mr-4">R</div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-800">राजेश कुमार</h4>
+                                <p class="text-sm text-gray-500">Patient ID: P001</p>
+                            </div>
+                            <input type="checkbox" class="contact-checkbox">
+                        </div>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center text-sm">
+                                <i class="fas fa-phone mr-2 text-gray-400"></i>
+                                <span>+91 98765 43210</span>
+                            </div>
+                            <div class="flex items-center text-sm">
+                                <i class="fas fa-envelope mr-2 text-gray-400"></i>
+                                <span>rajesh@example.com</span>
+                            </div>
+                            <div class="flex items-center text-sm">
+                                <div class="status-indicator status-active"></div>
+                                <span class="text-green-600">Active</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="action-button flex-1" onclick="editContact(1)">Edit</button>
+                            <button class="action-button flex-1" onclick="callContact(1)">Call</button>
+                            <button class="action-button flex-1" onclick="viewContact(1)">View</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="flex justify-between items-center mt-8">
+                    <div class="text-sm text-gray-600">
+                        Showing 1-10 of 247 contacts
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="action-button" onclick="previousPage()">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="action-button active">1</button>
+                        <button class="action-button">2</button>
+                        <button class="action-button">3</button>
+                        <button class="action-button">...</button>
+                        <button class="action-button">25</button>
+                        <button class="action-button" onclick="nextPage()">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Contact Modal -->
+    <div id="contactModal" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50">
+        <div class="modal-content max-w-2xl w-full mx-4 p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800" id="modalTitle">Add New Contact</h3>
+                <button onclick="closeContactModal()" class="action-button">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="contactForm" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Full Name *</label>
+                        <input type="text" id="contactName" class="form-input" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Phone Number *</label>
+                        <input type="tel" id="contactPhone" class="form-input" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                        <input type="email" id="contactEmail" class="form-input">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                        <select id="contactStatus" class="form-input">
+                            <option value="active">Active</option>
+                            <option value="pending">Pending</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Preferred Language</label>
+                        <select id="contactLanguage" class="form-input">
+                            <option value="hindi">हिंदी (Hindi)</option>
+                            <option value="english">English</option>
+                            <option value="hinglish">Hinglish</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Agent Assignment</label>
+                        <select id="contactAgent" class="form-input">
+                            <option value="">Auto-assign</option>
+                            <option value="appointment">Appointment Agent</option>
+                            <option value="support">Support Agent</option>
+                            <option value="prescription">Prescription Agent</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Notes</label>
+                    <textarea id="contactNotes" class="form-input" rows="3" placeholder="Additional notes about this contact..."></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-4 pt-6">
+                    <button type="button" onclick="closeContactModal()" class="action-button">Cancel</button>
+                    <button type="submit" class="quick-action">
+                        <i class="fas fa-save mr-2"></i>Save Contact
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let selectedContacts = [];
+        let currentView = 'list';
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Contact Management page loaded successfully!');
+            loadContacts(); // Load real contacts from API
+        });
+
+        // Search functionality
+        function searchContacts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const contactRows = document.querySelectorAll('.table-row');
+            
+            contactRows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = 'block';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Filter functionality
+        function filterContacts(filter) {
+            // Update active filter chip
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Filter logic would go here
+            console.log('Filtering by:', filter);
+        }
+
+        // View toggle
+        function toggleView(view) {
+            currentView = view;
+            
+            if (view === 'grid') {
+                document.getElementById('listView').style.display = 'none';
+                document.getElementById('gridView').style.display = 'grid';
+                document.getElementById('gridViewBtn').classList.add('active');
+                document.getElementById('listViewBtn').classList.remove('active');
+            } else {
+                document.getElementById('listView').style.display = 'block';
+                document.getElementById('gridView').style.display = 'none';
+                document.getElementById('listViewBtn').classList.add('active');
+                document.getElementById('gridViewBtn').classList.remove('active');
+            }
+        }
+
+        // Selection management
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.contact-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+            
+            updateSelection();
+        }
+
+        function updateSelection() {
+            const checkboxes = document.querySelectorAll('.contact-checkbox:checked');
+            selectedContacts = Array.from(checkboxes).map(cb => cb.closest('[data-contact-id]')?.dataset.contactId).filter(Boolean);
+            
+            document.getElementById('selectedCount').textContent = selectedContacts.length;
+            
+            if (selectedContacts.length > 0) {
+                document.getElementById('bulkActionBar').classList.add('show');
+            } else {
+                document.getElementById('bulkActionBar').classList.remove('show');
+            }
+        }
+
+        function clearSelection() {
+            document.querySelectorAll('.contact-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            document.getElementById('selectAll').checked = false;
+            updateSelection();
+        }
+
+        // Load contacts from API
+        async function loadContacts() {
+            try {
+                // Get current agent ID from URL or localStorage
+                const urlParams = new URLSearchParams(window.location.search);
+                const agentId = urlParams.get('agentId') || localStorage.getItem('currentAgentId');
+                
+                if (!agentId) {
+                    console.warn('No agent ID found, loading all contacts');
+                    // Load all agents and their contacts
+                    const agentsResponse = await apiRequest('/api/voice-agents');
+                    const agents = agentsResponse.data || [];
+                    
+                    let allContacts = [];
+                    for (const agent of agents) {
+                        try {
+                            const contactsResponse = await apiRequest(`/api/voice-agents/${agent.id}/contacts`);
+                            const contacts = (contactsResponse.data || []).map(contact => ({
+                                ...contact,
+                                agentName: agent.name
+                            }));
+                            allContacts = allContacts.concat(contacts);
+                        } catch (err) {
+                            console.error('Error fetching contacts for agent:', agent.id);
+                        }
+                    }
+                    
+                    updateContactsDisplay(allContacts);
+                    updateStats(allContacts);
+                } else {
+                    // Load contacts for specific agent
+                    const contactsResponse = await apiRequest(`/api/voice-agents/${agentId}/contacts`);
+                    const contacts = contactsResponse.data || [];
+                    updateContactsDisplay(contacts);
+                    updateStats(contacts);
+                }
+                
+            } catch (error) {
+                console.error('Error loading contacts:', error);
+            }
+        }
+
+        // Update contacts display
+        function updateContactsDisplay(contacts) {
+            const container = document.querySelector('.space-y-4');
+            if (!contacts || contacts.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-500 py-8">No contacts found</div>';
+                return;
+            }
+            
+            const contactsHtml = contacts.map(contact => {
+                const statusClass = contact.status === 'active' ? 'green' : contact.status === 'inactive' ? 'red' : 'yellow';
+                return `
+                    <div class="contact-card" data-contact-id="${contact.id}">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-start space-x-4">
+                                <input type="checkbox" class="contact-checkbox mt-1" value="${contact.id}" onchange="updateSelection()">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-3 mb-2">
+                                        <h3 class="font-semibold text-gray-900">${contact.name}</h3>
+                                        <span class="px-2 py-1 text-xs rounded-full bg-${statusClass}-100 text-${statusClass}-800">${contact.status || 'active'}</span>
+                                    </div>
+                                    <div class="space-y-1 text-sm text-gray-600">
+                                        <div><i class="fas fa-phone mr-2"></i>${contact.phone}</div>
+                                        ${contact.email ? `<div><i class="fas fa-envelope mr-2"></i>${contact.email}</div>` : ''}
+                                        ${contact.agentName ? `<div><i class="fas fa-robot mr-2"></i>${contact.agentName}</div>` : ''}
+                                    </div>
+                                    ${contact.notes ? `<p class="text-sm text-gray-500 mt-2">${contact.notes}</p>` : ''}
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="callContact('${contact.id}')" class="btn-icon text-green-600 hover:text-green-700" title="Call">
+                                    <i class="fas fa-phone"></i>
+                                </button>
+                                <button onclick="editContact('${contact.id}')" class="btn-icon text-blue-600 hover:text-blue-700" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="viewContact('${contact.id}')" class="btn-icon text-gray-600 hover:text-gray-700" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = contactsHtml;
+        }
+
+        // Update statistics
+        function updateStats(contacts) {
+            const total = contacts.length;
+            const active = contacts.filter(c => c.status === 'active').length;
+            const inactive = contacts.filter(c => c.status === 'inactive').length;
+            
+            document.querySelector('.stat-card:nth-child(1) .text-3xl').textContent = total;
+            document.querySelector('.stat-card:nth-child(2) .text-3xl').textContent = active;
+            document.querySelector('.stat-card:nth-child(3) .text-3xl').textContent = inactive;
+        }
+
+        // Contact actions
+        function addContact() {
+            document.getElementById('modalTitle').textContent = 'Add New Contact';
+            document.getElementById('contactForm').reset();
+            document.getElementById('contactModal').classList.remove('hidden');
+        }
+
+        function editContact(contactId) {
+            document.getElementById('modalTitle').textContent = 'Edit Contact';
+            // Load contact data here
+            document.getElementById('contactModal').classList.remove('hidden');
+            console.log('Editing contact:', contactId);
+        }
+
+        function viewContact(contactId) {
+            console.log('Viewing contact:', contactId);
+            // Implementation would show detailed contact view
+        }
+
+        function callContact(contactId) {
+            console.log('Calling contact:', contactId);
+            alert('📞 Initiating call to contact...\n\nThis would connect to your voice agent system.');
+        }
+
+        function closeContactModal() {
+            document.getElementById('contactModal').classList.add('hidden');
+        }
+
+        // API helper function
+        async function apiRequest(url, options = {}) {
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                }
+            };
+            
+            const response = await fetch(url, { ...defaultOptions, ...options });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'API request failed');
+            }
+            
+            return response.json();
+        }
+
+        // Form submission
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('contactName').value,
+                phone: document.getElementById('contactPhone').value,
+                email: document.getElementById('contactEmail').value,
+                status: document.getElementById('contactStatus').value,
+                language: document.getElementById('contactLanguage').value,
+                notes: document.getElementById('contactNotes').value
+            };
+            
+            const agentId = document.getElementById('contactAgent').value;
+            
+            // Validate phone number format
+            const phoneRegex = /^\+91[0-9]{10}$/;
+            if (!phoneRegex.test(formData.phone)) {
+                alert('Please enter a valid phone number in format +91XXXXXXXXXX');
+                return;
+            }
+            
+            try {
+                // Save contact to API
+                const response = await apiRequest(`/api/voice-agents/${agentId}/contacts`, {
+                    method: 'POST',
+                    body: JSON.stringify(formData)
+                });
+                
+                alert('✅ Contact saved successfully!');
+                closeContactModal();
+                
+                // Reload contacts
+                loadContacts();
+                
+            } catch (error) {
+                console.error('Error saving contact:', error);
+                alert('❌ Error saving contact: ' + error.message);
+            }
+        });
+
+        // Bulk actions
+        function bulkEdit() {
+            alert('✏️ Bulk edit for ' + selectedContacts.length + ' contacts');
+        }
+
+        function bulkDelete() {
+            if (confirm('Are you sure you want to delete ' + selectedContacts.length + ' contacts?')) {
+                alert('🗑️ Contacts deleted successfully!');
+                clearSelection();
+            }
+        }
+
+        // Import/Export functions
+        function importContacts() {
+            alert('📁 CSV Import functionality will open a file picker and process the uploaded contacts.');
+        }
+
+        function exportContacts() {
+            alert('💾 Exporting all contacts to CSV file...');
+        }
+
+        function syncContacts() {
+            alert('🔄 Syncing contacts with external systems...');
+        }
+
+        // Pagination
+        function previousPage() {
+            console.log('Previous page');
+        }
+
+        function nextPage() {
+            console.log('Next page');
+        }
+    </script>
+</body>
+</html>

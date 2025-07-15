@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organization Details - BhashAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        .breadcrumb a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        .breadcrumb-separator {
+            margin: 0 8px;
+            color: #d1d5db;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        .channel-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .channel-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .channel-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .inbound-channel { background: #10b981; }
+        .outbound-channel { background: #f59e0b; }
+        .whatsapp-channel { background: #25d366; }
+        .btn {
+            background: #4f46e5;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #4338ca;
+        }
+        .btn-secondary {
+            background: #6b7280;
+        }
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stats-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+        }
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .stats-label {
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen bg-gray-50">
+        <!-- Header -->
+        <header class="bg-white border-b border-gray-200 px-6 py-4">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-900">🗣️ BhashAI</h1>
+                <div class="flex items-center space-x-4">
+                    <span id="userEmail" class="text-gray-600">user@example.com</span>
+                    <a href="/dashboard.html" class="btn btn-secondary">Dashboard</a>
+                </div>
+            </div>
+        </header>
+
+        <div class="max-w-7xl mx-auto px-6 py-8">
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb">
+                <a href="/dashboard.html">Dashboard</a>
+                <span class="breadcrumb-separator">›</span>
+                <a href="/dashboard.html">Organizations</a>
+                <span class="breadcrumb-separator">›</span>
+                <span id="orgName">Main Hospital</span>
+            </nav>
+
+            <!-- Organization Header -->
+            <div class="card">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900 mb-2" id="organizationName">Main Hospital</h1>
+                        <p class="text-gray-600 mb-4" id="organizationDesc">Leading business organization providing comprehensive customer services</p>
+                        <div class="flex items-center space-x-4 text-sm text-gray-500">
+                            <span>📍 <span id="orgLocation">Mumbai, Maharashtra</span></span>
+                            <span>📞 <span id="orgPhone">+91 98765 43210</span></span>
+                            <span>✅ Active</span>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="editOrganization()">Edit Organization</button>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stats-card">
+                        <div class="stats-number" id="channelCount">3</div>
+                        <div class="stats-label">Communication Channels</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-number" id="agentCount">8</div>
+                        <div class="stats-label">Voice Agents</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-number" id="contactCount">156</div>
+                        <div class="stats-label">Total Contacts</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-number" id="callCount">1,234</div>
+                        <div class="stats-label">Calls This Month</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Communication Channels -->
+            <div class="card">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold">Communication Channels</h2>
+                    <button class="btn" onclick="addChannel()">Add Channel</button>
+                </div>
+
+                <div class="grid gap-6 md:grid-cols-3">
+                    <!-- Inbound Channel -->
+                    <div class="channel-card" onclick="openChannel('inbound')">
+                        <div class="channel-icon inbound-channel">
+                            📞
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2">Inbound Calls</h3>
+                        <p class="text-gray-600 mb-4">Handle incoming customer calls and inquiries</p>
+                        <div class="flex justify-between items-center text-sm text-gray-500 mb-4">
+                            <span>3 Voice Agents</span>
+                            <span>45 Contacts</span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="btn" onclick="event.stopPropagation(); openChannel('inbound')">Manage</button>
+                            <button class="btn btn-secondary" onclick="event.stopPropagation(); viewChannelStats('inbound')">Analytics</button>
+                        </div>
+                    </div>
+
+                    <!-- Outbound Channel -->
+                    <div class="channel-card" onclick="openChannel('outbound')">
+                        <div class="channel-icon outbound-channel">
+                            📲
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2">Outbound Calls</h3>
+                        <p class="text-gray-600 mb-4">Proactive customer outreach and follow-ups</p>
+                        <div class="flex justify-between items-center text-sm text-gray-500 mb-4">
+                            <span>2 Voice Agents</span>
+                            <span>78 Contacts</span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="btn" onclick="event.stopPropagation(); openChannel('outbound')">Manage</button>
+                            <button class="btn btn-secondary" onclick="event.stopPropagation(); viewChannelStats('outbound')">Analytics</button>
+                        </div>
+                    </div>
+
+                    <!-- WhatsApp Channel -->
+                    <div class="channel-card" onclick="openChannel('whatsapp')">
+                        <div class="channel-icon whatsapp-channel">
+                            💬
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2">WhatsApp</h3>
+                        <p class="text-gray-600 mb-4">WhatsApp messaging and voice notes</p>
+                        <div class="flex justify-between items-center text-sm text-gray-500 mb-4">
+                            <span>3 Voice Agents</span>
+                            <span>33 Contacts</span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="btn" onclick="event.stopPropagation(); openChannel('whatsapp')">Manage</button>
+                            <button class="btn btn-secondary" onclick="event.stopPropagation(); viewChannelStats('whatsapp')">Analytics</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="card">
+                <h2 class="text-xl font-semibold mb-4">Recent Activity</h2>
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <div class="flex-1">
+                            <p class="font-medium">New sales booking agent configured</p>
+                            <p class="text-sm text-gray-500">Inbound Channel • 2 hours ago</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <div class="flex-1">
+                            <p class="font-medium">45 new contacts imported</p>
+                            <p class="text-sm text-gray-500">WhatsApp Channel • 5 hours ago</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                        <div class="w-2 h-2 bg-orange-500 rounded-full"></div>
+                        <div class="flex-1">
+                            <p class="font-medium">Follow-up campaign completed</p>
+                            <p class="text-sm text-gray-500">Outbound Channel • 1 day ago</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const orgId = urlParams.get('org') || 'main-office';
+            const userEmail = localStorage.getItem('userEmail') || 'user@example.com';
+            
+            document.getElementById('userEmail').textContent = userEmail;
+            
+            // Load organization data based on orgId
+            loadOrganizationData(orgId);
+        });
+
+        function loadOrganizationData(orgId) {
+            // In a real app, this would fetch from API
+            const orgData = {
+                'main-office': {
+                    name: 'ABC Enterprises',
+                    desc: 'Leading business organization providing comprehensive customer services',
+                    location: 'Mumbai, Maharashtra',
+                    phone: '+91 98765 43210',
+                    channels: 3,
+                    agents: 8,
+                    contacts: 156,
+                    calls: 1234
+                },
+                'support-dept': {
+                    name: 'Support Department',
+                    desc: '24/7 customer support and service assistance',
+                    location: 'Mumbai, Maharashtra',
+                    phone: '+91 98765 43211',
+                    channels: 2,
+                    agents: 5,
+                    contacts: 89,
+                    calls: 567
+                }
+            };
+
+            const org = orgData[orgId] || orgData['main-office'];
+            
+            document.getElementById('organizationName').textContent = org.name;
+            document.getElementById('orgName').textContent = org.name;
+            document.getElementById('organizationDesc').textContent = org.desc;
+            document.getElementById('orgLocation').textContent = org.location;
+            document.getElementById('orgPhone').textContent = org.phone;
+            document.getElementById('channelCount').textContent = org.channels;
+            document.getElementById('agentCount').textContent = org.agents;
+            document.getElementById('contactCount').textContent = org.contacts;
+            document.getElementById('callCount').textContent = org.calls.toLocaleString();
+        }
+
+        function openChannel(channelType) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const orgId = urlParams.get('org') || 'main-office';
+            window.location.href = `/channel-detail.html?org=${orgId}&channel=${channelType}`;
+        }
+
+        function viewChannelStats(channelType) {
+            alert(`Opening analytics for ${channelType} channel. This will show detailed statistics, call volumes, and performance metrics.`);
+        }
+
+        function addChannel() {
+            alert('Adding new communication channel. This will open a wizard to configure a new channel type.');
+        }
+
+        function editOrganization() {
+            alert('Opening organization editor. This will allow you to modify organization details, settings, and permissions.');
+        }
+    </script>
+</body>
+</html>

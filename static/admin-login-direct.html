@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Access - DrM Hope</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        .logo {
+            margin-bottom: 30px;
+        }
+        .logo h1 {
+            color: #667eea;
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .subtitle {
+            color: #666;
+            margin: 5px 0 30px 0;
+            font-size: 16px;
+        }
+        .access-methods {
+            text-align: left;
+        }
+        .method {
+            background: #f8f9ff;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            transition: all 0.3s;
+        }
+        .method:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        .method h3 {
+            color: #333;
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+        .method p {
+            color: #666;
+            margin: 0 0 15px 0;
+            font-size: 14px;
+        }
+        .method-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .method-link:hover {
+            transform: translateY(-2px);
+        }
+        .direct-access {
+            background: #e8f5e8;
+            border-color: #4CAF50;
+        }
+        .direct-access h3 {
+            color: #2E7D32;
+        }
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #856404;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>DrM Hope</h1>
+            <p class="subtitle">Admin Access Portal</p>
+        </div>
+
+        <div class="note">
+            <strong>Note:</strong> The /admin/login route may need server restart. Try these alternative access methods:
+        </div>
+
+        <div class="access-methods">
+            <div class="method direct-access">
+                <h3>🚀 Direct Access (Recommended)</h3>
+                <p>Access the admin login page directly through static files</p>
+                <a href="/admin-login.html" class="method-link">Open Admin Login</a>
+            </div>
+
+            <div class="method">
+                <h3>📁 Static File Access</h3>
+                <p>Alternative static file access</p>
+                <a href="/admin.html" class="method-link">Open Alternative Login</a>
+            </div>
+
+            <div class="method">
+                <h3>🏠 Dashboard Direct</h3>
+                <p>Try accessing admin dashboard directly if already logged in</p>
+                <a href="/admin-dashboard.html" class="method-link">Open Admin Dashboard</a>
+            </div>
+
+            <div class="method">
+                <h3>🔧 Configuration Checker</h3>
+                <p>Check Clerk configuration and authentication status</p>
+                <a href="/check_clerk_config.html" class="method-link">Run Diagnostics</a>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+            <p style="color: #666; font-size: 14px;">
+                <strong>Admin Credentials:</strong><br>
+                Email: cmd@hopehospital.com<br>
+                Use your Clerk account password
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Auto-redirect to working admin login after 3 seconds
+        setTimeout(() => {
+            window.location.href = '/admin-login.html';
+        }, 3000);
+    </script>
+</body>
+</html>
