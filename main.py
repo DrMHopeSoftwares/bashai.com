@@ -17,12 +17,16 @@ from razorpay_integration import RazorpayIntegration, calculate_credits_from_amo
 from phone_provider_integration import phone_provider_manager
 from auth_routes import auth_bp
 from functools import wraps
+from flask_socketio import SocketIO
 
 # Load environment variables from .env file
 load_dotenv()
 
 app = Flask(__name__, static_folder='static', static_url_path='/')
 CORS(app)  # Enable CORS for all routes
+
+# Initialize SocketIO for WebSocket support
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 # Redirect non-www to www for consistent domain access
 @app.before_request
@@ -35,6 +39,10 @@ def redirect_non_www():
 
 # Register authentication blueprint
 app.register_blueprint(auth_bp)
+
+# Initialize OpenAI Realtime WebSocket handler
+from realtime_websocket_handler import init_realtime_websocket
+realtime_handler = init_realtime_websocket(app, socketio)
 
 # Supabase Configuration (with graceful fallback)
 SUPABASE_URL = os.getenv("SUPABASE_URL")
@@ -3010,12 +3018,434 @@ def serve_book_demo():
     """Serve book demo page"""
     return send_from_directory(app.static_folder, 'book-demo.html')
 
+@app.route('/realtime-voice-interface.html')
+def serve_realtime_voice():
+    """Serve OpenAI Realtime Voice interface"""
+    return send_from_directory(app.static_folder, 'realtime-voice-interface.html')
+
+@app.route('/twilio-openai-call-interface.html')
+def serve_twilio_openai_calls():
+    """Serve Twilio + OpenAI Real Voice Call interface"""
+    return send_from_directory(app.static_folder, 'twilio-openai-call-interface.html')
+
+# OpenAI Realtime Phone Call API Endpoints
+@app.route('/api/realtime/make-call', methods=['POST'])
+@login_required
+def make_realtime_call():
+    """Make an outbound call using OpenAI Realtime API"""
+    try:
+        data = request.get_json()
+        phone_number = data.get('phone_number')
+        message = data.get('message', '')
+        provider = data.get('provider', 'twilio')
+        
+        if not phone_number:
+            return jsonify({
+                'success': False,
+                'error': 'Phone number is required'
+            }), 400
+        
+        # Get user info from session
+        user_info = g.get('user')
+        user_id = user_info.get('user_id') if user_info else 'anonymous'
+        
+        # Import call manager
+        from openai_phone_call_integration import make_call
+        
+        # Create async task to make the call
+        import asyncio
+        
+        async def make_async_call():
+            return await make_call(
+                phone_number=phone_number,
+                message=message,
+                provider=provider,
+                user_id=user_id
+            )
+        
+        # Run the async call
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        call_result = loop.run_until_complete(make_async_call())
+        loop.close()
+        
+        return jsonify(call_result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/realtime/call-status/<call_id>', methods=['GET'])
+@login_required
+def get_realtime_call_status(call_id):
+    """Get status of an active call"""
+    try:
+        from openai_phone_call_integration import call_manager
+        
+        status = call_manager.get_call_status(call_id)
+        if status:
+            return jsonify({
+                'success': True,
+                'status': status
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Call not found'
+            }), 404
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/realtime/end-call/<call_id>', methods=['POST'])
+@login_required
+def end_realtime_call(call_id):
+    """End an active call"""
+    try:
+        from openai_phone_call_integration import call_manager
+        import asyncio
+        
+        async def end_async_call():
+            return await call_manager.end_call(call_id)
+        
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        result = loop.run_until_complete(end_async_call())
+        loop.close()
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/realtime/call-analytics/<call_id>', methods=['GET'])
+@login_required
+def get_call_analytics(call_id):
+    """Get call analytics and cost information"""
+    try:
+        from openai_phone_call_integration import call_manager
+        import asyncio
+        
+        async def get_async_analytics():
+            return await call_manager.get_call_analytics(call_id)
+        
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        analytics = loop.run_until_complete(get_async_analytics())
+        loop.close()
+        
+        return jsonify({
+            'success': True,
+            'analytics': analytics
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# Real Twilio Voice Call Endpoints
+@app.route('/api/twilio/make-real-call', methods=['POST'])
+def make_real_twilio_call():
+    """Make a real phone call using Enhanced Twilio + OpenAI system"""
+    try:
+        data = request.get_json()
+        phone_number = data.get('phone_number')
+        message = data.get('message', '')
+        voice_model = data.get('voice_model', 'alloy')
+        language = data.get('language', 'hi-IN')
+        call_type = data.get('call_type', 'ai_conversation')
+        
+        if not phone_number:
+            return jsonify({
+                'success': False,
+                'error': 'Phone number is required'
+            }), 400
+        
+        # Import enhanced call system
+        from enhanced_twilio_openai_call import make_enhanced_call
+        import asyncio
+        
+        async def make_async_enhanced_call():
+            return await make_enhanced_call(
+                phone_number=phone_number,
+                ai_message=message,
+                voice_model=voice_model,
+                language=language,
+                call_type=call_type
+            )
+        
+        # Run the async call
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        call_result = loop.run_until_complete(make_async_enhanced_call())
+        loop.close()
+        
+        return jsonify(call_result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/twilio/twiml/<call_id>', methods=['GET', 'POST'])
+def twilio_twiml_response(call_id):
+    """Generate intelligent TwiML response for Twilio webhook"""
+    try:
+        from enhanced_twilio_openai_call import enhanced_call_system
+        
+        twiml = enhanced_call_system.generate_intelligent_twiml(call_id)
+        
+        return twiml, 200, {'Content-Type': 'text/xml'}
+        
+    except Exception as e:
+        from twilio.twiml.voice_response import VoiceResponse
+        response = VoiceResponse()
+        response.say("Sorry, there was an error processing your call. Thank you for calling BhashAI. Goodbye!", voice='alice', language='en-IN')
+        response.hangup()
+        return str(response), 200, {'Content-Type': 'text/xml'}
+
+@app.route('/api/twilio/status/<call_id>', methods=['POST'])
+def twilio_status_callback(call_id):
+    """Handle Twilio call status callbacks"""
+    try:
+        from enhanced_twilio_openai_call import enhanced_call_system
+        
+        # Get form data from Twilio
+        status_data = dict(request.form)
+        
+        result = enhanced_call_system.handle_call_status_update(call_id, status_data)
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/twilio/process-speech/<call_id>', methods=['POST'])
+def twilio_process_speech(call_id):
+    """Process speech input from Twilio with AI intelligence"""
+    try:
+        from enhanced_twilio_openai_call import enhanced_call_system
+        
+        # Get speech data from Twilio
+        speech_data = dict(request.form)
+        
+        twiml = enhanced_call_system.process_speech_intelligent(call_id, speech_data)
+        
+        return twiml, 200, {'Content-Type': 'text/xml'}
+        
+    except Exception as e:
+        from twilio.twiml.voice_response import VoiceResponse
+        response = VoiceResponse()
+        response.say("Sorry, I couldn't process your speech. Thank you for calling BhashAI. Goodbye!", voice='alice', language='en-IN')
+        response.hangup()
+        return str(response), 200, {'Content-Type': 'text/xml'}
+
 @app.route('/<path:path>')
 def serve_static(path):
     # Prevent directory traversal
     if '..' in path or path.startswith('/'):
         return 'Forbidden', 403
     return send_from_directory(app.static_folder, path)
+
+# Real AI Conversation Routes
+@app.route('/ai-webhook/process-speech', methods=['POST'])
+def process_ai_speech():
+    """Process user speech and generate real AI response using OpenAI"""
+    
+    try:
+        import requests
+        
+        # Get speech data from Twilio
+        speech_result = request.form.get('SpeechResult', '')
+        confidence = request.form.get('Confidence', '0')
+        call_sid = request.form.get('CallSid', '')
+        
+        print(f"🗣️  User said: '{speech_result}' (confidence: {confidence})")
+        
+        if not speech_result.strip():
+            speech_result = "I didn't hear anything clearly"
+        
+        # Generate AI response using OpenAI API
+        openai_api_key = os.getenv('OPENAI_API_KEY')
+        
+        if openai_api_key:
+            try:
+                # Call OpenAI API for intelligent response
+                ai_response_data = requests.post(
+                    'https://api.openai.com/v1/chat/completions',
+                    headers={
+                        'Authorization': f'Bearer {openai_api_key}',
+                        'Content-Type': 'application/json'
+                    },
+                    json={
+                        'model': 'gpt-4',
+                        'messages': [
+                            {
+                                "role": "system",
+                                "content": "You are BhashAI, a friendly AI voice assistant on a phone call. Keep responses under 40 words, be conversational, warm, and ask engaging follow-up questions. You can speak Hindi and English naturally."
+                            },
+                            {
+                                "role": "user", 
+                                "content": speech_result
+                            }
+                        ],
+                        'max_tokens': 80,
+                        'temperature': 0.8
+                    },
+                    timeout=8
+                )
+                
+                if ai_response_data.status_code == 200:
+                    result = ai_response_data.json()
+                    ai_response = result['choices'][0]['message']['content'].strip()
+                    print(f"🤖 AI Response: {ai_response}")
+                else:
+                    ai_response = f"That's interesting! You mentioned '{speech_result[:30]}'. Tell me more about that!"
+                    
+            except Exception as api_error:
+                print(f"❌ OpenAI API Error: {api_error}")
+                ai_response = f"I find that fascinating! You said '{speech_result[:30]}' - can you tell me more about your thoughts on that?"
+        else:
+            ai_response = f"That's really interesting! You mentioned '{speech_result[:30]}'. I'd love to hear more about that!"
+        
+        # Create TwiML response with AI-generated content
+        from twilio.twiml.voice_response import VoiceResponse, Gather
+        
+        response = VoiceResponse()
+        
+        # Speak the AI response
+        response.say(
+            ai_response,
+            voice='alice',
+            language='en-IN'
+        )
+        
+        # Continue conversation - listen for next response
+        gather = Gather(
+            input='speech',
+            timeout=8,
+            speech_timeout='auto',
+            action='/ai-webhook/process-speech',
+            method='POST',
+            language='en-IN'
+        )
+        
+        gather.say(
+            "What else would you like to talk about?",
+            voice='alice',
+            language='en-IN'
+        )
+        
+        response.append(gather)
+        
+        # End conversation gracefully
+        response.say(
+            "Thank you for this wonderful AI conversation! It was great talking with you. Have an amazing day! Goodbye!",
+            voice='alice',
+            language='en-IN'
+        )
+        response.hangup()
+        
+        return response.to_xml(), 200, {'Content-Type': 'text/xml'}
+        
+    except Exception as e:
+        print(f"❌ Error in AI conversation: {e}")
+        
+        # Error fallback
+        from twilio.twiml.voice_response import VoiceResponse
+        response = VoiceResponse()
+        response.say(
+            "Thank you for calling BhashAI! Have a wonderful day!",
+            voice='alice',
+            language='en-IN'
+        )
+        response.hangup()
+        return response.to_xml(), 200, {'Content-Type': 'text/xml'}
+
+@app.route('/api/make-ai-conversation-call', methods=['POST'])
+def make_ai_conversation_call():
+    """Make a real AI conversation call"""
+    
+    try:
+        data = request.get_json()
+        phone_number = data.get('phone_number', '+919373111709')
+        
+        from twilio.rest import Client
+        from twilio.twiml.voice_response import VoiceResponse, Gather
+        
+        # Twilio credentials from environment
+        account_sid = os.getenv('TWILIO_ACCOUNT_SID')
+        auth_token = os.getenv('TWILIO_AUTH_TOKEN')
+        from_number = "+19896621396"
+        
+        client = Client(account_sid, auth_token)
+        
+        # Create conversation starter TwiML
+        response = VoiceResponse()
+        
+        response.say(
+            "Hello! This is BhashAI calling with real artificial intelligence! I'm excited to have an intelligent conversation with you using OpenAI's technology.",
+            voice='alice',
+            language='en-IN'
+        )
+        
+        # Start listening for user input
+        gather = Gather(
+            input='speech',
+            timeout=10,
+            speech_timeout='auto',
+            action='/ai-webhook/process-speech',
+            method='POST',
+            language='en-IN'
+        )
+        
+        gather.say(
+            "How are you doing today? Please tell me about yourself - I'm genuinely curious and ready to have a real conversation!",
+            voice='alice',
+            language='en-IN'
+        )
+        
+        response.append(gather)
+        
+        # Fallback
+        response.say(
+            "Thank you for answering! Have a great day!",
+            voice='alice',
+            language='en-IN'
+        )
+        response.hangup()
+        
+        # Make the call
+        call = client.calls.create(
+            to=phone_number,
+            from_=from_number,
+            twiml=str(response),
+            timeout=60
+        )
+        
+        return jsonify({
+            'success': True,
+            'message': 'Real AI conversation call initiated',
+            'call_sid': call.sid,
+            'phone_number': phone_number
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 # Vercel serverless function handler
 def handler(request):
@@ -3034,4 +3464,5 @@ if __name__ == "__main__":
     print(f"- http://0.0.0.0:{port}/dashboard.html (User Dashboard)")
     print(f"- http://0.0.0.0:{port}/admin/dashboard (Superadmin Dashboard)")
     print(f"- http://0.0.0.0:{port}/api/dev/voice-agents (API Test)")
-    app.run(host="0.0.0.0", port=port, debug=False)
+    print(f"- WebSocket endpoint for realtime voice: ws://0.0.0.0:{port}/socket.io/")
+    socketio.run(app, host="0.0.0.0", port=port, debug=False, allow_unsafe_werkzeug=True)
