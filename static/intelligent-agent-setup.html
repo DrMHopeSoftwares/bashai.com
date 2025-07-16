@@ -262,6 +262,28 @@
 <body>
     <div class="min-h-screen p-6">
         <div class="max-w-7xl mx-auto">
+            <!-- Context Banner (shows when coming from flow hierarchy) -->
+            <div id="context-banner" class="hidden glassmorphism rounded-lg p-4 mb-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <i class="fas fa-link text-indigo-600 text-xl"></i>
+                        <div>
+                            <div class="font-semibold text-gray-800">
+                                Continuing from Project Flow Setup
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                Enterprise: <span id="context-enterprise">Healthcare</span> | 
+                                Channel: <span id="context-channel">Outbound Calls</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="returnToFlow()" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                        <i class="fas fa-arrow-left mr-1"></i>
+                        Back to Flow
+                    </button>
+                </div>
+            </div>
+
             <!-- Header -->
             <div class="glassmorphism rounded-2xl p-6 mb-6">
                 <div class="flex items-center justify-between">
@@ -1601,28 +1623,127 @@
             }
         }
 
+        // Flow hierarchy integration
+        function checkFlowContext() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const context = urlParams.get('context');
+            
+            if (context === 'flow') {
+                // Show context banner
+                const banner = document.getElementById('context-banner');
+                if (banner) {
+                    banner.classList.remove('hidden');
+                }
+                
+                // Load context data from localStorage
+                const contextData = localStorage.getItem('bhashai_setup_context');
+                if (contextData) {
+                    const data = JSON.parse(contextData);
+                    
+                    // Populate context information
+                    document.getElementById('context-enterprise').textContent = 
+                        data.enterpriseType ? data.enterpriseType.charAt(0).toUpperCase() + data.enterpriseType.slice(1) : 'Healthcare';
+                    document.getElementById('context-channel').textContent = 
+                        data.selectedChannel ? data.selectedChannel.charAt(0).toUpperCase() + data.selectedChannel.slice(1) + ' Calls' : 'Outbound Calls';
+                    
+                    // Pre-fill agent configuration based on context
+                    prefillAgentFromContext(data);
+                }
+            }
+        }
+
+        function prefillAgentFromContext(contextData) {
+            // Pre-fill agent name based on enterprise type
+            const agentNameInput = document.getElementById('agentName');
+            if (agentNameInput && contextData.enterpriseType) {
+                const agentNames = {
+                    healthcare: 'Dr. Smart Assistant',
+                    education: 'Academic Assistant',
+                    retail: 'Sales Assistant',
+                    legal: 'Legal Assistant',
+                    government: 'Citizen Services Assistant',
+                    finance: 'Financial Assistant'
+                };
+                agentNameInput.value = agentNames[contextData.enterpriseType] || 'Smart Assistant';
+            }
+
+            // Pre-fill description
+            const agentDescInput = document.getElementById('agentDescription');
+            if (agentDescInput && contextData.enterpriseType) {
+                const descriptions = {
+                    healthcare: 'Professional healthcare AI assistant for patient consultation and appointment booking',
+                    education: 'Educational AI assistant for student support and academic inquiries',
+                    retail: 'Customer service AI assistant for sales support and order management',
+                    legal: 'Legal AI assistant for consultation scheduling and basic legal guidance',
+                    government: 'Citizen services AI assistant for public service information and support',
+                    finance: 'Financial AI assistant for account services and financial guidance'
+                };
+                agentDescInput.value = descriptions[contextData.enterpriseType] || 'Intelligent AI assistant';
+            }
+
+            // Update preview
+            updatePreview();
+        }
+
+        function returnToFlow() {
+            // Save current progress to localStorage
+            const currentProgress = {
+                agentName: document.getElementById('agentName')?.value || '',
+                agentDescription: document.getElementById('agentDescription')?.value || '',
+                agentType: document.getElementById('agentType')?.value || '',
+                // Add other fields as needed
+            };
+            
+            localStorage.setItem('bhashai_agent_progress', JSON.stringify(currentProgress));
+            
+            // Return to flow hierarchy
+            window.close(); // Close if opened in new tab
+            // Or redirect if same tab
+            // window.location.href = '/project-flow-hierarchy.html#step-4';
+        }
+
+        function continueToContacts() {
+            // Save agent configuration and continue to contacts step
+            const agentData = {
+                name: document.getElementById('agentName')?.value || '',
+                description: document.getElementById('agentDescription')?.value || '',
+                type: document.getElementById('agentType')?.value || '',
+                completed: true
+            };
+            
+            localStorage.setItem('bhashai_agent_data', JSON.stringify(agentData));
+            
+            // Redirect back to flow hierarchy step 5 (contacts)
+            window.location.href = '/project-flow-hierarchy.html#step-5';
+        }
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
+            // Check for flow context first
+            checkFlowContext();
+            
             updatePreview();
             
             // Setup drag and drop for knowledge upload
             const uploadArea = document.getElementById('knowledgeUpload');
             
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.classList.add('dragover');
-            });
-            
-            uploadArea.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                uploadArea.classList.remove('dragover');
-            });
-            
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.classList.remove('dragover');
-                handleFileUpload(e.dataTransfer.files);
-            });
+            if (uploadArea) {
+                uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.add('dragover');
+                });
+                
+                uploadArea.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.remove('dragover');
+                });
+                
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.remove('dragover');
+                    handleFileUpload(e.dataTransfer.files);
+                });
+            }
         });
     </script>
 </body>

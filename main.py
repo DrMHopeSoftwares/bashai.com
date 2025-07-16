@@ -2961,6 +2961,16 @@ def serve_dashboard():
     # Always serve dashboard.html - local auth will handle authentication on the frontend
     return send_from_directory(app.static_folder, 'dashboard.html')
 
+@app.route('/project-flow-hierarchy.html')
+def serve_project_flow():
+    """Serve complete project setup flow hierarchy"""
+    return send_from_directory(app.static_folder, 'project-flow-hierarchy.html')
+
+@app.route('/intelligent-agent-setup.html')
+def serve_intelligent_agent_setup():
+    """Serve intelligent agent setup page - integrated with flow hierarchy"""
+    return send_from_directory(app.static_folder, 'intelligent-agent-setup.html')
+
 @app.route('/signup.html')
 @app.route('/signup')
 @app.route('/register')
