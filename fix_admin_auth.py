@@ -121,7 +121,7 @@ if existing_users_by_email and len(existing_users_by_email) > 0:
             })
 '''
     
-    with open('/Users/murali/bhashai.com for git push/bashai.com/auth_fix_patch.txt', 'w') as f:
+    with open('/Users/murali/bhashai.com for git push/bhashai.com/auth_fix_patch.txt', 'w') as f:
         f.write(patch_content)
     
     print("\n4. Created patch file: auth_fix_patch.txt")

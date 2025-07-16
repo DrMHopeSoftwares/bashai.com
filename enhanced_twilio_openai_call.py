@@ -87,7 +87,7 @@ class EnhancedTwilioOpenAICall:
             try:
                 # Start webhook server
                 subprocess.Popen(['python', 'conversational_webhook_server.py'], 
-                               cwd='/Users/murali/bhashai.com 15th Jul/bashai.com')
+                               cwd='/Users/murali/bhashai.com 15th Jul/bhashai.com')
                 time.sleep(2)  # Give server time to start
                 
                 print(f"✅ Webhook server started on port 9000")
