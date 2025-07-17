@@ -129,6 +129,53 @@
         let currentAgent = null;
         let allAgents = [];
         let originalPrompt = '';
+        let authToken = null;
+        
+        // Check authentication on page load
+        function checkAuthentication() {
+            authToken = localStorage.getItem('authToken') || localStorage.getItem('sessionToken');
+            if (!authToken) {
+                showStatus('Authentication required. Redirecting to login...', 'danger');
+                setTimeout(() => {
+                    window.location.href = '/admin/login.html';
+                }, 2000);
+                return false;
+            }
+            return true;
+        }
+        
+        // Helper function to make authenticated API calls
+        async function makeAuthenticatedRequest(url, options = {}) {
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`,
+                    ...options.headers
+                }
+            };
+            
+            const mergedOptions = { ...defaultOptions, ...options };
+            
+            try {
+                const response = await fetch(url, mergedOptions);
+                
+                // Handle authentication errors
+                if (response.status === 401) {
+                    showStatus('Session expired. Redirecting to login...', 'danger');
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('sessionToken');
+                    setTimeout(() => {
+                        window.location.href = '/admin/login.html';
+                    }, 2000);
+                    return null;
+                }
+                
+                return response;
+            } catch (error) {
+                console.error('Request failed:', error);
+                throw error;
+            }
+        }
         
         function showStatus(message, type = 'info') {
             const status = document.getElementById('status');
@@ -146,9 +193,9 @@
         async function loadEnterprises() {
             try {
                 showStatus('Loading enterprises...', 'info');
-                const response = await fetch('/api/enterprises');
+                const response = await makeAuthenticatedRequest('/api/enterprises');
                 
-                if (response.ok) {
+                if (response && response.ok) {
                     const data = await response.json();
                     const select = document.getElementById('enterpriseSelect');
                     select.innerHTML = '<option value="">Select Enterprise...</option>';
@@ -178,9 +225,9 @@
             
             try {
                 showStatus('Loading agents for enterprise...', 'info');
-                const response = await fetch(`/api/voice-agents?enterprise_id=${enterpriseId}`);
+                const response = await makeAuthenticatedRequest(`/api/voice-agents?enterprise_id=${enterpriseId}`);
                 
-                if (response.ok) {
+                if (response && response.ok) {
                     const data = await response.json();
                     allAgents = data.voice_agents || [];
                     populateAgentSelect(allAgents);
@@ -250,9 +297,9 @@
         async function loadRelevanceAIPrompt() {
             try {
                 showStatus('Loading RelevanceAI prompt...', 'info');
-                const response = await fetch(`/api/relevance-ai/agents/${currentAgent.id}/prompt`);
+                const response = await makeAuthenticatedRequest(`/api/relevance-ai/agents/${currentAgent.id}/prompt`);
                 
-                if (response.ok) {
+                if (response && response.ok) {
                     const data = await response.json();
                     originalPrompt = data.system_prompt;
                     document.getElementById('promptTextarea').value = originalPrompt;
@@ -335,13 +382,12 @@
         }
         
         async function updateRelevanceAIPrompt(newPrompt) {
-            const response = await fetch(`/api/relevance-ai/agents/${currentAgent.id}/prompt`, {
+            const response = await makeAuthenticatedRequest(`/api/relevance-ai/agents/${currentAgent.id}/prompt`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ system_prompt: newPrompt })
             });
             
-            if (response.ok) {
+            if (response && response.ok) {
                 showStatus('RelevanceAI prompt updated successfully!', 'success');
                 document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
             } else {
@@ -352,9 +398,8 @@
         
         async function updateGenericPrompt(newPrompt) {
             // Update prompt in voice_agents table
-            const response = await fetch(`/api/voice-agents/${currentAgent.id}`, {
+            const response = await makeAuthenticatedRequest(`/api/voice-agents/${currentAgent.id}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     provider_config: {
                         ...currentAgent.provider_config,
@@ -363,7 +408,7 @@
                 })
             });
             
-            if (response.ok) {
+            if (response && response.ok) {
                 showStatus('Agent prompt updated successfully!', 'success');
                 document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
                 currentAgent.provider_config.system_prompt = newPrompt;
@@ -382,13 +427,12 @@
             
             if (currentAgent.provider_type === 'relevance_ai') {
                 try {
-                    const response = await fetch(`/api/relevance-ai/agents/${currentAgent.id}/test-prompt`, {
+                    const response = await makeAuthenticatedRequest(`/api/relevance-ai/agents/${currentAgent.id}/test-prompt`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ message: 'Hello, this is a test message for the prompt' })
                     });
                     
-                    if (response.ok) {
+                    if (response && response.ok) {
                         const result = await response.json();
                         showStatus(`Test initiated! Conversation ID: ${result.conversation_id}`, 'success');
                     } else {
@@ -452,8 +496,10 @@
         
         // Load enterprises on page load
         window.addEventListener('load', () => {
-            loadEnterprises();
-            showStatus('Universal Prompt Editor ready! Select an enterprise and agent to begin.', 'success');
+            if (checkAuthentication()) {
+                loadEnterprises();
+                showStatus('Universal Prompt Editor ready! Select an enterprise and agent to begin.', 'success');
+            }
         });
     </script>
 </body>

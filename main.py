@@ -3757,6 +3757,11 @@ def serve_anohra_prompt_editor_simple():
     """Serve Anohra Prompt Editor interface (simple version)"""
     return send_from_directory(app.static_folder, 'anohra-prompt-editor-simple.html')
 
+@app.route('/universal-prompt-editor.html')
+def serve_universal_prompt_editor():
+    """Serve Universal Multi-tenant Prompt Editor interface"""
+    return send_from_directory(app.static_folder, 'universal-prompt-editor.html')
+
 # OpenAI Realtime Phone Call API Endpoints
 @app.route('/api/realtime/make-call', methods=['POST'])
 @login_required
