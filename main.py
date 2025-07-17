@@ -79,6 +79,7 @@ def supabase_request(method, endpoint, data=None, params=None):
         return [] if method == 'GET' else None
     
     url = f"{SUPABASE_URL}/rest/v1/{endpoint}"
+    print(f"🔍 Supabase request: {method} {url} with params: {params}")
     
     try:
         if method == 'GET':
@@ -94,8 +95,11 @@ def supabase_request(method, endpoint, data=None, params=None):
         else:
             raise ValueError(f"Unsupported HTTP method: {method}")
         
+        print(f"🔍 Response status: {response.status_code}")
         response.raise_for_status()
-        return response.json() if response.content else None
+        result = response.json() if response.content else None
+        print(f"🔍 Response data: {result}")
+        return result
     
     except requests.exceptions.RequestException as e:
         print(f"⚠️  Supabase API error ({method} {endpoint}): {e}")
@@ -363,18 +367,23 @@ def get_enterprises():
     """Get enterprises with trial limitations"""
     try:
         user_id = g.user_id
+        print(f"🔍 Getting enterprises for user_id: {user_id}")
+        print(f"🔍 Supabase available: {SUPABASE_AVAILABLE}")
 
         # Log API call for trial users
         if hasattr(g, 'trial_status') and g.trial_status.get('is_trial'):
             log_trial_activity(user_id, 'api_call', {'endpoint': '/api/enterprises', 'method': 'GET'})
 
         enterprises = supabase_request('GET', 'enterprises', params={'owner_id': f'eq.{user_id}'})
+        print(f"🔍 Enterprises result: {enterprises}")
 
         return jsonify({'enterprises': enterprises or []})
 
     except Exception as e:
-        print(f"Get enterprises error: {e}")
-        return jsonify({'message': 'Failed to get enterprises'}), 500
+        print(f"❌ Get enterprises error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'message': f'Failed to get enterprises: {str(e)}'}), 500
 
 @app.route('/api/enterprises', methods=['POST'])
 @login_required
