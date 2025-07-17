@@ -150,6 +150,79 @@ class RelevanceAIProvider:
             print(f"❌ Failed to delete agent {agent_id}: {e}")
             return False
     
+    def update_agent_prompt(self, agent_id: str, new_prompt: str) -> bool:
+        """Update an agent's system prompt"""
+        try:
+            # Get current agent data first
+            current_agent = self.client.agents.retrieve_agent(agent_id=agent_id)
+            
+            # Update the system prompt using upsert_agent
+            updated_agent_data = {
+                "agent_id": agent_id,
+                "name": getattr(current_agent.metadata, 'name', 'Unknown'),
+                "system_prompt": new_prompt,
+                # Keep other existing settings
+                "model": getattr(current_agent.metadata, 'model', 'openai-gpt-4o-mini'),
+                "temperature": getattr(current_agent.metadata, 'temperature', 0),
+            }
+            
+            # Update the agent
+            result = self.client.agents.upsert_agent(**updated_agent_data)
+            print(f"✅ Agent {agent_id} prompt updated successfully")
+            return True
+            
+        except Exception as e:
+            print(f"❌ Failed to update agent prompt: {e}")
+            # Try raw API approach as backup
+            return self._update_prompt_raw_api(agent_id, new_prompt)
+    
+    def _update_prompt_raw_api(self, agent_id: str, new_prompt: str) -> bool:
+        """Update prompt using raw API calls as backup"""
+        try:
+            import requests
+            
+            headers = {
+                "Authorization": f"{self.project_id}:{self.api_key}",
+                "Content-Type": "application/json"
+            }
+            
+            base_url = f"https://api-{self.region}.stack.tryrelevance.com"
+            
+            # Try different endpoints for updating agent
+            endpoints = [
+                f"{base_url}/latest/agents/{agent_id}",
+                f"{base_url}/agents/{agent_id}"
+            ]
+            
+            update_data = {
+                "system_prompt": new_prompt,
+                "agent_id": agent_id
+            }
+            
+            for endpoint in endpoints:
+                try:
+                    # Try PATCH method
+                    response = requests.patch(endpoint, headers=headers, json=update_data, timeout=30)
+                    
+                    if response.status_code in [200, 201]:
+                        print(f"✅ Raw API prompt update successful!")
+                        return True
+                    elif response.status_code == 405:
+                        # Try PUT method
+                        response = requests.put(endpoint, headers=headers, json=update_data, timeout=30)
+                        if response.status_code in [200, 201]:
+                            print(f"✅ Raw API prompt update successful!")
+                            return True
+                            
+                except Exception:
+                    continue
+            
+            return False
+            
+        except Exception as e:
+            print(f"❌ Raw API prompt update failed: {e}")
+            return False
+    
     def create_session(self, agent_id: str, session_config: Dict = None) -> Dict:
         """Create a new conversation session with an agent"""
         try:
