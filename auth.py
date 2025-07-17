@@ -300,7 +300,7 @@ def login_required(f):
         
         # Set user data in both request and g objects for compatibility
         request.current_user = user_data
-        g.user_id = user_data['id']
+        g.user_id = user_data['user_id']
         g.current_user = user_data
         return f(*args, **kwargs)
     
