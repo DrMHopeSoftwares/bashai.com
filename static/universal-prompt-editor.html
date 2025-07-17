@@ -133,15 +133,40 @@
         
         // Check authentication on page load
         function checkAuthentication() {
-            authToken = localStorage.getItem('authToken') || localStorage.getItem('sessionToken');
+            // Check multiple possible token keys used across the platform
+            const authTokenLocal = localStorage.getItem('auth_token');
+            const authTokenAlt = localStorage.getItem('authToken');
+            const sessionToken = localStorage.getItem('sessionToken');
+            const authTokenCookie = getCookie('auth_token');
+            
+            console.log('🔍 Token check:', {
+                auth_token: authTokenLocal ? 'Found' : 'Missing',
+                authToken: authTokenAlt ? 'Found' : 'Missing', 
+                sessionToken: sessionToken ? 'Found' : 'Missing',
+                auth_token_cookie: authTokenCookie ? 'Found' : 'Missing'
+            });
+            
+            authToken = authTokenLocal || authTokenAlt || sessionToken || authTokenCookie;
+            
             if (!authToken) {
                 showStatus('Authentication required. Redirecting to login...', 'danger');
+                console.log('❌ No authentication token found');
                 setTimeout(() => {
                     window.location.href = '/admin/login.html';
                 }, 2000);
                 return false;
             }
+            
+            console.log('✅ Authentication token found');
             return true;
+        }
+        
+        // Helper function to get cookie value
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
         }
         
         // Helper function to make authenticated API calls
@@ -162,8 +187,12 @@
                 // Handle authentication errors
                 if (response.status === 401) {
                     showStatus('Session expired. Redirecting to login...', 'danger');
+                    // Clear all possible token keys
+                    localStorage.removeItem('auth_token');
                     localStorage.removeItem('authToken');
                     localStorage.removeItem('sessionToken');
+                    // Clear auth cookie
+                    document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
                     setTimeout(() => {
                         window.location.href = '/admin/login.html';
                     }, 2000);
