@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Anohra Prompt Editor</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .prompt-editor { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }
+        textarea { width: 100%; height: 400px; font-family: monospace; }
+        button { padding: 10px 20px; margin: 5px; border: none; border-radius: 4px; cursor: pointer; }
+        .primary { background: #007bff; color: white; }
+        .success { background: #28a745; color: white; }
+        .danger { background: #dc3545; color: white; }
+        .info { background: #17a2b8; color: white; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Anohra Prompt Editor</h1>
+        <p>Edit Anohra's system prompt for Dr. Murali's Orthopaedic Clinic</p>
+        
+        <div class="prompt-editor">
+            <h3>Current System Prompt</h3>
+            <div id="status" class="status" style="display:none;"></div>
+            
+            <textarea id="promptTextarea" placeholder="Loading current prompt..."></textarea>
+            
+            <div style="margin-top: 10px;">
+                <button class="primary" onclick="loadCurrentPrompt()">🔄 Reload Current Prompt</button>
+                <button class="success" onclick="updatePrompt()">💾 Save Updated Prompt</button>
+                <button class="info" onclick="testPrompt()">📞 Test Prompt</button>
+                <button class="danger" onclick="resetPrompt()">↺ Reset to Default</button>
+            </div>
+            
+            <div style="margin-top: 15px;">
+                <p><strong>Prompt Length:</strong> <span id="promptLength">0</span> characters</p>
+                <p><strong>Agent ID:</strong> 7a4cfa99-6a96-4a48-941f-d5865e0ba577</p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <h4>📋 Quick Templates:</h4>
+            <button onclick="addTemplate('hindi')">Add Hindi Fluency</button>
+            <button onclick="addTemplate('emergency')">Add Emergency Handling</button>
+            <button onclick="addTemplate('scheduling')">Add Appointment Rules</button>
+            <button onclick="addTemplate('closing')">Add Professional Closing</button>
+        </div>
+    </div>
+
+    <script>
+        const ANOHRA_ID = '7a4cfa99-6a96-4a48-941f-d5865e0ba577';
+        
+        function showStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+            setTimeout(() => status.style.display = 'none', 5000);
+        }
+        
+        function updatePromptLength() {
+            const textarea = document.getElementById('promptTextarea');
+            document.getElementById('promptLength').textContent = textarea.value.length;
+        }
+        
+        function loadCurrentPrompt() {
+            showStatus('Loading current prompt...', 'info');
+            
+            fetch(`/api/relevance-ai/agents/${ANOHRA_ID}/prompt`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.system_prompt) {
+                        document.getElementById('promptTextarea').value = data.system_prompt;
+                        updatePromptLength();
+                        showStatus('Prompt loaded successfully!', 'success');
+                    } else {
+                        showStatus('Failed to load prompt', 'danger');
+                    }
+                })
+                .catch(error => {
+                    showStatus('Error loading prompt: ' + error.message, 'danger');
+                });
+        }
+        
+        function updatePrompt() {
+            const newPrompt = document.getElementById('promptTextarea').value;
+            
+            if (!newPrompt.trim()) {
+                showStatus('Prompt cannot be empty', 'danger');
+                return;
+            }
+            
+            showStatus('Updating prompt...', 'info');
+            
+            fetch(`/api/relevance-ai/agents/${ANOHRA_ID}/prompt`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ system_prompt: newPrompt })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message.includes('successfully')) {
+                        showStatus('Prompt updated successfully!', 'success');
+                    } else {
+                        showStatus('Failed to update prompt', 'danger');
+                    }
+                })
+                .catch(error => {
+                    showStatus('Error updating prompt: ' + error.message, 'danger');
+                });
+        }
+        
+        function testPrompt() {
+            showStatus('Testing prompt with sample message...', 'info');
+            
+            fetch(`/api/relevance-ai/agents/${ANOHRA_ID}/test-prompt`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: 'Hello, I need to book an appointment with Dr. Murali for knee pain' })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'test_initiated') {
+                        showStatus(`Test initiated! Conversation ID: ${data.conversation_id}`, 'success');
+                    } else {
+                        showStatus('Test failed: ' + data.message, 'danger');
+                    }
+                })
+                .catch(error => {
+                    showStatus('Error testing prompt: ' + error.message, 'danger');
+                });
+        }
+        
+        function addTemplate(type) {
+            const textarea = document.getElementById('promptTextarea');
+            const templates = {
+                hindi: '\n\n• Always respond in Hindi when the caller speaks Hindi\n• Use professional medical Hindi terminology\n• Be warm and empathetic in Hindi conversations',
+                emergency: '\n\n• For emergency cases, immediately escalate to Dr. Murali\n• Ask for emergency contact details\n• Provide calm, reassuring guidance while arranging immediate care',
+                scheduling: '\n\n• Check Dr. Murali\'s availability before confirming appointments\n• Always confirm date, time, and patient details\n• Send appointment confirmation via SMS/email',
+                closing: '\n\n• End every call with: \"Thank you for calling Dr. Murali\'s clinic\"\n• Offer assistance for any follow-up questions\n• Mention clinic hours and emergency contact if needed'
+            };
+            
+            if (templates[type]) {
+                textarea.value += templates[type];
+                updatePromptLength();
+                showStatus(`Added ${type} template`, 'success');
+            }
+        }
+        
+        // Initialize
+        document.getElementById('promptTextarea').addEventListener('input', updatePromptLength);
+        loadCurrentPrompt();
+    </script>
+</body>
+</html>

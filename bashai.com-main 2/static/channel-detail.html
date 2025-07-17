@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Channel Details - BhashAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        .breadcrumb a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        .breadcrumb-separator {
+            margin: 0 8px;
+            color: #d1d5db;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        .agent-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+        .agent-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .agent-status {
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .status-inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .status-training {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .btn {
+            background: #4f46e5;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+        .btn:hover {
+            background: #4338ca;
+        }
+        .btn-secondary {
+            background: #6b7280;
+        }
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 14px;
+        }
+        .channel-header {
+            border-radius: 12px;
+            padding: 2rem;
+            color: white;
+            margin-bottom: 2rem;
+        }
+        .inbound-header { background: linear-gradient(135deg, #10b981, #059669); }
+        .outbound-header { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .whatsapp-header { background: linear-gradient(135deg, #25d366, #22c55e); }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stats-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+        }
+        .stats-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen bg-gray-50">
+        <!-- Header -->
+        <header class="bg-white border-b border-gray-200 px-6 py-4">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-900">🗣️ BhashAI</h1>
+                <div class="flex items-center space-x-4">
+                    <span id="userEmail" class="text-gray-600">user@example.com</span>
+                    <a href="/dashboard.html" class="btn btn-secondary">Dashboard</a>
+                </div>
+            </div>
+        </header>
+
+        <div class="max-w-7xl mx-auto px-6 py-8">
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb">
+                <a href="/dashboard.html">Dashboard</a>
+                <span class="breadcrumb-separator">›</span>
+                <a href="/dashboard.html">Organizations</a>
+                <span class="breadcrumb-separator">›</span>
+                <a href="#" onclick="goBackToOrg()" id="orgBreadcrumb">Main Hospital</a>
+                <span class="breadcrumb-separator">›</span>
+                <span id="channelName">Inbound Calls</span>
+            </nav>
+
+            <!-- Channel Header -->
+            <div class="channel-header inbound-header" id="channelHeader">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2" id="channelTitle">📞 Inbound Calls</h1>
+                        <p class="text-lg opacity-90 mb-6" id="channelDesc">Handle incoming patient calls and inquiries with AI voice agents</p>
+                        
+                        <div class="stats-grid">
+                            <div class="stats-card">
+                                <div class="stats-number" id="agentCount">3</div>
+                                <div class="stats-label">Voice Agents</div>
+                            </div>
+                            <div class="stats-card">
+                                <div class="stats-number" id="contactCount">45</div>
+                                <div class="stats-label">Contacts</div>
+                            </div>
+                            <div class="stats-card">
+                                <div class="stats-number" id="callCount">567</div>
+                                <div class="stats-label">Calls Today</div>
+                            </div>
+                            <div class="stats-card">
+                                <div class="stats-number" id="successRate">94%</div>
+                                <div class="stats-label">Success Rate</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);" onclick="configureChannel()">
+                        Configure Channel
+                    </button>
+                </div>
+            </div>
+
+            <!-- Voice Agents -->
+            <div class="card">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold">Voice Agents</h2>
+                    <button class="btn" onclick="addAgent()">Add Voice Agent</button>
+                </div>
+
+                <div class="space-y-4" id="agentsList">
+                    <!-- Appointment Booking Agent -->
+                    <div class="agent-card">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex-1">
+                                <div class="flex items-center mb-2">
+                                    <h3 class="text-lg font-semibold mr-3">🗓️ Appointment Booking Agent</h3>
+                                    <span class="agent-status status-active">Active</span>
+                                </div>
+                                <p class="text-gray-600 mb-3">AI assistant for scheduling patient appointments in Hindi and English</p>
+                                <div class="flex items-center space-x-6 text-sm text-gray-500">
+                                    <span>👥 12 contacts</span>
+                                    <span>📞 234 calls this month</span>
+                                    <span>⏱️ Avg. 3.2 min call time</span>
+                                    <span>✅ 96% success rate</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="btn btn-sm" onclick="setupAgent('appointment-booking')">Setup Agent</button>
+                            <button class="btn btn-sm btn-secondary" onclick="manageContacts('appointment-booking')">Manage Contacts</button>
+                            <button class="btn btn-sm btn-secondary" onclick="viewAnalytics('appointment-booking')">Analytics</button>
+                            <button class="btn btn-sm btn-secondary" onclick="testAgent('appointment-booking')">Test</button>
+                        </div>
+                    </div>
+
+                    <!-- General Inquiry Agent -->
+                    <div class="agent-card">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex-1">
+                                <div class="flex items-center mb-2">
+                                    <h3 class="text-lg font-semibold mr-3">❓ General Inquiry Agent</h3>
+                                    <span class="agent-status status-active">Active</span>
+                                </div>
+                                <p class="text-gray-600 mb-3">Handles general questions about hospital services and directions</p>
+                                <div class="flex items-center space-x-6 text-sm text-gray-500">
+                                    <span>👥 18 contacts</span>
+                                    <span>📞 156 calls this month</span>
+                                    <span>⏱️ Avg. 2.8 min call time</span>
+                                    <span>✅ 92% success rate</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="btn btn-sm" onclick="setupAgent('general-inquiry')">Setup Agent</button>
+                            <button class="btn btn-sm btn-secondary" onclick="manageContacts('general-inquiry')">Manage Contacts</button>
+                            <button class="btn btn-sm btn-secondary" onclick="viewAnalytics('general-inquiry')">Analytics</button>
+                            <button class="btn btn-sm btn-secondary" onclick="testAgent('general-inquiry')">Test</button>
+                        </div>
+                    </div>
+
+                    <!-- Emergency Triage Agent -->
+                    <div class="agent-card">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex-1">
+                                <div class="flex items-center mb-2">
+                                    <h3 class="text-lg font-semibold mr-3">🚨 Emergency Triage Agent</h3>
+                                    <span class="agent-status status-training">Training</span>
+                                </div>
+                                <p class="text-gray-600 mb-3">Initial assessment and routing for emergency situations</p>
+                                <div class="flex items-center space-x-6 text-sm text-gray-500">
+                                    <span>👥 15 contacts</span>
+                                    <span>📞 89 calls this month</span>
+                                    <span>⏱️ Avg. 4.1 min call time</span>
+                                    <span>✅ 98% success rate</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="btn btn-sm" onclick="setupAgent('emergency-triage')">Setup Agent</button>
+                            <button class="btn btn-sm btn-secondary" onclick="manageContacts('emergency-triage')">Manage Contacts</button>
+                            <button class="btn btn-sm btn-secondary" onclick="viewAnalytics('emergency-triage')">Analytics</button>
+                            <button class="btn btn-sm btn-secondary" onclick="testAgent('emergency-triage')">Test</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Channel Settings -->
+            <div class="card">
+                <h2 class="text-xl font-semibold mb-4">Channel Configuration</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-semibold mb-3">Call Routing</h3>
+                        <div class="space-y-2 text-sm text-gray-600">
+                            <p>• Route calls based on caller ID and time</p>
+                            <p>• Fallback to human operator after 3 failed attempts</p>
+                            <p>• Priority routing for emergency keywords</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-3">Operating Hours</h3>
+                        <div class="space-y-2 text-sm text-gray-600">
+                            <p>• Monday - Friday: 8:00 AM - 8:00 PM</p>
+                            <p>• Saturday: 9:00 AM - 5:00 PM</p>
+                            <p>• Sunday: Emergency calls only</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <button class="btn btn-secondary" onclick="configureChannel()">Edit Configuration</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const orgId = urlParams.get('org') || 'main-hospital';
+            const channelType = urlParams.get('channel') || 'inbound';
+            const userEmail = localStorage.getItem('userEmail') || 'user@example.com';
+            
+            document.getElementById('userEmail').textContent = userEmail;
+            
+            // Load channel data
+            loadChannelData(orgId, channelType);
+        });
+
+        function loadChannelData(orgId, channelType) {
+            const channelData = {
+                inbound: {
+                    name: 'Inbound Calls',
+                    icon: '📞',
+                    desc: 'Handle incoming patient calls and inquiries with AI voice agents',
+                    headerClass: 'inbound-header',
+                    agents: 3,
+                    contacts: 45,
+                    calls: 567,
+                    successRate: '94%'
+                },
+                outbound: {
+                    name: 'Outbound Calls',
+                    icon: '📲',
+                    desc: 'Proactive patient outreach and follow-up calls using AI voice agents',
+                    headerClass: 'outbound-header',
+                    agents: 2,
+                    contacts: 78,
+                    calls: 234,
+                    successRate: '89%'
+                },
+                whatsapp: {
+                    name: 'WhatsApp',
+                    icon: '💬',
+                    desc: 'WhatsApp messaging and voice notes with intelligent AI responses',
+                    headerClass: 'whatsapp-header',
+                    agents: 3,
+                    contacts: 33,
+                    calls: 445,
+                    successRate: '97%'
+                }
+            };
+
+            const channel = channelData[channelType];
+            
+            // Update UI
+            document.getElementById('channelName').textContent = channel.name;
+            document.getElementById('channelTitle').textContent = `${channel.icon} ${channel.name}`;
+            document.getElementById('channelDesc').textContent = channel.desc;
+            document.getElementById('agentCount').textContent = channel.agents;
+            document.getElementById('contactCount').textContent = channel.contacts;
+            document.getElementById('callCount').textContent = channel.calls;
+            document.getElementById('successRate').textContent = channel.successRate;
+            
+            // Update header class
+            const header = document.getElementById('channelHeader');
+            header.className = `channel-header ${channel.headerClass}`;
+            
+            // Store current context
+            window.currentOrg = orgId;
+            window.currentChannel = channelType;
+            
+            // Update agents list based on channel type
+            if (channelType === 'outbound') {
+                loadOutboundAgents();
+            } else if (channelType === 'whatsapp') {
+                loadWhatsAppAgents();
+            }
+        }
+
+        function loadOutboundAgents() {
+            const agentsList = document.getElementById('agentsList');
+            agentsList.innerHTML = `
+                <div class="agent-card">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex-1">
+                            <div class="flex items-center mb-2">
+                                <h3 class="text-lg font-semibold mr-3">🔄 Follow-up Reminder Agent</h3>
+                                <span class="agent-status status-active">Active</span>
+                            </div>
+                            <p class="text-gray-600 mb-3">Automated follow-up calls for treatment compliance and check-ups</p>
+                            <div class="flex items-center space-x-6 text-sm text-gray-500">
+                                <span>👥 35 contacts</span>
+                                <span>📞 145 calls this month</span>
+                                <span>⏱️ Avg. 2.5 min call time</span>
+                                <span>✅ 91% success rate</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="btn btn-sm" onclick="setupAgent('follow-up-reminder')">Setup Agent</button>
+                        <button class="btn btn-sm btn-secondary" onclick="manageContacts('follow-up-reminder')">Manage Contacts</button>
+                        <button class="btn btn-sm btn-secondary" onclick="viewAnalytics('follow-up-reminder')">Analytics</button>
+                        <button class="btn btn-sm btn-secondary" onclick="testAgent('follow-up-reminder')">Test</button>
+                    </div>
+                </div>
+                <div class="agent-card">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex-1">
+                            <div class="flex items-center mb-2">
+                                <h3 class="text-lg font-semibold mr-3">💊 Medication Reminder Agent</h3>
+                                <span class="agent-status status-active">Active</span>
+                            </div>
+                            <p class="text-gray-600 mb-3">Daily medication reminders and adherence monitoring</p>
+                            <div class="flex items-center space-x-6 text-sm text-gray-500">
+                                <span>👥 43 contacts</span>
+                                <span>📞 89 calls this month</span>
+                                <span>⏱️ Avg. 1.8 min call time</span>
+                                <span>✅ 87% success rate</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="btn btn-sm" onclick="setupAgent('medication-reminder')">Setup Agent</button>
+                        <button class="btn btn-sm btn-secondary" onclick="manageContacts('medication-reminder')">Manage Contacts</button>
+                        <button class="btn btn-sm btn-secondary" onclick="viewAnalytics('medication-reminder')">Analytics</button>
+                        <button class="btn btn-sm btn-secondary" onclick="testAgent('medication-reminder')">Test</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function loadWhatsAppAgents() {
+            const agentsList = document.getElementById('agentsList');
+            agentsList.innerHTML = `
+                <div class="agent-card">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex-1">
+                            <div class="flex items-center mb-2">
+                                <h3 class="text-lg font-semibold mr-3">💬 WhatsApp Support Agent</h3>
+                                <span class="agent-status status-active">Active</span>
+                            </div>
+                            <p class="text-gray-600 mb-3">24/7 WhatsApp support for patient queries and assistance</p>
+                            <div class="flex items-center space-x-6 text-sm text-gray-500">
+                                <span>👥 15 contacts</span>
+                                <span>📞 234 messages today</span>
+                                <span>⏱️ Avg. 45 sec response</span>
+                                <span>✅ 98% success rate</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="btn btn-sm" onclick="setupAgent('whatsapp-support')">Setup Agent</button>
+                        <button class="btn btn-sm btn-secondary" onclick="manageContacts('whatsapp-support')">Manage Contacts</button>
+                        <button class="btn btn-sm btn-secondary" onclick="viewAnalytics('whatsapp-support')">Analytics</button>
+                        <button class="btn btn-sm btn-secondary" onclick="testAgent('whatsapp-support')">Test</button>
+                    </div>
+                </div>
+                <div class="agent-card">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex-1">
+                            <div class="flex items-center mb-2">
+                                <h3 class="text-lg font-semibold mr-3">🎙️ Voice Note Agent</h3>
+                                <span class="agent-status status-active">Active</span>
+                            </div>
+                            <p class="text-gray-600 mb-3">Process and respond to WhatsApp voice messages in Hindi</p>
+                            <div class="flex items-center space-x-6 text-sm text-gray-500">
+                                <span>👥 18 contacts</span>
+                                <span>📞 89 voice notes today</span>
+                                <span>⏱️ Avg. 1.2 min processing</span>
+                                <span>✅ 95% success rate</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="btn btn-sm" onclick="setupAgent('voice-note')">Setup Agent</button>
+                        <button class="btn btn-sm btn-secondary" onclick="manageContacts('voice-note')">Manage Contacts</button>
+                        <button class="btn btn-sm btn-secondary" onclick="viewAnalytics('voice-note')">Analytics</button>
+                        <button class="btn btn-sm btn-secondary" onclick="testAgent('voice-note')">Test</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function goBackToOrg() {
+            const orgId = window.currentOrg || 'main-hospital';
+            window.location.href = `/organization-detail.html?org=${orgId}`;
+        }
+
+        function setupAgent(agentId) {
+            const orgId = window.currentOrg;
+            const channelType = window.currentChannel;
+            window.location.href = `/agent-setup.html?org=${orgId}&channel=${channelType}&agent=${agentId}`;
+        }
+
+        function manageContacts(agentId) {
+            const orgId = window.currentOrg;
+            const channelType = window.currentChannel;
+            window.location.href = `/contact-management.html?org=${orgId}&channel=${channelType}&agent=${agentId}`;
+        }
+
+        function viewAnalytics(agentId) {
+            alert(`Opening analytics dashboard for ${agentId}. This will show detailed performance metrics, call statistics, and success rates.`);
+        }
+
+        function testAgent(agentId) {
+            alert(`Starting test call with ${agentId}. This will simulate a conversation to test the agent's responses and behavior.`);
+        }
+
+        function addAgent() {
+            const orgId = window.currentOrg;
+            const channelType = window.currentChannel;
+            // Redirect to agent creation wizard with context
+            window.location.href = `/create-agent.html?org=${orgId}&channel=${channelType}`;
+        }
+
+        function configureChannel() {
+            alert('Opening channel configuration panel. This allows you to modify routing rules, operating hours, and channel-specific settings.');
+        }
+    </script>
+</body>
+</html>

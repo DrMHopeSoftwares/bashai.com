@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phone Numbers Management - BhashAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            margin: 4px 0;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid #fff;
+        }
+
+        .number-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            padding: 28px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .number-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .number-card:hover::before {
+            left: 100%;
+        }
+
+        .number-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+            border-color: var(--primary);
+        }
+
+        .number-card.premium {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 255, 255, 0.95));
+            border-color: #ffd700;
+        }
+
+        .quick-action {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-action::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .quick-action:hover::before {
+            left: 100%;
+        }
+
+        .quick-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .action-button {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 10px 16px;
+            margin: 4px;
+            cursor: pointer;
+            color: #374151;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .action-button:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .action-button.danger:hover {
+            background: var(--danger);
+        }
+
+        .action-button.success:hover {
+            background: var(--success);
+        }
+
+        .stats-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .stats-card:hover::before {
+            left: 100%;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .number-display {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-inactive {
+            background: rgba(107, 114, 128, 0.1);
+            color: #4b5563;
+            border: 1px solid rgba(107, 114, 128, 0.3);
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .feature-badge {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 2px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 16px 20px;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .cost-calculator {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+
+        .provider-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            margin-right: 12px;
+        }
+
+        .usage-chart {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+
+        .usage-bar {
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .usage-fill {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .premium-glow {
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+            border: 2px solid #ffd700;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="fixed left-0 top-0 h-full w-72 sidebar z-50">
+        <div class="p-6">
+            <div class="flex items-center mb-8">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center mr-3">
+                    <i class="fas fa-microphone-alt text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-white text-xl font-bold">BhashAI</h1>
+                    <p class="text-white/70 text-sm">Phone Numbers</p>
+                </div>
+            </div>
+
+            <nav class="space-y-2 mb-8">
+                <a href="/dashboard.html" class="nav-item flex items-center p-3 text-white/80">
+                    <i class="fas fa-chart-pie mr-3"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/create-agent.html" class="nav-item flex items-center p-3 text-white/80">
+                    <i class="fas fa-plus mr-3"></i>
+                    <span>Create Agent</span>
+                </a>
+                <a href="/agent-setup.html" class="nav-item flex items-center p-3 text-white/80">
+                    <i class="fas fa-robot mr-3"></i>
+                    <span>Voice Agents</span>
+                </a>
+                <a href="/contact-management.html" class="nav-item flex items-center p-3 text-white/80">
+                    <i class="fas fa-address-book mr-3"></i>
+                    <span>Contacts</span>
+                </a>
+                <a href="#" class="nav-item active flex items-center p-3 text-white">
+                    <i class="fas fa-phone mr-3"></i>
+                    <span>Phone Numbers</span>
+                </a>
+            </nav>
+
+            <!-- Number Stats -->
+            <div class="glassmorphism rounded-xl p-4 mb-6">
+                <h3 class="text-gray-800 font-semibold mb-4">📊 Usage Overview</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between text-gray-700">
+                        <span>Active Numbers:</span>
+                        <span class="font-bold text-gray-800">3</span>
+                    </div>
+                    <div class="flex justify-between text-gray-700">
+                        <span>Total Calls:</span>
+                        <span class="font-bold text-green-600">1,247</span>
+                    </div>
+                    <div class="flex justify-between text-gray-700">
+                        <span>Monthly Cost:</span>
+                        <span class="font-bold text-yellow-600">₹2,850</span>
+                    </div>
+                    <div class="flex justify-between text-gray-700">
+                        <span>Avg Duration:</span>
+                        <span class="font-bold text-blue-600">3.2 min</span>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <div class="text-sm text-white/70 mb-2">Monthly Usage</div>
+                    <div class="usage-bar">
+                        <div class="usage-fill" style="width: 65%"></div>
+                    </div>
+                    <div class="text-xs text-white/60">65% of plan limit</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="glassmorphism rounded-xl p-4">
+                <h3 class="text-white font-semibold mb-4">⚡ Quick Actions</h3>
+                <div class="space-y-3">
+                    <button class="quick-action w-full" onclick="purchaseNumber()">
+                        <i class="fas fa-plus mr-2"></i>Buy Number
+                    </button>
+                    <button class="quick-action w-full" onclick="portNumber()">
+                        <i class="fas fa-exchange-alt mr-2"></i>Port Number
+                    </button>
+                    <button class="quick-action w-full" onclick="viewBilling()">
+                        <i class="fas fa-receipt mr-2"></i>View Billing
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="ml-72 min-h-screen">
+        <!-- Header -->
+        <header class="glassmorphism border-b border-white/20 p-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">📞 My Phone Numbers</h1>
+                    <p class="text-gray-600">Manage your voice communication infrastructure</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="quick-action" onclick="purchaseNumber()">
+                        <i class="fas fa-plus mr-2"></i>Purchase Number
+                    </button>
+                    <button class="quick-action" onclick="viewAnalytics()">
+                        <i class="fas fa-chart-line mr-2"></i>Analytics
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Overview -->
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="stats-card floating">
+                    <div class="text-3xl mb-2">📱</div>
+                    <div class="text-2xl font-bold text-gray-800">3</div>
+                    <div class="text-gray-600">Active Numbers</div>
+                </div>
+                <div class="stats-card floating" style="animation-delay: 0.2s;">
+                    <div class="text-3xl mb-2">📞</div>
+                    <div class="text-2xl font-bold text-blue-600">1,247</div>
+                    <div class="text-gray-600">Total Calls</div>
+                </div>
+                <div class="stats-card floating" style="animation-delay: 0.4s;">
+                    <div class="text-3xl mb-2">⏱️</div>
+                    <div class="text-2xl font-bold text-green-600">3.2 min</div>
+                    <div class="text-gray-600">Avg Duration</div>
+                </div>
+                <div class="stats-card floating" style="animation-delay: 0.6s;">
+                    <div class="text-3xl mb-2">💰</div>
+                    <div class="text-2xl font-bold text-purple-600">₹2,850</div>
+                    <div class="text-gray-600">Monthly Cost</div>
+                </div>
+            </div>
+
+            <!-- Phone Numbers List -->
+            <div class="glassmorphism rounded-2xl p-6 mb-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">Your Phone Numbers</h3>
+                
+                <div class="space-y-6">
+                    <!-- Premium Number -->
+                    <div class="number-card premium premium-glow slide-in">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="provider-logo">
+                                    <i class="fas fa-crown text-yellow-400"></i>
+                                </div>
+                                <div>
+                                    <div class="number-display pulse">+91 98765 43210</div>
+                                    <div class="text-sm text-gray-600">Primary Business Line</div>
+                                </div>
+                            </div>
+                            <div class="status-badge status-active">Premium Active</div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-gray-800">847</div>
+                                <div class="text-sm text-gray-600">Calls This Month</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-green-600">94%</div>
+                                <div class="text-sm text-gray-600">Success Rate</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-blue-600">₹1,450</div>
+                                <div class="text-sm text-gray-600">Monthly Cost</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="flex flex-wrap gap-2">
+                                <div class="feature-badge">📞 Inbound/Outbound</div>
+                                <div class="feature-badge">🔒 End-to-End Encryption</div>
+                                <div class="feature-badge">📊 Advanced Analytics</div>
+                                <div class="feature-badge">🎯 Smart Routing</div>
+                                <div class="feature-badge">💎 Premium Support</div>
+                            </div>
+                        </div>
+
+                        <div class="usage-chart">
+                            <div class="flex justify-between text-sm text-gray-600 mb-2">
+                                <span>Monthly Usage</span>
+                                <span>847/1000 calls</span>
+                            </div>
+                            <div class="usage-bar">
+                                <div class="usage-fill" style="width: 85%"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex space-x-3">
+                            <button class="action-button success" onclick="configureNumber('+91 98765 43210')">
+                                <i class="fas fa-cog mr-2"></i>Configure
+                            </button>
+                            <button class="action-button" onclick="viewCallLogs('+91 98765 43210')">
+                                <i class="fas fa-list mr-2"></i>Call Logs
+                            </button>
+                            <button class="action-button" onclick="testNumber('+91 98765 43210')">
+                                <i class="fas fa-phone mr-2"></i>Test Call
+                            </button>
+                            <button class="action-button danger" onclick="suspendNumber('+91 98765 43210')">
+                                <i class="fas fa-pause mr-2"></i>Suspend
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Standard Number 1 -->
+                    <div class="number-card slide-in" style="animation-delay: 0.1s;">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="provider-logo">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div>
+                                    <div class="number-display">+91 87654 32109</div>
+                                    <div class="text-sm text-gray-600">Appointment Booking Line</div>
+                                </div>
+                            </div>
+                            <div class="status-badge status-active">Active</div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-gray-800">234</div>
+                                <div class="text-sm text-gray-600">Calls This Month</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-green-600">87%</div>
+                                <div class="text-sm text-gray-600">Success Rate</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-blue-600">₹750</div>
+                                <div class="text-sm text-gray-600">Monthly Cost</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="flex flex-wrap gap-2">
+                                <div class="feature-badge">📞 Inbound Calls</div>
+                                <div class="feature-badge">🤖 AI Assistant</div>
+                                <div class="feature-badge">📋 Appointment Booking</div>
+                                <div class="feature-badge">🇮🇳 Hindi Support</div>
+                            </div>
+                        </div>
+
+                        <div class="usage-chart">
+                            <div class="flex justify-between text-sm text-gray-600 mb-2">
+                                <span>Monthly Usage</span>
+                                <span>234/500 calls</span>
+                            </div>
+                            <div class="usage-bar">
+                                <div class="usage-fill" style="width: 47%"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex space-x-3">
+                            <button class="action-button success" onclick="configureNumber('+91 87654 32109')">
+                                <i class="fas fa-cog mr-2"></i>Configure
+                            </button>
+                            <button class="action-button" onclick="viewCallLogs('+91 87654 32109')">
+                                <i class="fas fa-list mr-2"></i>Call Logs
+                            </button>
+                            <button class="action-button" onclick="testNumber('+91 87654 32109')">
+                                <i class="fas fa-phone mr-2"></i>Test Call
+                            </button>
+                            <button class="action-button danger" onclick="releaseNumber('+91 87654 32109')">
+                                <i class="fas fa-trash mr-2"></i>Release
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Standard Number 2 -->
+                    <div class="number-card slide-in" style="animation-delay: 0.2s;">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="provider-logo">
+                                    <i class="fas fa-phone-alt"></i>
+                                </div>
+                                <div>
+                                    <div class="number-display">+91 76543 21098</div>
+                                    <div class="text-sm text-gray-600">Emergency Support Line</div>
+                                </div>
+                            </div>
+                            <div class="status-badge status-pending">Setup Pending</div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-gray-800">12</div>
+                                <div class="text-sm text-gray-600">Test Calls</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-yellow-600">--</div>
+                                <div class="text-sm text-gray-600">Success Rate</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-blue-600">₹650</div>
+                                <div class="text-sm text-gray-600">Monthly Cost</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="flex flex-wrap gap-2">
+                                <div class="feature-badge">🚨 Emergency Line</div>
+                                <div class="feature-badge">🏥 24/7 Support</div>
+                                <div class="feature-badge">🎯 Priority Routing</div>
+                                <div class="feature-badge">📱 SMS Alerts</div>
+                            </div>
+                        </div>
+
+                        <div class="usage-chart">
+                            <div class="flex justify-between text-sm text-gray-600 mb-2">
+                                <span>Setup Progress</span>
+                                <span>60% Complete</span>
+                            </div>
+                            <div class="usage-bar">
+                                <div class="usage-fill" style="width: 60%"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex space-x-3">
+                            <button class="action-button success" onclick="continueSetup('+91 76543 21098')">
+                                <i class="fas fa-play mr-2"></i>Continue Setup
+                            </button>
+                            <button class="action-button" onclick="viewSetupGuide('+91 76543 21098')">
+                                <i class="fas fa-book mr-2"></i>Setup Guide
+                            </button>
+                            <button class="action-button" onclick="testNumber('+91 76543 21098')">
+                                <i class="fas fa-phone mr-2"></i>Test Call
+                            </button>
+                            <button class="action-button danger" onclick="cancelSetup('+91 76543 21098')">
+                                <i class="fas fa-times mr-2"></i>Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cost Calculator -->
+            <div class="glassmorphism rounded-2xl p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">💰 Cost Calculator & Billing</h3>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-4">Estimate New Number Costs</h4>
+                        <div class="cost-calculator">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Number Type</label>
+                                    <select class="form-input" onchange="updateCostEstimate()">
+                                        <option value="local">Local Number (₹650/month)</option>
+                                        <option value="premium">Premium Number (₹1,450/month)</option>
+                                        <option value="toll-free">Toll-Free (₹2,200/month)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Expected Monthly Calls</label>
+                                    <input type="range" min="100" max="5000" value="500" class="w-full" oninput="updateCostEstimate()">
+                                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                        <span>100</span>
+                                        <span id="callEstimate">500 calls</span>
+                                        <span>5000</span>
+                                    </div>
+                                </div>
+                                <div class="border-t pt-4">
+                                    <div class="flex justify-between text-lg font-bold">
+                                        <span>Estimated Monthly Cost:</span>
+                                        <span class="text-green-600" id="costEstimate">₹750</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-4">Current Month Billing</h4>
+                        <div class="space-y-4">
+                            <div class="flex justify-between py-2 border-b border-gray-200">
+                                <span>+91 98765 43210 (Premium)</span>
+                                <span class="font-semibold">₹1,450</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-gray-200">
+                                <span>+91 87654 32109 (Standard)</span>
+                                <span class="font-semibold">₹750</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-gray-200">
+                                <span>+91 76543 21098 (Setup)</span>
+                                <span class="font-semibold">₹650</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-gray-200">
+                                <span>Additional Call Charges</span>
+                                <span class="font-semibold">₹127</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-gray-200">
+                                <span>SMS & MMS</span>
+                                <span class="font-semibold">₹43</span>
+                            </div>
+                            <div class="flex justify-between py-2 font-bold text-lg">
+                                <span>Total</span>
+                                <span class="text-green-600">₹3,020</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 flex space-x-3">
+                            <button class="action-button success flex-1" onclick="viewDetailedBilling()">
+                                <i class="fas fa-receipt mr-2"></i>Detailed Bill
+                            </button>
+                            <button class="action-button flex-1" onclick="downloadInvoice()">
+                                <i class="fas fa-download mr-2"></i>Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purchase Number Modal -->
+    <div id="purchaseModal" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50">
+        <div class="modal-content max-w-2xl w-full mx-4 p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Purchase New Phone Number</h3>
+                <button onclick="closePurchaseModal()" class="action-button">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Select Location</label>
+                    <select class="form-input">
+                        <option>Mumbai, Maharashtra</option>
+                        <option>Delhi, NCR</option>
+                        <option>Bangalore, Karnataka</option>
+                        <option>Chennai, Tamil Nadu</option>
+                        <option>Kolkata, West Bengal</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Number Type</label>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="border border-gray-300 rounded-lg p-4 cursor-pointer hover:border-blue-500">
+                            <h4 class="font-semibold">Local Number</h4>
+                            <p class="text-sm text-gray-600">Standard local number</p>
+                            <p class="text-lg font-bold text-green-600">₹650/month</p>
+                        </div>
+                        <div class="border border-blue-500 bg-blue-50 rounded-lg p-4 cursor-pointer">
+                            <h4 class="font-semibold">Premium Number</h4>
+                            <p class="text-sm text-gray-600">Enhanced features</p>
+                            <p class="text-lg font-bold text-blue-600">₹1,450/month</p>
+                        </div>
+                        <div class="border border-gray-300 rounded-lg p-4 cursor-pointer hover:border-blue-500">
+                            <h4 class="font-semibold">Toll-Free</h4>
+                            <p class="text-sm text-gray-600">1800 number</p>
+                            <p class="text-lg font-bold text-purple-600">₹2,200/month</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-4 pt-6">
+                    <button onclick="closePurchaseModal()" class="action-button">Cancel</button>
+                    <button onclick="completePurchase()" class="quick-action">
+                        <i class="fas fa-shopping-cart mr-2"></i>Purchase Number
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Phone Numbers Management page loaded successfully!');
+        });
+
+        // Number management functions
+        function configureNumber(number) {
+            window.location.href = '/agent-setup.html?number=' + encodeURIComponent(number);
+        }
+
+        function viewCallLogs(number) {
+            alert('📋 Call Logs for ' + number + '\n\nThis would show detailed call history, duration, success rates, and analytics for this number.');
+        }
+
+        function testNumber(number) {
+            alert('📞 Test Call for ' + number + '\n\nInitiating test call to verify number functionality and voice agent response.');
+        }
+
+        function suspendNumber(number) {
+            if (confirm('Are you sure you want to suspend ' + number + '?\n\nThis will temporarily disable all calls to this number.')) {
+                alert('⏸️ Number suspended successfully!\n\nYou can reactivate it anytime from the number settings.');
+            }
+        }
+
+        function releaseNumber(number) {
+            if (confirm('Are you sure you want to release ' + number + '?\n\nThis action cannot be undone and you will lose this number.')) {
+                alert('🗑️ Number released successfully!\n\nThe number has been returned to the available pool.');
+            }
+        }
+
+        function continueSetup(number) {
+            alert('🔧 Continuing setup for ' + number + '\n\nRedirecting to the setup wizard to complete configuration.');
+        }
+
+        function viewSetupGuide(number) {
+            alert('📖 Setup Guide for ' + number + '\n\nOpening comprehensive setup guide with step-by-step instructions.');
+        }
+
+        function cancelSetup(number) {
+            if (confirm('Cancel setup for ' + number + '?\n\nThis will return the number and stop billing.')) {
+                alert('❌ Setup cancelled for ' + number);
+            }
+        }
+
+        // Purchase functions
+        function purchaseNumber() {
+            document.getElementById('purchaseModal').classList.remove('hidden');
+        }
+
+        function closePurchaseModal() {
+            document.getElementById('purchaseModal').classList.add('hidden');
+        }
+
+        function completePurchase() {
+            alert('🎉 Purchase Successful!\n\nYour new number will be activated within 24 hours. You will receive SMS and email confirmation.');
+            closePurchaseModal();
+        }
+
+        function portNumber() {
+            alert('📱 Number Porting\n\nTo port your existing number to BhashAI:\n\n1. Fill out the porting form\n2. Provide current carrier details\n3. Upload required documents\n4. Process takes 5-7 business days');
+        }
+
+        // Billing functions
+        function viewBilling() {
+            alert('💳 Billing Overview\n\nCurrent month: ₹3,020\nLast month: ₹2,750\nAverage: ₹2,890\n\nNext billing date: 15th Jan 2024');
+        }
+
+        function viewDetailedBilling() {
+            alert('📊 Detailed Billing Report\n\nDownloading detailed usage report with:\n- Call-by-call breakdown\n- Duration analysis\n- Cost breakdown\n- Usage patterns');
+        }
+
+        function downloadInvoice() {
+            alert('📄 Invoice Download\n\nDownloading PDF invoice for current month...');
+        }
+
+        function viewAnalytics() {
+            alert('📈 Phone Number Analytics\n\nOpening comprehensive analytics dashboard with:\n- Call volume trends\n- Success rate metrics\n- Cost analysis\n- Performance insights');
+        }
+
+        // Cost calculator
+        function updateCostEstimate() {
+            // This would calculate based on selected options
+            const calls = document.querySelector('input[type="range"]').value;
+            document.getElementById('callEstimate').textContent = calls + ' calls';
+            
+            // Simple calculation for demo
+            const baseCost = 750;
+            const additionalCost = Math.max(0, (calls - 500) * 0.5);
+            const total = baseCost + additionalCost;
+            
+            document.getElementById('costEstimate').textContent = '₹' + total.toFixed(0);
+        }
+    </script>
+</body>
+</html>

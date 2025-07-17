@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Button Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 50px; }
+        .test-button { 
+            background: #3b82f6; 
+            color: white; 
+            padding: 15px 30px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px;
+            margin: 10px;
+        }
+        .test-button:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+    <h1>Minimal Button Test</h1>
+    
+    <button class="test-button" onclick="alert('Button 1 works!')">
+        Test Button 1 (inline alert)
+    </button>
+    
+    <button class="test-button" onclick="testFunction()">
+        Test Button 2 (function call)
+    </button>
+    
+    <button class="test-button" onclick="showModal()">
+        Test Button 3 (modal function)
+    </button>
+    
+    <script>
+        function testFunction() {
+            alert('Test function works!');
+        }
+        
+        function showModal() {
+            alert('This would open a modal');
+            console.log('Modal function called');
+        }
+        
+        console.log('Script loaded successfully');
+    </script>
+</body>
+</html>

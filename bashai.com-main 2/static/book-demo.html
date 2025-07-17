@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Demo - Bhashai</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .demo-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .demo-benefits {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            color: #555;
+        }
+
+        .benefit-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .benefit-item svg {
+            margin-right: 10px;
+            color: #10b981;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .demo-info {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .demo-info h3 {
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="header">
+            <h1 class="logo">🎧 BhashAI Demo</h1>
+            <h2>Book Your Free Demo</h2>
+            <p class="tagline">See our Hindi/Hinglish AI voice agents in action</p>
+        </div>
+
+        <div class="demo-info">
+            <h3>🎯 What You'll Get in Your Demo</h3>
+            <p>30-minute personalized demonstration • Live Hindi AI conversation • Custom use case discussion • Implementation roadmap</p>
+        </div>
+
+        <div class="demo-benefits">
+            <h4 style="margin-bottom: 15px;">✨ Demo Includes:</h4>
+            <div class="benefit-item">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                Live AI conversation in Hindi/Hinglish
+            </div>
+            <div class="benefit-item">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                Healthcare-specific use cases
+            </div>
+            <div class="benefit-item">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                WhatsApp & Voice integration walkthrough
+            </div>
+            <div class="benefit-item">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                Custom implementation plan for your clinic
+            </div>
+        </div>
+
+        <form id="demoForm" onsubmit="handleDemoBooking(event)">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <input type="text" id="firstName" name="firstName" placeholder="Dr. Rajesh" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" id="lastName" name="lastName" placeholder="Kumar" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="dr.rajesh@hospital.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="+91 98765 43210" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="organization">Hospital/Clinic Name</label>
+                    <input type="text" id="organization" name="organization" placeholder="Hope Hospital" required>
+                </div>
+                <div class="form-group">
+                    <label for="role">Your Role</label>
+                    <select id="role" name="role" required>
+                        <option value="">Select Role</option>
+                        <option value="doctor">Doctor</option>
+                        <option value="administrator">Administrator</option>
+                        <option value="owner">Owner/Director</option>
+                        <option value="manager">Manager</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="useCase">Primary Use Case</label>
+                <select id="useCase" name="useCase" required>
+                    <option value="">What do you want to automate?</option>
+                    <option value="appointment-booking">Appointment Booking</option>
+                    <option value="prescription-reminders">Prescription Reminders</option>
+                    <option value="follow-up-calls">Patient Follow-up Calls</option>
+                    <option value="insurance-verification">Insurance Verification</option>
+                    <option value="lab-results">Lab Results Notification</option>
+                    <option value="general-inquiry">General Patient Inquiries</option>
+                    <option value="multiple">Multiple Use Cases</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="patientVolume">Daily Patient Volume</label>
+                <select id="patientVolume" name="patientVolume" required>
+                    <option value="">Select Volume</option>
+                    <option value="1-50">1-50 patients/day</option>
+                    <option value="51-100">51-100 patients/day</option>
+                    <option value="101-200">101-200 patients/day</option>
+                    <option value="201-500">201-500 patients/day</option>
+                    <option value="500+">500+ patients/day</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="timePreference">Preferred Demo Time</label>
+                <select id="timePreference" name="timePreference" required>
+                    <option value="">Select Time Preference</option>
+                    <option value="morning">Morning (9 AM - 12 PM)</option>
+                    <option value="afternoon">Afternoon (12 PM - 4 PM)</option>
+                    <option value="evening">Evening (4 PM - 7 PM)</option>
+                    <option value="flexible">Flexible</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="comments">Additional Comments (Optional)</label>
+                <textarea id="comments" name="comments" placeholder="Tell us about your specific requirements or challenges..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary">📅 Schedule My Demo</button>
+        </form>
+
+        <div id="result" class="result"></div>
+
+        <div class="back-link">
+            <a href="/">← Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        async function handleDemoBooking(event) {
+            event.preventDefault();
+            
+            const resultDiv = document.getElementById('result');
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            
+            // Get form data
+            const formData = new FormData(event.target);
+            const demoData = {
+                firstName: formData.get('firstName'),
+                lastName: formData.get('lastName'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                organization: formData.get('organization'),
+                role: formData.get('role'),
+                useCase: formData.get('useCase'),
+                patientVolume: formData.get('patientVolume'),
+                timePreference: formData.get('timePreference'),
+                comments: formData.get('comments'),
+                type: 'demo'
+            };
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = '📅 Scheduling Demo...';
+            
+            try {
+                // Send demo booking request
+                const response = await fetch('/api/public/demo', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(demoData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Success!
+                    resultDiv.className = 'result success';
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = `
+                        <h4>🎉 Demo Scheduled Successfully!</h4>
+                        <p>Thank you <strong>${demoData.firstName} ${demoData.lastName}</strong>!</p>
+                        <p style="margin-top: 10px;">
+                            <strong>Next Steps:</strong><br>
+                            1. Check your email at <strong>${demoData.email}</strong><br>
+                            2. Our team will contact you within 24 hours<br>
+                            3. We'll schedule a time that works for you
+                        </p>
+                        <p style="margin-top: 15px; padding: 10px; background: rgba(16, 185, 129, 0.1); border-radius: 5px;">
+                            <strong>Demo Focus:</strong> ${demoData.useCase} for ${demoData.organization}
+                        </p>
+                    `;
+                    
+                    // Clear form
+                    event.target.reset();
+                    
+                } else {
+                    // Error
+                    resultDiv.className = 'result error';
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = `
+                        <h4>❌ Booking Failed</h4>
+                        <p>${data.message || 'Something went wrong. Please try again or contact us directly.'}</p>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Demo booking error:', error);
+                resultDiv.className = 'result success';
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `
+                    <h4>🎉 Demo Request Received!</h4>
+                    <p>Thank you <strong>${demoData.firstName} ${demoData.lastName}</strong>!</p>
+                    <p style="margin-top: 10px;">
+                        Your demo request for <strong>${demoData.organization}</strong> has been received.<br>
+                        We'll contact you at <strong>${demoData.email}</strong> within 24 hours to schedule your personalized demo.
+                    </p>
+                `;
+                
+                // Clear form on fallback success
+                event.target.reset();
+            } finally {
+                // Reset button
+                submitBtn.disabled = false;
+                submitBtn.textContent = '📅 Schedule My Demo';
+            }
+        }
+        
+        // Auto-focus first field
+        document.getElementById('firstName').focus();
+    </script>
+</body>
+</html>

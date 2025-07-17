@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BhashAI - 20+ Languages Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Multi-language Support -->
+    <script src="/js/languages.js"></script>
+    <script src="/js/language-switcher.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .demo-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #fff, #f0f9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .demo-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .language-switcher-demo {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+
+        .languages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .language-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .language-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .language-card.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #4f46e5;
+            box-shadow: 0 0 20px rgba(79, 70, 229, 0.3);
+        }
+
+        .language-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .language-flag {
+            font-size: 2rem;
+        }
+
+        .language-info h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .language-info p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .language-sample {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            border-left: 3px solid #4f46e5;
+        }
+
+        .language-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .demo-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #4f46e5;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
+        .demo-features {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            margin-bottom: 2rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            background: rgba(79, 70, 229, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+
+        /* RTL Support */
+        [dir="rtl"] {
+            text-align: right;
+        }
+
+        [dir="rtl"] .language-header {
+            flex-direction: row-reverse;
+        }
+
+        [dir="rtl"] .feature-item {
+            flex-direction: row-reverse;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .demo-title {
+                font-size: 2rem;
+            }
+
+            .languages-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .demo-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-button">← Back to Home</a>
+
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1 class="demo-title" data-translate="demo.title">BhashAI Multi-Language Demo</h1>
+            <p class="demo-subtitle" data-translate="demo.subtitle">Experience AI voice agents in 20+ languages with real-time switching</p>
+            
+            <div class="language-switcher-demo">
+                <div class="language-switcher"></div>
+            </div>
+        </div>
+
+        <div class="demo-stats">
+            <div class="stat-card">
+                <span class="stat-number" id="languageCount">24</span>
+                <div class="stat-label" data-translate="stats.languages">Languages Supported</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">100%</span>
+                <div class="stat-label" data-translate="stats.coverage">Unicode Coverage</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">RTL</span>
+                <div class="stat-label" data-translate="stats.rtl">RTL Support</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">AI</span>
+                <div class="stat-label" data-translate="stats.voice">Voice Ready</div>
+            </div>
+        </div>
+
+        <div class="demo-features">
+            <h2 data-translate="features.title">Multi-Language Features</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">🌐</div>
+                    <div>
+                        <h3 data-translate="features.realtime">Real-time Language Switching</h3>
+                        <p data-translate="features.realtime_desc">Switch between languages instantly without page reload</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🎯</div>
+                    <div>
+                        <h3 data-translate="features.rtl">RTL Language Support</h3>
+                        <p data-translate="features.rtl_desc">Full support for right-to-left languages like Arabic and Urdu</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🎤</div>
+                    <div>
+                        <h3 data-translate="features.voice">Voice Agent Integration</h3>
+                        <p data-translate="features.voice_desc">AI voice agents trained for each language and dialect</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">💾</div>
+                    <div>
+                        <h3 data-translate="features.persistence">Language Persistence</h3>
+                        <p data-translate="features.persistence_desc">Your language preference is saved across sessions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="languages-grid" id="languagesGrid">
+            <div class="loading">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Demo-specific functionality
+        let currentDemoLanguage = 'en';
+
+        // Sample texts for each language
+        const demoTexts = {
+            'en': 'Hello! I am your AI voice agent. How can I help you today?',
+            'hi': 'नमस्ते! मैं आपका AI वॉयस एजेंट हूं। आज मैं आपकी कैसे मदद कर सकता हूं?',
+            'bn': 'নমস্কার! আমি আপনার AI ভয়েস এজেন্ট। আজ আমি কীভাবে আপনাকে সাহায্য করতে পারি?',
+            'ta': 'வணக்கம்! நான் உங்கள் AI குரல் முகவர். இன்று நான் உங்களுக்கு எப்படி உதவ முடியும்?',
+            'te': 'నమస్కారం! నేను మీ AI వాయిస్ ఏజెంట్. ఈరోజు నేను మీకు ఎలా సహాయం చేయగలను?',
+            'mr': 'नमस्कार! मी तुमचा AI व्हॉइस एजंट आहे. आज मी तुम्हाला कशी मदत करू शकतो?',
+            'gu': 'નમસ્તે! હું તમારો AI વૉઇસ એજન્ટ છું. આજે હું તમારી કેવી રીતે મદદ કરી શકું?',
+            'kn': 'ನಮಸ್ಕಾರ! ನಾನು ನಿಮ್ಮ AI ಧ್ವನಿ ಏಜೆಂಟ್. ಇಂದು ನಾನು ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಬಹುದು?',
+            'ml': 'നമസ്കാരം! ഞാൻ നിങ്ങളുടെ AI വോയ്സ് ഏജന്റാണ്. ഇന്ന് എനിക്ക് നിങ്ങളെ എങ്ങനെ സഹായിക്കാം?',
+            'pa': 'ਸਤ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ ਤੁਹਾਡਾ AI ਵੌਇਸ ਏਜੰਟ ਹਾਂ। ਅੱਜ ਮੈਂ ਤੁਹਾਡੀ ਕਿਵੇਂ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ?',
+            'or': 'ନମସ୍କାର! ମୁଁ ଆପଣଙ୍କର AI ଭଏସ୍ ଏଜେଣ୍ଟ। ଆଜି ମୁଁ ଆପଣଙ୍କୁ କିପରି ସାହାଯ୍ୟ କରିପାରିବି?',
+            'as': 'নমস্কাৰ! মই আপোনাৰ AI ভইচ এজেণ্ট। আজি মই আপোনাক কেনেকৈ সহায় কৰিব পাৰোঁ?',
+            'ur': 'السلام علیکم! میں آپ کا AI وائس ایجنٹ ہوں۔ آج میں آپ کی کیسے مدد کر سکتا ہوں؟',
+            'ne': 'नमस्कार! म तपाईंको AI भ्वाइस एजेन्ट हुँ। आज म तपाईंलाई कसरी मद्दत गर्न सक्छु?',
+            'si': 'ආයුබෝවන්! මම ඔබේ AI හඬ නියෝජිතයා. අද මට ඔබට කෙසේ උදව් කළ හැකිද?',
+            'ar': 'مرحبا! أنا وكيل الصوت الذكي الخاص بك. كيف يمكنني مساعدتك اليوم؟',
+            'zh': '你好！我是您的AI语音代理。今天我如何为您提供帮助？',
+            'ja': 'こんにちは！私はあなたのAI音声エージェントです。今日はどのようにお手伝いできますか？',
+            'ko': '안녕하세요! 저는 당신의 AI 음성 에이전트입니다. 오늘 어떻게 도와드릴까요？',
+            'th': 'สวัสดี! ฉันเป็นตัวแทนเสียง AI ของคุณ วันนี้ฉันจะช่วยคุณได้อย่างไร?',
+            'vi': 'Xin chào! Tôi là đại lý giọng nói AI của bạn. Hôm nay tôi có thể giúp bạn như thế nào?',
+            'id': 'Halo! Saya adalah agen suara AI Anda. Bagaimana saya bisa membantu Anda hari ini?',
+            'ms': 'Hello! Saya adalah ejen suara AI anda. Bagaimana saya boleh membantu anda hari ini?',
+            'tl': 'Kumusta! Ako ang inyong AI voice agent. Paano ko kayo matutulungan ngayon?'
+        };
+
+        // Generate language cards
+        function generateLanguageCards() {
+            const grid = document.getElementById('languagesGrid');
+            
+            if (!window.SUPPORTED_LANGUAGES) {
+                setTimeout(generateLanguageCards, 100);
+                return;
+            }
+
+            const languages = window.SUPPORTED_LANGUAGES;
+            
+            grid.innerHTML = Object.entries(languages).map(([code, lang]) => {
+                const sampleText = demoTexts[code] || demoTexts['en'];
+                
+                return `
+                    <div class="language-card fade-in" data-lang="${code}" onclick="selectLanguage('${code}')">
+                        <div class="language-header">
+                            <div class="language-flag">${lang.flag}</div>
+                            <div class="language-info">
+                                <h3>${lang.nativeName}</h3>
+                                <p>${lang.name} • ${lang.voice}</p>
+                            </div>
+                        </div>
+                        <div class="language-sample">"${sampleText}"</div>
+                        <div class="language-actions">
+                            <button class="btn btn-primary" onclick="event.stopPropagation(); playVoiceSample('${code}')">
+                                🎵 Play Sample
+                            </button>
+                            <button class="btn btn-secondary" onclick="event.stopPropagation(); selectLanguage('${code}')">
+                                🌐 Switch to ${lang.name}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Update language count
+            document.getElementById('languageCount').textContent = Object.keys(languages).length;
+        }
+
+        // Select language
+        function selectLanguage(langCode) {
+            // Remove active class from all cards
+            document.querySelectorAll('.language-card').forEach(card => {
+                card.classList.remove('active');
+            });
+
+            // Add active class to selected card
+            const selectedCard = document.querySelector(`[data-lang="${langCode}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('active');
+            }
+
+            // Change language using language manager
+            if (window.languageManager) {
+                window.languageManager.changeLanguage(langCode);
+                currentDemoLanguage = langCode;
+            }
+        }
+
+        // Play voice sample
+        function playVoiceSample(langCode) {
+            const lang = window.SUPPORTED_LANGUAGES[langCode];
+            if (lang) {
+                // Show notification
+                if (window.languageManager && window.languageManager.showNotification) {
+                    window.languageManager.showNotification(`🎵 Playing ${lang.nativeName} voice sample...`);
+                }
+
+                // In a real implementation, this would play actual audio
+                setTimeout(() => {
+                    if (window.languageManager && window.languageManager.showNotification) {
+                        window.languageManager.showNotification(`✅ ${lang.nativeName} voice sample completed!`);
+                    }
+                }, 2000);
+            }
+        }
+
+        // Initialize demo
+        function initDemo() {
+            if (window.languageManager) {
+                // Initialize language manager
+                window.languageManager.init();
+                
+                // Generate language cards
+                generateLanguageCards();
+                
+                // Set initial active language
+                setTimeout(() => {
+                    selectLanguage(window.languageManager.currentLang || 'en');
+                }, 500);
+                
+                // Show welcome message
+                setTimeout(() => {
+                    if (window.languageManager.showNotification) {
+                        window.languageManager.showNotification('🌐 Welcome to BhashAI Multi-Language Demo!');
+                    }
+                }, 1000);
+            } else {
+                setTimeout(initDemo, 100);
+            }
+        }
+
+        // Start demo when page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initDemo);
+        } else {
+            initDemo();
+        }
+    </script>
+</body>
+</html>

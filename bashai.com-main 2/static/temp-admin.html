@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temporary Admin Access</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .method {
+            border: 2px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .method:hover {
+            border-color: #007cba;
+            background: #f0f8ff;
+        }
+        button {
+            background: #007cba;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #005a87;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-left: 4px solid #007cba;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Temporary Admin Access</h1>
+        <p>Quick solutions to access the admin dashboard while fixing OAuth issues.</p>
+
+        <div class="info">
+            <strong>Current Issue:</strong> Google OAuth configuration needs to be fixed in Clerk dashboard.<br>
+            <strong>Solution:</strong> Use these temporary access methods.
+        </div>
+
+        <div class="method">
+            <h3>Method 1: Direct Dashboard Access</h3>
+            <p>Try accessing the admin dashboard directly. If you're already logged in somewhere, this might work.</p>
+            <button onclick="window.open('/admin-dashboard.html', '_blank')">
+                🎯 Open Admin Dashboard
+            </button>
+        </div>
+
+        <div class="method">
+            <h3>Method 2: Regular Dashboard (Check for Admin Features)</h3>
+            <p>The regular dashboard might have admin features if you're logged in as admin.</p>
+            <button onclick="window.open('/dashboard.html', '_blank')">
+                📊 Open Regular Dashboard  
+            </button>
+        </div>
+
+        <div class="method">
+            <h3>Method 3: Test API Directly</h3>
+            <p>Test if the admin API endpoints are working.</p>
+            <button onclick="testAPI()">🧪 Test Admin API</button>
+            <div id="apiResult"></div>
+        </div>
+
+        <div class="method">
+            <h3>Method 4: Create Enterprise via Backend</h3>
+            <p>Create an enterprise directly through the backend.</p>
+            <input type="text" id="enterpriseName" placeholder="Enterprise Name" style="width: 200px; padding: 8px; margin: 5px;">
+            <input type="email" id="enterpriseEmail" placeholder="Owner Email" style="width: 200px; padding: 8px; margin: 5px;">
+            <br>
+            <button onclick="createEnterpriseBackend()">🏢 Create Enterprise</button>
+            <div id="createResult"></div>
+        </div>
+
+        <div class="method">
+            <h3>Method 5: Configuration Checker</h3>
+            <p>Check the current Clerk configuration to diagnose issues.</p>
+            <button onclick="window.open('/check_clerk_config.html', '_blank')">
+                🔍 Check Configuration
+            </button>
+        </div>
+
+        <hr style="margin: 30px 0;">
+        
+        <h3>📋 OAuth Fix Instructions</h3>
+        <div style="background: #fff3cd; padding: 15px; border-radius: 5px;">
+            <p><strong>To fix the Google OAuth issue permanently:</strong></p>
+            <ol>
+                <li>Go to <a href="https://dashboard.clerk.com" target="_blank">Clerk Dashboard</a></li>
+                <li>Select your production application</li>
+                <li>Go to "User & Authentication" → "Social Connections"</li>
+                <li>Configure Google OAuth provider</li>
+                <li>Add bhashai.com to allowed domains</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        async function testAPI() {
+            const resultEl = document.getElementById('apiResult');
+            resultEl.innerHTML = 'Testing API...';
+            
+            try {
+                const response = await fetch('/api/admin/stats');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultEl.innerHTML = `<div class="success">✅ API Working! Found ${data.total_enterprises || 0} enterprises</div>`;
+                } else {
+                    resultEl.innerHTML = `<div class="error">❌ API Error: ${data.message}</div>`;
+                }
+            } catch (error) {
+                resultEl.innerHTML = `<div class="error">❌ Connection Error: ${error.message}</div>`;
+            }
+        }
+
+        async function createEnterpriseBackend() {
+            const name = document.getElementById('enterpriseName').value;
+            const email = document.getElementById('enterpriseEmail').value;
+            const resultEl = document.getElementById('createResult');
+            
+            if (!name || !email) {
+                resultEl.innerHTML = '<div class="error">❌ Please enter both name and email</div>';
+                return;
+            }
+            
+            resultEl.innerHTML = 'Creating enterprise...';
+            
+            try {
+                const response = await fetch('/api/admin/enterprises', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        type: 'healthcare',
+                        contact_email: email,
+                        status: 'trial'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultEl.innerHTML = `<div class="success">✅ Enterprise created successfully!</div>`;
+                } else {
+                    resultEl.innerHTML = `<div class="error">❌ Creation failed: ${data.message}</div>`;
+                }
+            } catch (error) {
+                resultEl.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

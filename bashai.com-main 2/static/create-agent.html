@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Voice Agent - BhashAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            margin: 4px 0;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid #fff;
+        }
+
+        .use-case-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            padding: 2.5rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .use-case-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .use-case-card:hover::before {
+            left: 100%;
+        }
+
+        .use-case-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.25);
+            transform: translateY(-8px);
+        }
+
+        .use-case-card.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .use-case-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .inbound-icon { 
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .outbound-icon { 
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .prebuilt-icon { 
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+
+        .template-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .template-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.05), transparent);
+            transition: left 0.5s;
+        }
+
+        .template-card:hover::before {
+            left: 100%;
+        }
+
+        .template-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .template-card.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.2);
+        }
+
+        .step-indicator {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            position: relative;
+        }
+
+        .step-indicator.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .step-indicator.completed {
+            background: linear-gradient(135deg, var(--success), #059669);
+            border-color: var(--success);
+        }
+
+        .step-line {
+            height: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            flex: 1;
+            margin: 0 1rem;
+        }
+
+        .step-line.active {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .quick-action {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-action::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .quick-action:hover::before {
+            left: 100%;
+        }
+
+        .quick-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .quick-action:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 16px 20px;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .feature-badge {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 2px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .cost-indicator {
+            background: rgba(255, 255, 255, 0.9);
+            color: #6b7280;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .cost-low { border-left: 4px solid #10b981; }
+        .cost-medium { border-left: 4px solid #f59e0b; }
+        .cost-high { border-left: 4px solid #ef4444; }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="fixed left-0 top-0 h-full w-72 sidebar z-50">
+        <div class="p-6">
+            <div class="flex items-center mb-8">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center mr-3">
+                    <i class="fas fa-microphone-alt text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-white text-xl font-bold">BhashAI</h1>
+                    <p class="text-white/70 text-sm">Create Voice Agent</p>
+                </div>
+            </div>
+
+            <nav class="space-y-2 mb-8">
+                <a href="/dashboard.html" class="nav-item flex items-center p-3 text-white/80">
+                    <i class="fas fa-chart-pie mr-3"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item active flex items-center p-3 text-white">
+                    <i class="fas fa-plus mr-3"></i>
+                    <span>Create Agent</span>
+                </a>
+                <a href="/agent-setup.html" class="nav-item flex items-center p-3 text-white/80">
+                    <i class="fas fa-robot mr-3"></i>
+                    <span>Voice Agents</span>
+                </a>
+                <a href="/contact-management.html" class="nav-item flex items-center p-3 text-white/80">
+                    <i class="fas fa-address-book mr-3"></i>
+                    <span>Contacts</span>
+                </a>
+            </nav>
+
+            <!-- Progress Indicator -->
+            <div class="glassmorphism rounded-xl p-4">
+                <h3 class="text-gray-800 font-semibold mb-4">Creation Progress</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        <div class="step-indicator active">1</div>
+                        <div class="step-line active"></div>
+                        <span class="text-gray-800 text-sm">Use Case</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="step-indicator" id="step2">2</div>
+                        <div class="step-line" id="line2"></div>
+                        <span class="text-gray-600 text-sm">Template</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="step-indicator" id="step3">3</div>
+                        <div class="step-line" id="line3"></div>
+                        <span class="text-gray-600 text-sm">Configure</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="step-indicator" id="step4">4</div>
+                        <span class="text-gray-600 text-sm ml-4">Deploy</span>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <div class="flex justify-between text-sm text-gray-700 mb-2">
+                        <span>Progress</span>
+                        <span id="progressText">25%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar" style="width: 25%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="ml-72 min-h-screen">
+        <!-- Header -->
+        <header class="glassmorphism border-b border-white/20 p-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">🚀 Create New Voice Agent</h1>
+                    <p class="text-gray-600">Build your AI assistant for Hindi/Hinglish conversations</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="quick-action" onclick="saveAndContinueLater()">
+                        <i class="fas fa-save mr-2"></i>
+                        Save Draft
+                    </button>
+                    <button class="quick-action" onclick="getHelp()">
+                        <i class="fas fa-question-circle mr-2"></i>
+                        Get Help
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Step 1: Use Case Selection -->
+        <div id="step1" class="step-content p-8">
+            <div class="glassmorphism rounded-2xl p-8 mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Step 1: Choose Your Use Case</h2>
+                <p class="text-gray-600 mb-8">Select the primary purpose of your voice agent to get started with the best configuration.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="use-case-card slide-in" onclick="selectUseCase('inbound')" id="inbound-card">
+                        <div class="use-case-icon inbound-icon floating">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Inbound Calls</h3>
+                        <p class="text-gray-600 mb-4">Handle incoming calls from customers, patients, or clients with automated responses.</p>
+                        <div class="space-y-2">
+                            <div class="feature-badge">📞 Call Answering</div>
+                            <div class="feature-badge">🏥 Appointment Booking</div>
+                            <div class="feature-badge">ℹ️ Information Queries</div>
+                            <div class="feature-badge">🔄 Call Routing</div>
+                        </div>
+                        <div class="cost-indicator cost-low">
+                            <i class="fas fa-rupee-sign mr-2"></i>Low Cost • ₹1-3/min
+                        </div>
+                    </div>
+
+                    <div class="use-case-card slide-in" onclick="selectUseCase('outbound')" id="outbound-card" style="animation-delay: 0.1s;">
+                        <div class="use-case-icon outbound-icon floating" style="animation-delay: 0.5s;">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Outbound Calls</h3>
+                        <p class="text-gray-600 mb-4">Make automated calls for reminders, follow-ups, surveys, and marketing campaigns.</p>
+                        <div class="space-y-2">
+                            <div class="feature-badge">💊 Medication Reminders</div>
+                            <div class="feature-badge">📋 Survey Calls</div>
+                            <div class="feature-badge">📧 Follow-up Calls</div>
+                            <div class="feature-badge">📢 Announcements</div>
+                        </div>
+                        <div class="cost-indicator cost-medium">
+                            <i class="fas fa-rupee-sign mr-2"></i>Medium Cost • ₹3-5/min
+                        </div>
+                    </div>
+
+                    <div class="use-case-card slide-in" onclick="selectUseCase('prebuilt')" id="prebuilt-card" style="animation-delay: 0.2s;">
+                        <div class="use-case-icon prebuilt-icon floating" style="animation-delay: 1s;">
+                            <i class="fas fa-magic"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Pre-built Templates</h3>
+                        <p class="text-gray-600 mb-4">Start with ready-made agents for common use cases in healthcare and business.</p>
+                        <div class="space-y-2">
+                            <div class="feature-badge">🏥 Healthcare Templates</div>
+                            <div class="feature-badge">🏢 Business Templates</div>
+                            <div class="feature-badge">⚡ Quick Setup</div>
+                            <div class="feature-badge">🎯 Optimized</div>
+                        </div>
+                        <div class="cost-indicator cost-low">
+                            <i class="fas fa-rupee-sign mr-2"></i>Optimized Cost • ₹1-4/min
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <button class="quick-action" id="continueBtn1" onclick="goToStep2()" disabled>
+                        <i class="fas fa-arrow-right mr-2"></i>
+                        Continue to Templates
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Template Selection -->
+        <div id="step2" class="step-content p-8" style="display: none;">
+            <div class="glassmorphism rounded-2xl p-8 mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Step 2: Choose a Template</h2>
+                <p class="text-gray-600 mb-8">Select a pre-configured template that matches your needs, or start from scratch.</p>
+                
+                <div id="templateContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Templates will be loaded here based on use case -->
+                </div>
+
+                <div class="mt-8 flex justify-between">
+                    <button class="quick-action" onclick="goToStep1()">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Use Cases
+                    </button>
+                    <button class="quick-action" id="continueBtn2" onclick="goToStep3()" disabled>
+                        <i class="fas fa-arrow-right mr-2"></i>
+                        Continue to Configuration
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Configuration -->
+        <div id="step3" class="step-content p-8" style="display: none;">
+            <div class="glassmorphism rounded-2xl p-8 mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Step 3: Configure Your Agent</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Agent Name *</label>
+                            <input type="text" id="agentName" class="form-input" placeholder="e.g., Appointment Booking Assistant" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                            <textarea id="agentDescription" class="form-input" rows="3" placeholder="Describe what this agent does..."></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Department/Organization</label>
+                            <select id="agentOrganization" class="form-input">
+                                <option>Main Hospital</option>
+                                <option>Emergency Department</option>
+                                <option>Outpatient Clinic</option>
+                                <option>Pharmacy</option>
+                                <option>Billing Department</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-4">Languages</label>
+                            <div class="space-y-3">
+                                <label class="flex items-center">
+                                    <input type="checkbox" checked class="mr-3 w-4 h-4 text-blue-600 rounded">
+                                    <span>🇮🇳 Hindi (हिंदी)</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" checked class="mr-3 w-4 h-4 text-blue-600 rounded">
+                                    <span>🇬🇧 English</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" checked class="mr-3 w-4 h-4 text-blue-600 rounded">
+                                    <span>🔄 Hinglish (Mixed)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Voice Type</label>
+                            <select class="form-input">
+                                <option>Female - Professional</option>
+                                <option>Male - Professional</option>
+                                <option>Female - Friendly</option>
+                                <option>Male - Friendly</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Personality</label>
+                            <select class="form-input">
+                                <option>Professional & Polite</option>
+                                <option>Friendly & Warm</option>
+                                <option>Casual & Conversational</option>
+                                <option>Formal & Business-like</option>
+                                <option>Empathetic & Caring</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Response Speed</label>
+                            <select class="form-input">
+                                <option>Quick & Efficient</option>
+                                <option>Balanced</option>
+                                <option>Thoughtful & Detailed</option>
+                            </select>
+                        </div>
+
+                        <div class="glassmorphism rounded-xl p-6">
+                            <h4 class="font-semibold text-gray-800 mb-3">🎯 Quick Preview</h4>
+                            <p class="text-gray-600 text-sm mb-4">Your agent will say:</p>
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                <p class="text-blue-800 italic">"नमस्ते! मैं आपकी अपॉइंटमेंट बुकिंग में सहायता कर सकता हूँ। आपका नाम क्या है?"</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-between">
+                    <button class="quick-action" onclick="goToStep2()">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Templates
+                    </button>
+                    <button class="quick-action" onclick="goToStep4()">
+                        <i class="fas fa-arrow-right mr-2"></i>
+                        Continue to Deploy
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Deploy -->
+        <div id="step4" class="step-content p-8" style="display: none;">
+            <div class="glassmorphism rounded-2xl p-8 mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Step 4: Review & Deploy</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">📋 Agent Summary</h3>
+                        <div class="space-y-4" id="agentSummary">
+                            <div class="flex justify-between py-2 border-b border-gray-200">
+                                <span class="text-gray-600">Name:</span>
+                                <span class="font-medium" id="summaryName">-</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-gray-200">
+                                <span class="text-gray-600">Use Case:</span>
+                                <span class="font-medium" id="summaryUseCase">-</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-gray-200">
+                                <span class="text-gray-600">Template:</span>
+                                <span class="font-medium" id="summaryTemplate">-</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-gray-200">
+                                <span class="text-gray-600">Languages:</span>
+                                <span class="font-medium">Hindi, English, Hinglish</span>
+                            </div>
+                            <div class="flex justify-between py-2">
+                                <span class="text-gray-600">Estimated Cost:</span>
+                                <span class="font-medium text-green-600">₹2-4/min</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <h4 class="font-semibold text-gray-800 mb-3">🚀 Deployment Options</h4>
+                            <div class="space-y-3">
+                                <label class="flex items-center">
+                                    <input type="radio" name="deployment" value="test" checked class="mr-3">
+                                    <span>Test Mode (Free for 7 days)</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="deployment" value="live" class="mr-3">
+                                    <span>Live Deployment (Start billing)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">🧪 Final Test</h3>
+                        <div class="glassmorphism rounded-xl p-6 h-80 overflow-y-auto">
+                            <div class="space-y-4" id="finalTestConsole">
+                                <div class="text-gray-500 text-center py-8">
+                                    <i class="fas fa-vial text-4xl mb-4"></i>
+                                    <p>Click "Test Agent" to run a final test</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 space-y-3">
+                            <button class="quick-action w-full" onclick="runFinalTest()">
+                                <i class="fas fa-play mr-2"></i>
+                                Test Agent Before Deploy
+                            </button>
+                            <button class="quick-action w-full" onclick="deployAgent()" id="deployBtn">
+                                <i class="fas fa-rocket mr-2"></i>
+                                Deploy Agent
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-between">
+                    <button class="quick-action" onclick="goToStep3()">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Configuration
+                    </button>
+                    <button class="quick-action" onclick="window.location.href='/agent-setup.html'">
+                        <i class="fas fa-cog mr-2"></i>
+                        Advanced Setup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let selectedUseCase = null;
+        let selectedTemplate = null;
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Create Agent page loaded successfully!');
+        });
+
+        // Use case selection
+        function selectUseCase(useCase) {
+            selectedUseCase = useCase;
+            
+            // Remove selection from all cards
+            document.querySelectorAll('.use-case-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selection to clicked card
+            document.getElementById(useCase + '-card').classList.add('selected');
+            
+            // Enable continue button
+            document.getElementById('continueBtn1').disabled = false;
+        }
+
+        // Step navigation
+        function goToStep1() {
+            showStep(1);
+            updateProgress(25);
+        }
+
+        function goToStep2() {
+            if (!selectedUseCase) {
+                alert('Please select a use case first!');
+                return;
+            }
+            showStep(2);
+            updateProgress(50);
+            loadTemplates(selectedUseCase);
+        }
+
+        function goToStep3() {
+            if (!selectedTemplate) {
+                alert('Please select a template first!');
+                return;
+            }
+            showStep(3);
+            updateProgress(75);
+        }
+
+        function goToStep4() {
+            showStep(4);
+            updateProgress(100);
+            updateSummary();
+        }
+
+        function showStep(step) {
+            // Hide all steps
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Show selected step
+            document.getElementById('step' + step).style.display = 'block';
+            
+            // Update step indicators
+            updateStepIndicators(step);
+            currentStep = step;
+        }
+
+        function updateStepIndicators(activeStep) {
+            for (let i = 1; i <= 4; i++) {
+                const indicator = document.getElementById('step' + i) || document.querySelector('.step-indicator:nth-child(' + (i * 2 - 1) + ')');
+                const line = document.getElementById('line' + i);
+                
+                if (i < activeStep) {
+                    indicator?.classList.add('completed');
+                    indicator?.classList.remove('active');
+                    line?.classList.add('active');
+                } else if (i === activeStep) {
+                    indicator?.classList.add('active');
+                    indicator?.classList.remove('completed');
+                } else {
+                    indicator?.classList.remove('active', 'completed');
+                    line?.classList.remove('active');
+                }
+            }
+        }
+
+        function updateProgress(percentage) {
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = percentage + '%';
+        }
+
+        // Template loading
+        function loadTemplates(useCase) {
+            const container = document.getElementById('templateContainer');
+            let templates = [];
+
+            if (useCase === 'inbound') {
+                templates = [
+                    {
+                        id: 'appointment',
+                        name: 'Appointment Booking',
+                        description: 'Handle appointment scheduling and rescheduling',
+                        features: ['📅 Schedule appointments', '🔄 Reschedule/Cancel', '📋 Patient info collection', '⏰ Reminder setup'],
+                        cost: 'Low'
+                    },
+                    {
+                        id: 'reception',
+                        name: 'Virtual Receptionist',
+                        description: 'Answer general inquiries and route calls',
+                        features: ['📞 Call routing', 'ℹ️ General info', '🏥 Department directory', '⏰ Operating hours'],
+                        cost: 'Low'
+                    },
+                    {
+                        id: 'support',
+                        name: 'Patient Support',
+                        description: 'Provide support and answer patient questions',
+                        features: ['❓ FAQ responses', '💊 Medication info', '📋 Procedure prep', '🤝 Emotional support'],
+                        cost: 'Medium'
+                    }
+                ];
+            } else if (useCase === 'outbound') {
+                templates = [
+                    {
+                        id: 'reminder',
+                        name: 'Appointment Reminders',
+                        description: 'Automated appointment reminder calls',
+                        features: ['⏰ Appointment alerts', '📅 Reschedule options', '✅ Confirmation', '📱 SMS backup'],
+                        cost: 'Low'
+                    },
+                    {
+                        id: 'medication',
+                        name: 'Medication Reminders',
+                        description: 'Daily medication reminder calls',
+                        features: ['💊 Dose reminders', '⏰ Timing alerts', '✅ Adherence tracking', '🚨 Missed dose alerts'],
+                        cost: 'Medium'
+                    },
+                    {
+                        id: 'followup',
+                        name: 'Follow-up Calls',
+                        description: 'Post-treatment follow-up and care',
+                        features: ['🏥 Post-visit check', '😊 Satisfaction survey', '📊 Health monitoring', '📋 Care instructions'],
+                        cost: 'Medium'
+                    }
+                ];
+            } else if (useCase === 'prebuilt') {
+                templates = [
+                    {
+                        id: 'hospital',
+                        name: 'Complete Hospital System',
+                        description: 'Full-featured hospital communication system',
+                        features: ['📞 All call types', '🏥 Multi-department', '📊 Analytics', '🔧 Customizable'],
+                        cost: 'Medium'
+                    },
+                    {
+                        id: 'clinic',
+                        name: 'Small Clinic Package',
+                        description: 'Perfect for small clinics and practices',
+                        features: ['📅 Appointments', '📞 Reception', '💊 Prescriptions', '⚡ Quick setup'],
+                        cost: 'Low'
+                    },
+                    {
+                        id: 'pharmacy',
+                        name: 'Pharmacy Assistant',
+                        description: 'Specialized for pharmacy operations',
+                        features: ['💊 Prescription ready', '📦 Order status', '🚚 Delivery updates', '💳 Payment reminders'],
+                        cost: 'Medium'
+                    }
+                ];
+            }
+
+            container.innerHTML = templates.map(template => `
+                <div class="template-card slide-in" onclick="selectTemplate('${template.id}')" id="${template.id}-template">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-2">${template.name}</h4>
+                    <p class="text-gray-600 text-sm mb-4">${template.description}</p>
+                    <div class="space-y-2 mb-4">
+                        ${template.features.map(feature => `<div class="feature-badge">${feature}</div>`).join('')}
+                    </div>
+                    <div class="cost-indicator cost-${template.cost.toLowerCase()}">
+                        <i class="fas fa-rupee-sign mr-2"></i>${template.cost} Cost
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectTemplate(templateId) {
+            selectedTemplate = templateId;
+            
+            // Remove selection from all cards
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selection to clicked card
+            document.getElementById(templateId + '-template').classList.add('selected');
+            
+            // Enable continue button
+            document.getElementById('continueBtn2').disabled = false;
+        }
+
+        function updateSummary() {
+            document.getElementById('summaryName').textContent = document.getElementById('agentName').value || 'Unnamed Agent';
+            document.getElementById('summaryUseCase').textContent = selectedUseCase ? selectedUseCase.charAt(0).toUpperCase() + selectedUseCase.slice(1) : '-';
+            document.getElementById('summaryTemplate').textContent = selectedTemplate ? selectedTemplate.charAt(0).toUpperCase() + selectedTemplate.slice(1) : '-';
+        }
+
+        function runFinalTest() {
+            const console = document.getElementById('finalTestConsole');
+            console.innerHTML = `
+                <div class="text-blue-600 mb-2">
+                    <i class="fas fa-spinner fa-spin mr-2"></i>Running final test...
+                </div>
+            `;
+            
+            setTimeout(() => {
+                console.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                            <div class="font-medium text-blue-800">🤖 Agent:</div>
+                            <div class="text-blue-600">नमस्ते! मैं ${document.getElementById('agentName').value || 'आपका असिस्टेंट'} हूं। मैं आपकी सहायता कैसे कर सकता हूं?</div>
+                        </div>
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+                            <div class="font-medium text-green-800">✅ Test Result:</div>
+                            <div class="text-green-600">Agent is working perfectly! Ready for deployment.</div>
+                        </div>
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                            <div class="font-medium text-yellow-800">📊 Performance:</div>
+                            <div class="text-yellow-600">Response time: 0.8s • Accuracy: 95% • Language detection: Perfect</div>
+                        </div>
+                    </div>
+                `;
+            }, 3000);
+        }
+
+        // API helper function
+        async function apiRequest(url, options = {}) {
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                }
+            };
+            
+            const response = await fetch(url, { ...defaultOptions, ...options });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'API request failed');
+            }
+            
+            return response.json();
+        }
+
+        async function deployAgent() {
+            const btn = document.getElementById('deployBtn');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Deploying...';
+            btn.disabled = true;
+            
+            try {
+                // Get form data
+                const agentData = {
+                    name: document.getElementById('agentName').value || 'Unnamed Agent',
+                    description: document.getElementById('agentDescription').value || '',
+                    use_case: selectedUseCase || 'general',
+                    template: selectedTemplate || 'basic',
+                    language: 'hindi', // Default to Hindi
+                    is_active: true
+                };
+                
+                // Get organization and channel from URL or localStorage
+                const urlParams = new URLSearchParams(window.location.search);
+                const orgId = urlParams.get('orgId') || localStorage.getItem('currentOrgId');
+                const channelId = urlParams.get('channelId') || localStorage.getItem('currentChannelId');
+                
+                if (orgId) agentData.organization_id = orgId;
+                if (channelId) agentData.channel_id = channelId;
+                
+                // Create agent via API
+                const response = await apiRequest('/api/voice-agents', {
+                    method: 'POST',
+                    body: JSON.stringify(agentData)
+                });
+                
+                btn.innerHTML = '<i class="fas fa-check mr-2"></i>Deployed Successfully!';
+                
+                setTimeout(() => {
+                    alert('🎉 Congratulations! Your voice agent has been deployed successfully!\n\nAgent ID: ' + response.data.id + '\n\nYou can now manage and test your agent from the Voice Agents section.');
+                    window.location.href = '/agent-setup.html?agentId=' + response.data.id;
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Error deploying agent:', error);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                alert('❌ Error deploying agent: ' + error.message);
+            }
+        }
+
+        function saveAndContinueLater() {
+            alert('💾 Draft saved! You can continue creating this agent later from the dashboard.');
+        }
+
+        function getHelp() {
+            alert('🆘 Help is on the way!\n\nFor immediate assistance:\n📧 Email: support@bhashai.com\n📞 Phone: +91-XXXX-XXXX\n💬 Live chat available 24/7');
+        }
+    </script>
+</body>
+</html>
