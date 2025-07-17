@@ -768,6 +768,170 @@ def list_relevance_ai_tools():
         print(f"List RelevanceAI tools error: {e}")
         return jsonify({'message': 'Failed to list tools'}), 500
 
+# RelevanceAI Agent Prompt Management Endpoints
+@app.route('/api/relevance-ai/agents/<agent_id>/prompt', methods=['GET'])
+@login_required
+@require_enterprise_context
+def get_relevance_ai_agent_prompt(agent_id):
+    """Get the current system prompt for a RelevanceAI agent"""
+    try:
+        enterprise_id = g.enterprise_id
+        
+        # Verify agent belongs to enterprise
+        voice_agent = supabase_request('GET', f'voice_agents?id=eq.{agent_id}&enterprise_id=eq.{enterprise_id}&provider_type=eq.relevance_ai')
+        if not voice_agent or len(voice_agent) == 0:
+            return jsonify({'message': 'RelevanceAI agent not found'}), 404
+        
+        # Get current prompt from RelevanceAI
+        from relevance_ai_integration_fixed import RelevanceAIProvider
+        provider = RelevanceAIProvider()
+        
+        try:
+            # Get agent details from RelevanceAI
+            agent_details = provider.get_agent(agent_id)
+            agent_data = agent_details.get('agent_data')
+            
+            if hasattr(agent_data, 'metadata'):
+                current_prompt = getattr(agent_data.metadata, 'system_prompt', '')
+                agent_name = getattr(agent_data.metadata, 'name', 'Unknown')
+                last_updated = getattr(agent_data.metadata, 'update_date_', 'Unknown')
+            else:
+                current_prompt = ''
+                agent_name = 'Unknown'
+                last_updated = 'Unknown'
+            
+            return jsonify({
+                'agent_id': agent_id,
+                'agent_name': agent_name,
+                'system_prompt': current_prompt,
+                'prompt_length': len(current_prompt),
+                'last_updated': last_updated
+            }), 200
+            
+        except Exception as e:
+            return jsonify({'message': f'Failed to retrieve prompt: {str(e)}'}), 500
+        
+    except Exception as e:
+        print(f"Get RelevanceAI prompt error: {e}")
+        return jsonify({'message': 'Failed to get agent prompt'}), 500
+
+@app.route('/api/relevance-ai/agents/<agent_id>/prompt', methods=['PUT'])
+@login_required
+@require_enterprise_context
+def update_relevance_ai_agent_prompt(agent_id):
+    """Update the system prompt for a RelevanceAI agent"""
+    try:
+        enterprise_id = g.enterprise_id
+        data = request.json
+        new_prompt = data.get('system_prompt', '').strip()
+        
+        if not new_prompt:
+            return jsonify({'message': 'System prompt is required'}), 400
+        
+        # Verify agent belongs to enterprise
+        voice_agent = supabase_request('GET', f'voice_agents?id=eq.{agent_id}&enterprise_id=eq.{enterprise_id}&provider_type=eq.relevance_ai')
+        if not voice_agent or len(voice_agent) == 0:
+            return jsonify({'message': 'RelevanceAI agent not found'}), 404
+        
+        # Update prompt in RelevanceAI
+        from relevance_ai_integration_fixed import RelevanceAIProvider
+        provider = RelevanceAIProvider()
+        
+        try:
+            # Update the agent prompt
+            success = provider.update_agent_prompt(agent_id, new_prompt)
+            
+            if success:
+                # Update last modified in our database
+                update_data = {
+                    'updated_at': datetime.now(timezone.utc).isoformat(),
+                    'provider_config': {
+                        **voice_agent[0].get('provider_config', {}),
+                        'last_prompt_update': datetime.now(timezone.utc).isoformat(),
+                        'prompt_length': len(new_prompt)
+                    }
+                }
+                
+                supabase_request('PATCH', f'voice_agents?id=eq.{agent_id}', data=update_data)
+                
+                return jsonify({
+                    'message': 'Agent prompt updated successfully',
+                    'agent_id': agent_id,
+                    'prompt_length': len(new_prompt),
+                    'updated_at': update_data['updated_at']
+                }), 200
+            else:
+                return jsonify({'message': 'Failed to update prompt in RelevanceAI'}), 500
+                
+        except Exception as e:
+            return jsonify({'message': f'Failed to update prompt: {str(e)}'}), 500
+        
+    except Exception as e:
+        print(f"Update RelevanceAI prompt error: {e}")
+        return jsonify({'message': 'Failed to update agent prompt'}), 500
+
+@app.route('/api/relevance-ai/agents/<agent_id>/test-prompt', methods=['POST'])
+@login_required  
+@require_enterprise_context
+def test_relevance_ai_agent_prompt(agent_id):
+    """Test a RelevanceAI agent with a sample message"""
+    try:
+        enterprise_id = g.enterprise_id
+        data = request.json
+        test_message = data.get('message', 'Hello, I need to book an appointment with Dr. Murali')
+        
+        # Verify agent belongs to enterprise
+        voice_agent = supabase_request('GET', f'voice_agents?id=eq.{agent_id}&enterprise_id=eq.{enterprise_id}&provider_type=eq.relevance_ai')
+        if not voice_agent or len(voice_agent) == 0:
+            return jsonify({'message': 'RelevanceAI agent not found'}), 404
+        
+        # Test the agent using our working API format
+        import requests
+        import os
+        
+        api_key = os.getenv('RELEVANCE_AI_API_KEY')
+        region = os.getenv('RELEVANCE_AI_REGION', 'f1db6c') 
+        project_id = os.getenv('RELEVANCE_AI_PROJECT_ID')
+        
+        headers = {
+            "Authorization": f"{project_id}:{api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        test_payload = {
+            "agent_id": agent_id,
+            "message": {
+                "role": "user",
+                "content": test_message
+            }
+        }
+        
+        response = requests.post(
+            f"https://api-{region}.stack.tryrelevance.com/latest/agents/trigger",
+            headers=headers,
+            json=test_payload,
+            timeout=30
+        )
+        
+        if response.status_code == 200:
+            result = response.json()
+            return jsonify({
+                'status': 'test_initiated',
+                'conversation_id': result.get('conversation_id'),
+                'job_id': result.get('job_info', {}).get('job_id'),
+                'test_message': test_message,
+                'agent_id': agent_id
+            }), 200
+        else:
+            return jsonify({
+                'message': f'Test failed with status {response.status_code}',
+                'error': response.text
+            }), 500
+            
+    except Exception as e:
+        print(f"Test RelevanceAI agent error: {e}")
+        return jsonify({'message': 'Failed to test agent'}), 500
+
 @app.route('/api/relevance-ai/tools', methods=['POST'])
 @login_required
 @require_enterprise_context
@@ -3582,6 +3746,16 @@ def serve_realtime_voice():
 def serve_twilio_openai_calls():
     """Serve Twilio + OpenAI Real Voice Call interface"""
     return send_from_directory(app.static_folder, 'twilio-openai-call-interface.html')
+
+@app.route('/anohra-prompt-editor.html')
+def serve_anohra_prompt_editor():
+    """Serve Anohra Prompt Editor interface"""
+    return send_from_directory(app.static_folder, 'anohra-prompt-editor.html')
+
+@app.route('/anohra-prompt-editor-simple.html')
+def serve_anohra_prompt_editor_simple():
+    """Serve Anohra Prompt Editor interface (simple version)"""
+    return send_from_directory(app.static_folder, 'anohra-prompt-editor-simple.html')
 
 # OpenAI Realtime Phone Call API Endpoints
 @app.route('/api/realtime/make-call', methods=['POST'])
