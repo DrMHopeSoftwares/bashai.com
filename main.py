@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 from auth import auth_manager, login_required
 from trial_middleware import check_trial_limits, log_trial_activity, get_trial_usage_summary
 from bolna_integration import BolnaAPI, get_agent_config_for_voice_agent
+from relevance_ai_integration import RelevanceAIProvider, RelevanceAIAgentManager, create_relevance_agent_config
 from razorpay_integration import RazorpayIntegration, calculate_credits_from_amount, get_predefined_recharge_options
 from phone_provider_integration import phone_provider_manager
 from auth_routes import auth_bp
@@ -420,10 +421,10 @@ def create_enterprise():
 @require_enterprise_context
 @check_trial_limits(feature='basic_voice_agent', usage_type='voice_agent_creation')
 def create_voice_agent():
-    """Create voice agent with trial limitations"""
+    """Create voice agent with multi-provider support (Bolna, RelevanceAI, OpenAI)"""
     try:
         user_id = g.user_id
-        enterprise_id = g.enterprise_id  # Now available from middleware
+        enterprise_id = g.enterprise_id
         data = request.json
 
         # Log API call for trial users
@@ -436,7 +437,17 @@ def create_voice_agent():
             if not data.get(field):
                 return jsonify({'message': f'{field} is required'}), 400
 
-        # Trial users are limited to Hindi/Hinglish
+        # Get provider type (default to bolna for backward compatibility)
+        provider_type = data.get('provider', 'bolna').lower()
+        allowed_providers = ['bolna', 'relevance_ai', 'openai_realtime']
+        
+        if provider_type not in allowed_providers:
+            return jsonify({
+                'message': f'Invalid provider. Allowed providers: {allowed_providers}',
+                'allowed_providers': allowed_providers
+            }), 400
+
+        # Trial users are limited to Hindi/Hinglish and basic providers
         if hasattr(g, 'trial_status') and g.trial_status.get('is_trial'):
             allowed_languages = ['hindi', 'hinglish', 'hi-IN']
             if data['language'].lower() not in allowed_languages:
@@ -444,26 +455,367 @@ def create_voice_agent():
                     'message': 'Trial users can only create Hindi/Hinglish voice agents',
                     'allowed_languages': allowed_languages
                 }), 403
+            
+            # Trial users can't use RelevanceAI (premium feature)
+            if provider_type == 'relevance_ai':
+                return jsonify({
+                    'message': 'RelevanceAI is a premium feature. Please upgrade your plan.',
+                    'allowed_providers': ['bolna', 'openai_realtime']
+                }), 403
 
+        # Base voice agent data
         voice_agent_data = {
             'name': data['name'],
             'language': data['language'],
             'use_case': data['use_case'],
-            'calling_number': data.get('calling_number'),  # Add calling number field
+            'provider_type': provider_type,
+            'calling_number': data.get('calling_number'),
             'status': 'trial' if hasattr(g, 'trial_status') and g.trial_status.get('is_trial') else 'active',
             'created_by': user_id,
-            'enterprise_id': enterprise_id,  # 🔥 CRITICAL FIX: Add enterprise_id
+            'enterprise_id': enterprise_id,
             'configuration': data.get('configuration', {}),
+            'provider_config': data.get('provider_config', {}),
             'created_at': datetime.now(timezone.utc).isoformat()
         }
 
-        voice_agent = supabase_request('POST', 'voice_agents', data=voice_agent_data)
+        # Provider-specific initialization
+        external_agent_id = None
+        external_config = {}
 
-        return jsonify({'voice_agent': voice_agent}), 201
+        if provider_type == 'relevance_ai':
+            try:
+                # Initialize RelevanceAI manager
+                relevance_manager = RelevanceAIAgentManager()
+                
+                # Create agent in RelevanceAI
+                relevance_config = {
+                    'name': data['name'],
+                    'description': data.get('description', f"AI agent for {data['use_case']}"),
+                    'language': data['language'],
+                    'use_case': data['use_case'],
+                    'integrations': data.get('integrations', []),
+                    'tools': data.get('tools', [])
+                }
+                
+                if data['use_case'] in ['workflow', 'automation', 'dataprocess']:
+                    relevance_agent = relevance_manager.create_workflow_agent(relevance_config)
+                else:
+                    relevance_agent = relevance_manager.create_voice_agent(relevance_config)
+                
+                external_agent_id = relevance_agent.get('id')
+                external_config = relevance_agent
+                
+                # Add RelevanceAI specific fields
+                voice_agent_data.update({
+                    'relevance_ai_agent_id': external_agent_id,
+                    'relevance_ai_config': external_config
+                })
+                
+                print(f"✅ RelevanceAI agent created: {external_agent_id}")
+                
+            except Exception as e:
+                print(f"❌ Failed to create RelevanceAI agent: {e}")
+                return jsonify({
+                    'message': f'Failed to create RelevanceAI agent: {str(e)}',
+                    'provider': 'relevance_ai'
+                }), 500
+
+        elif provider_type == 'bolna':
+            # Existing Bolna logic (keep existing behavior)
+            pass
+            
+        elif provider_type == 'openai_realtime':
+            # OpenAI Realtime configuration
+            voice_agent_data['provider_config'] = {
+                'model': data.get('model', 'gpt-4o-realtime-preview'),
+                'temperature': data.get('temperature', 0.7),
+                'system_prompt': data.get('system_prompt', 'You are a helpful AI assistant.')
+            }
+
+        # Create voice agent in database
+        voice_agent = supabase_request('POST', 'voice_agents', data=voice_agent_data)
+        
+        if not voice_agent:
+            return jsonify({'message': 'Failed to create voice agent in database'}), 500
+
+        # Add provider info to response
+        response_data = {
+            'voice_agent': voice_agent,
+            'provider': {
+                'type': provider_type,
+                'external_agent_id': external_agent_id,
+                'config': external_config
+            }
+        }
+
+        return jsonify(response_data), 201
 
     except Exception as e:
         print(f"Create voice agent error: {e}")
-        return jsonify({'message': 'Failed to create voice agent'}), 500
+        return jsonify({'message': f'Failed to create voice agent: {str(e)}'}), 500
+
+# RelevanceAI specific endpoints
+@app.route('/api/relevance-ai/agents', methods=['GET'])
+@login_required
+@require_enterprise_context
+def list_relevance_ai_agents():
+    """List all RelevanceAI agents for the enterprise"""
+    try:
+        enterprise_id = g.enterprise_id
+        
+        # Get RelevanceAI agents from database
+        agents = supabase_request('GET', f'voice_agents?enterprise_id=eq.{enterprise_id}&provider_type=eq.relevance_ai&order=created_at.desc')
+        
+        return jsonify({'agents': agents or []}), 200
+        
+    except Exception as e:
+        print(f"List RelevanceAI agents error: {e}")
+        return jsonify({'message': 'Failed to list RelevanceAI agents'}), 500
+
+@app.route('/api/relevance-ai/agents/<agent_id>/sessions', methods=['POST'])
+@login_required
+@require_enterprise_context
+def create_relevance_ai_session(agent_id):
+    """Create a new RelevanceAI conversation session"""
+    try:
+        enterprise_id = g.enterprise_id
+        data = request.json
+        
+        # Verify agent exists and belongs to enterprise
+        agent = supabase_request('GET', f'voice_agents?id=eq.{agent_id}&enterprise_id=eq.{enterprise_id}&provider_type=eq.relevance_ai')
+        if not agent or len(agent) == 0:
+            return jsonify({'message': 'RelevanceAI agent not found'}), 404
+        
+        agent_data = agent[0]
+        external_agent_id = agent_data.get('relevance_ai_agent_id')
+        
+        if not external_agent_id:
+            return jsonify({'message': 'RelevanceAI agent ID not found'}), 400
+        
+        # Create session via RelevanceAI
+        relevance_manager = RelevanceAIAgentManager()
+        session = relevance_manager.provider.create_session(
+            agent_id=external_agent_id,
+            session_config=data.get('config', {})
+        )
+        
+        # Store session in database
+        session_data = {
+            'voice_agent_id': agent_id,
+            'relevance_session_id': session['session_id'],
+            'agent_id': external_agent_id,
+            'status': 'active',
+            'context': data.get('context', {}),
+            'enterprise_id': enterprise_id,
+            'created_at': datetime.now(timezone.utc).isoformat()
+        }
+        
+        db_session = supabase_request('POST', 'relevance_ai_sessions', data=session_data)
+        
+        return jsonify({
+            'session': db_session,
+            'relevance_session': session
+        }), 201
+        
+    except Exception as e:
+        print(f"Create RelevanceAI session error: {e}")
+        return jsonify({'message': f'Failed to create session: {str(e)}'}), 500
+
+@app.route('/api/relevance-ai/sessions/<session_id>/messages', methods=['POST'])
+@login_required
+@require_enterprise_context
+def send_relevance_ai_message(session_id):
+    """Send a message to a RelevanceAI session"""
+    try:
+        enterprise_id = g.enterprise_id
+        data = request.json
+        
+        message = data.get('message')
+        if not message:
+            return jsonify({'message': 'Message content is required'}), 400
+        
+        # Get session from database
+        session = supabase_request('GET', f'relevance_ai_sessions?id=eq.{session_id}&enterprise_id=eq.{enterprise_id}')
+        if not session or len(session) == 0:
+            return jsonify({'message': 'Session not found'}), 404
+        
+        session_data = session[0]
+        external_agent_id = session_data['agent_id']
+        relevance_session_id = session_data['relevance_session_id']
+        
+        # Send message via RelevanceAI
+        relevance_manager = RelevanceAIAgentManager()
+        response = relevance_manager.provider.send_message(
+            agent_id=external_agent_id,
+            session_id=relevance_session_id,
+            message=message,
+            context=data.get('context', {})
+        )
+        
+        # Store user message in database
+        user_message_data = {
+            'session_id': session_id,
+            'message_type': 'user',
+            'content': message,
+            'metadata': data.get('context', {}),
+            'enterprise_id': enterprise_id,
+            'timestamp': datetime.now(timezone.utc).isoformat()
+        }
+        supabase_request('POST', 'relevance_ai_messages', data=user_message_data)
+        
+        # Store agent response in database
+        agent_response = response.get('response', '')
+        if agent_response:
+            agent_message_data = {
+                'session_id': session_id,
+                'message_type': 'agent',
+                'content': agent_response,
+                'metadata': response.get('metadata', {}),
+                'enterprise_id': enterprise_id,
+                'timestamp': datetime.now(timezone.utc).isoformat()
+            }
+            supabase_request('POST', 'relevance_ai_messages', data=agent_message_data)
+        
+        return jsonify({
+            'response': response,
+            'session_id': session_id
+        }), 200
+        
+    except Exception as e:
+        print(f"Send RelevanceAI message error: {e}")
+        return jsonify({'message': f'Failed to send message: {str(e)}'}), 500
+
+@app.route('/api/relevance-ai/sessions/<session_id>/history', methods=['GET'])
+@login_required
+@require_enterprise_context
+def get_relevance_ai_session_history(session_id):
+    """Get conversation history for a RelevanceAI session"""
+    try:
+        enterprise_id = g.enterprise_id
+        
+        # Verify session belongs to enterprise
+        session = supabase_request('GET', f'relevance_ai_sessions?id=eq.{session_id}&enterprise_id=eq.{enterprise_id}')
+        if not session or len(session) == 0:
+            return jsonify({'message': 'Session not found'}), 404
+        
+        # Get messages for this session
+        messages = supabase_request('GET', f'relevance_ai_messages?session_id=eq.{session_id}&order=timestamp.asc')
+        
+        return jsonify({
+            'session_id': session_id,
+            'messages': messages or []
+        }), 200
+        
+    except Exception as e:
+        print(f"Get RelevanceAI session history error: {e}")
+        return jsonify({'message': 'Failed to get session history'}), 500
+
+@app.route('/api/relevance-ai/agents/<agent_id>/analytics', methods=['GET'])
+@login_required
+@require_enterprise_context
+def get_relevance_ai_analytics(agent_id):
+    """Get analytics for a RelevanceAI agent"""
+    try:
+        enterprise_id = g.enterprise_id
+        
+        # Verify agent exists and belongs to enterprise
+        agent = supabase_request('GET', f'voice_agents?id=eq.{agent_id}&enterprise_id=eq.{enterprise_id}&provider_type=eq.relevance_ai')
+        if not agent or len(agent) == 0:
+            return jsonify({'message': 'RelevanceAI agent not found'}), 404
+        
+        agent_data = agent[0]
+        external_agent_id = agent_data.get('relevance_ai_agent_id')
+        
+        # Get analytics from RelevanceAI
+        relevance_manager = RelevanceAIAgentManager()
+        analytics = relevance_manager.provider.get_analytics(external_agent_id)
+        
+        # Get session statistics from database
+        sessions_count = supabase_request('GET', f'relevance_ai_sessions?voice_agent_id=eq.{agent_id}&select=id')
+        completed_sessions = supabase_request('GET', f'relevance_ai_sessions?voice_agent_id=eq.{agent_id}&status=eq.completed&select=id')
+        total_messages = supabase_request('GET', f'relevance_ai_messages?session_id=in.(select id from relevance_ai_sessions where voice_agent_id={agent_id})&select=id')
+        
+        local_analytics = {
+            'total_sessions': len(sessions_count) if sessions_count else 0,
+            'completed_sessions': len(completed_sessions) if completed_sessions else 0,
+            'total_messages': len(total_messages) if total_messages else 0,
+            'success_rate': (len(completed_sessions) / len(sessions_count) * 100) if sessions_count else 0
+        }
+        
+        return jsonify({
+            'agent_id': agent_id,
+            'external_analytics': analytics,
+            'local_analytics': local_analytics
+        }), 200
+        
+    except Exception as e:
+        print(f"Get RelevanceAI analytics error: {e}")
+        return jsonify({'message': 'Failed to get analytics'}), 500
+
+@app.route('/api/relevance-ai/tools', methods=['GET'])
+@login_required
+@require_enterprise_context
+def list_relevance_ai_tools():
+    """List available RelevanceAI tools for the enterprise"""
+    try:
+        enterprise_id = g.enterprise_id
+        
+        tools = supabase_request('GET', f'relevance_ai_tools?enterprise_id=eq.{enterprise_id}&is_active=eq.true&order=created_at.desc')
+        
+        return jsonify({'tools': tools or []}), 200
+        
+    except Exception as e:
+        print(f"List RelevanceAI tools error: {e}")
+        return jsonify({'message': 'Failed to list tools'}), 500
+
+@app.route('/api/relevance-ai/tools', methods=['POST'])
+@login_required
+@require_enterprise_context
+def create_relevance_ai_tool():
+    """Create a new RelevanceAI tool"""
+    try:
+        enterprise_id = g.enterprise_id
+        user_id = g.user_id
+        data = request.json
+        
+        required_fields = ['name', 'tool_type']
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({'message': f'{field} is required'}), 400
+        
+        # Create tool via RelevanceAI
+        relevance_manager = RelevanceAIAgentManager()
+        tool_config = {
+            'name': data['name'],
+            'description': data.get('description', ''),
+            'type': data['tool_type'],
+            'config': data.get('config', {})
+        }
+        
+        relevance_tool = relevance_manager.provider.create_tool(tool_config)
+        
+        # Store tool in database
+        tool_data = {
+            'name': data['name'],
+            'description': data.get('description', ''),
+            'tool_type': data['tool_type'],
+            'config': data.get('config', {}),
+            'relevance_tool_id': relevance_tool.get('id'),
+            'enterprise_id': enterprise_id,
+            'created_by': user_id,
+            'created_at': datetime.now(timezone.utc).isoformat()
+        }
+        
+        db_tool = supabase_request('POST', 'relevance_ai_tools', data=tool_data)
+        
+        return jsonify({
+            'tool': db_tool,
+            'relevance_tool': relevance_tool
+        }), 201
+        
+    except Exception as e:
+        print(f"Create RelevanceAI tool error: {e}")
+        return jsonify({'message': f'Failed to create tool: {str(e)}'}), 500
 
 @app.route('/api/enterprises/<enterprise_id>', methods=['PUT'])
 @login_required
@@ -2444,6 +2796,199 @@ def handle_sms_webhook():
     except Exception as e:
         print(f"Error handling SMS webhook: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+# RelevanceAI Webhook Handlers
+@app.route('/api/webhooks/relevance-ai', methods=['POST'])
+def handle_relevance_ai_webhook():
+    """Handle incoming webhooks from RelevanceAI"""
+    try:
+        data = request.json
+        event_type = data.get('event_type', 'unknown')
+        
+        print(f"📥 RelevanceAI webhook received: {event_type}")
+        print(f"Webhook data: {json.dumps(data, indent=2)}")
+        
+        # Handle different webhook events
+        if event_type == 'session.started':
+            return handle_relevance_session_started(data)
+        elif event_type == 'session.completed':
+            return handle_relevance_session_completed(data)
+        elif event_type == 'message.received':
+            return handle_relevance_message_received(data)
+        elif event_type == 'agent.response':
+            return handle_relevance_agent_response(data)
+        elif event_type == 'workflow.triggered':
+            return handle_relevance_workflow_triggered(data)
+        elif event_type == 'tool.executed':
+            return handle_relevance_tool_executed(data)
+        else:
+            print(f"⚠️  Unknown RelevanceAI webhook event: {event_type}")
+            return jsonify({'status': 'ignored', 'event_type': event_type}), 200
+        
+    except Exception as e:
+        print(f"❌ Error handling RelevanceAI webhook: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+def handle_relevance_session_started(data):
+    """Handle session started webhook from RelevanceAI"""
+    try:
+        session_id = data.get('session_id')
+        agent_id = data.get('agent_id')
+        
+        # Find the corresponding voice agent
+        voice_agent = supabase_request('GET', f'voice_agents?relevance_ai_agent_id=eq.{agent_id}')
+        
+        if voice_agent and len(voice_agent) > 0:
+            agent_data = voice_agent[0]
+            
+            # Update or create session record
+            session_data = {
+                'voice_agent_id': agent_data['id'],
+                'relevance_session_id': session_id,
+                'agent_id': agent_id,
+                'status': 'active',
+                'context': data.get('context', {}),
+                'enterprise_id': agent_data['enterprise_id'],
+                'created_at': datetime.now(timezone.utc).isoformat()
+            }
+            
+            # Check if session already exists
+            existing_session = supabase_request('GET', f'relevance_ai_sessions?relevance_session_id=eq.{session_id}')
+            
+            if not existing_session or len(existing_session) == 0:
+                supabase_request('POST', 'relevance_ai_sessions', data=session_data)
+                print(f"✅ RelevanceAI session started: {session_id}")
+            
+        return jsonify({'status': 'processed', 'session_id': session_id}), 200
+        
+    except Exception as e:
+        print(f"❌ Error handling session started: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+def handle_relevance_session_completed(data):
+    """Handle session completed webhook from RelevanceAI"""
+    try:
+        session_id = data.get('session_id')
+        completion_reason = data.get('completion_reason', 'completed')
+        
+        # Update session status in database
+        update_data = {
+            'status': 'completed',
+            'ended_at': datetime.now(timezone.utc).isoformat(),
+            'context': data.get('final_context', {})
+        }
+        
+        result = supabase_request('PATCH', f'relevance_ai_sessions?relevance_session_id=eq.{session_id}', data=update_data)
+        
+        print(f"✅ RelevanceAI session completed: {session_id} ({completion_reason})")
+        
+        return jsonify({'status': 'processed', 'session_id': session_id}), 200
+        
+    except Exception as e:
+        print(f"❌ Error handling session completed: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+def handle_relevance_message_received(data):
+    """Handle message received webhook from RelevanceAI"""
+    try:
+        session_id = data.get('session_id')
+        message_content = data.get('message', '')
+        message_type = data.get('message_type', 'user')
+        
+        # Find session in database
+        session = supabase_request('GET', f'relevance_ai_sessions?relevance_session_id=eq.{session_id}')
+        
+        if session and len(session) > 0:
+            session_data = session[0]
+            
+            # Store message in database
+            message_data = {
+                'session_id': session_data['id'],
+                'message_type': message_type,
+                'content': message_content,
+                'metadata': data.get('metadata', {}),
+                'enterprise_id': session_data['enterprise_id'],
+                'timestamp': datetime.now(timezone.utc).isoformat()
+            }
+            
+            supabase_request('POST', 'relevance_ai_messages', data=message_data)
+            print(f"💬 RelevanceAI message stored: {message_type} - {len(message_content)} chars")
+        
+        return jsonify({'status': 'processed', 'session_id': session_id}), 200
+        
+    except Exception as e:
+        print(f"❌ Error handling message received: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+def handle_relevance_agent_response(data):
+    """Handle agent response webhook from RelevanceAI"""
+    try:
+        session_id = data.get('session_id')
+        response_content = data.get('response', '')
+        
+        # This is similar to message received but specifically for agent responses
+        return handle_relevance_message_received({
+            'session_id': session_id,
+            'message': response_content,
+            'message_type': 'agent',
+            'metadata': data.get('metadata', {})
+        })
+        
+    except Exception as e:
+        print(f"❌ Error handling agent response: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+def handle_relevance_workflow_triggered(data):
+    """Handle workflow triggered webhook from RelevanceAI"""
+    try:
+        workflow_id = data.get('workflow_id')
+        trigger_data = data.get('trigger_data', {})
+        
+        print(f"🔄 RelevanceAI workflow triggered: {workflow_id}")
+        
+        # Log workflow execution
+        workflow_log = {
+            'id': str(uuid.uuid4()),
+            'workflow_id': workflow_id,
+            'trigger_data': trigger_data,
+            'status': 'triggered',
+            'timestamp': datetime.now(timezone.utc).isoformat()
+        }
+        
+        # Store in a workflow logs table if needed
+        # supabase_request('POST', 'workflow_logs', data=workflow_log)
+        
+        return jsonify({'status': 'processed', 'workflow_id': workflow_id}), 200
+        
+    except Exception as e:
+        print(f"❌ Error handling workflow triggered: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+def handle_relevance_tool_executed(data):
+    """Handle tool executed webhook from RelevanceAI"""
+    try:
+        tool_id = data.get('tool_id')
+        execution_result = data.get('result', {})
+        
+        print(f"🔧 RelevanceAI tool executed: {tool_id}")
+        
+        # Log tool execution
+        tool_log = {
+            'id': str(uuid.uuid4()),
+            'tool_id': tool_id,
+            'execution_result': execution_result,
+            'status': 'completed',
+            'timestamp': datetime.now(timezone.utc).isoformat()
+        }
+        
+        # Store in a tool logs table if needed
+        # supabase_request('POST', 'tool_logs', data=tool_log)
+        
+        return jsonify({'status': 'processed', 'tool_id': tool_id}), 200
+        
+    except Exception as e:
+        print(f"❌ Error handling tool executed: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @app.route('/api/dev/voice-providers', methods=['GET'])
 def get_voice_providers():

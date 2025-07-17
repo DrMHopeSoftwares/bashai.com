@@ -9,3 +9,4 @@ bcrypt==4.0.1
 websockets==12.0
 flask-socketio==5.3.6
 twilio==8.10.3
+relevanceai>=10.2.2
