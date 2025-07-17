@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Universal AI Agent Prompt Editor - BhashAI</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 30px; }
+        .agent-selector { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group select, .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        .prompt-editor { border: 2px solid #e1e5e9; padding: 25px; border-radius: 8px; margin-top: 20px; }
+        textarea { width: 100%; height: 450px; font-family: 'Courier New', monospace; border: 1px solid #ccc; border-radius: 4px; padding: 15px; font-size: 14px; line-height: 1.5; }
+        button { padding: 12px 24px; margin: 8px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+        .primary { background: #007bff; color: white; }
+        .primary:hover { background: #0056b3; }
+        .success { background: #28a745; color: white; }
+        .success:hover { background: #1e7e34; }
+        .danger { background: #dc3545; color: white; }
+        .danger:hover { background: #c82333; }
+        .info { background: #17a2b8; color: white; }
+        .info:hover { background: #138496; }
+        .warning { background: #ffc107; color: #212529; }
+        .warning:hover { background: #e0a800; }
+        .status { padding: 12px; margin: 15px 0; border-radius: 6px; display: none; }
+        .status.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status.danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .status.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .stats { display: flex; justify-content: space-between; margin: 15px 0; font-size: 14px; color: #666; }
+        .templates { margin-top: 20px; }
+        .template-btn { background: #6c757d; color: white; font-size: 12px; padding: 8px 16px; }
+        .template-btn:hover { background: #5a6268; }
+        .agent-info { background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #007bff; }
+        .provider-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .relevance { background: #e3f2fd; color: #1976d2; }
+        .bolna { background: #e8f5e8; color: #2e7d32; }
+        .openai { background: #fff3e0; color: #f57c00; }
+        .loading { text-align: center; padding: 50px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Universal AI Agent Prompt Editor</h1>
+            <p>Multi-tenant prompt editing for BhashAI platform</p>
+        </div>
+        
+        <div class="agent-selector">
+            <h3>🎯 Select Agent to Edit</h3>
+            
+            <div class="form-group">
+                <label for="enterpriseSelect">Enterprise:</label>
+                <select id="enterpriseSelect" onchange="loadEnterpriseAgents()">
+                    <option value="">Select Enterprise...</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="providerFilter">Provider:</label>
+                <select id="providerFilter" onchange="filterAgentsByProvider()">
+                    <option value="">All Providers</option>
+                    <option value="relevance_ai">RelevanceAI</option>
+                    <option value="bolna">Bolna</option>
+                    <option value="openai_realtime">OpenAI Realtime</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="agentSelect">AI Agent:</label>
+                <select id="agentSelect" onchange="loadAgentPrompt()">
+                    <option value="">Select Agent...</option>
+                </select>
+            </div>
+            
+            <button class="primary" onclick="loadAgents()">🔄 Refresh Agents</button>
+            <button class="info" onclick="showAgentDetails()">📊 Show Agent Details</button>
+        </div>
+        
+        <div id="agentInfo" class="agent-info" style="display: none;">
+            <h4>📋 Selected Agent Information</h4>
+            <div id="agentDetails"></div>
+        </div>
+        
+        <div class="prompt-editor" id="promptEditor" style="display: none;">
+            <h3>📝 System Prompt Editor</h3>
+            <div id="status" class="status"></div>
+            
+            <textarea id="promptTextarea" placeholder="Select an agent to load its prompt..."></textarea>
+            
+            <div class="stats">
+                <span><strong>📊 Prompt Length:</strong> <span id="promptLength">0</span> characters</span>
+                <span><strong>📅 Last Updated:</strong> <span id="lastUpdated">-</span></span>
+                <span><strong>🏢 Enterprise:</strong> <span id="currentEnterprise">-</span></span>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="primary" onclick="loadCurrentPrompt()">🔄 Reload Prompt</button>
+                <button class="success" onclick="updatePrompt()">💾 Save Changes</button>
+                <button class="info" onclick="testPrompt()">📞 Test Agent</button>
+                <button class="warning" onclick="copyToClipboard()">📋 Copy Prompt</button>
+                <button class="danger" onclick="resetPrompt()">↺ Reset to Original</button>
+            </div>
+        </div>
+        
+        <div class="templates" id="templates" style="display: none;">
+            <h4>📋 Quick Templates:</h4>
+            <button class="template-btn" onclick="addTemplate('multilingual')">Add Multi-language Support</button>
+            <button class="template-btn" onclick="addTemplate('professional')">Add Professional Tone</button>
+            <button class="template-btn" onclick="addTemplate('emergency')">Add Emergency Handling</button>
+            <button class="template-btn" onclick="addTemplate('scheduling')">Add Appointment Logic</button>
+            <button class="template-btn" onclick="addTemplate('healthcare')">Add Healthcare Guidelines</button>
+            <button class="template-btn" onclick="addTemplate('customer_service')">Add Customer Service</button>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #e9ecef; border-radius: 6px;">
+            <h4>🔧 Multi-tenant Features:</h4>
+            <ul>
+                <li><strong>Enterprise Isolation:</strong> Only see agents from your enterprise</li>
+                <li><strong>Provider Support:</strong> Edit prompts for RelevanceAI, Bolna, and OpenAI agents</li>
+                <li><strong>Role-based Access:</strong> Admins can edit all agents, users can edit their own</li>
+                <li><strong>Audit Trail:</strong> All prompt changes are logged with user and timestamp</li>
+                <li><strong>Backup & Restore:</strong> Previous prompt versions are saved automatically</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let currentAgent = null;
+        let allAgents = [];
+        let originalPrompt = '';
+        
+        function showStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+            setTimeout(() => status.style.display = 'none', 5000);
+        }
+        
+        function updatePromptLength() {
+            const textarea = document.getElementById('promptTextarea');
+            document.getElementById('promptLength').textContent = textarea.value.length;
+        }
+        
+        async function loadEnterprises() {
+            try {
+                showStatus('Loading enterprises...', 'info');
+                const response = await fetch('/api/enterprises');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const select = document.getElementById('enterpriseSelect');
+                    select.innerHTML = '<option value="">Select Enterprise...</option>';
+                    
+                    data.enterprises.forEach(enterprise => {
+                        const option = document.createElement('option');
+                        option.value = enterprise.id;
+                        option.textContent = enterprise.name;
+                        select.appendChild(option);
+                    });
+                    
+                    showStatus('Enterprises loaded successfully', 'success');
+                } else {
+                    showStatus('Failed to load enterprises', 'danger');
+                }
+            } catch (error) {
+                showStatus('Error loading enterprises: ' + error.message, 'danger');
+            }
+        }
+        
+        async function loadEnterpriseAgents() {
+            const enterpriseId = document.getElementById('enterpriseSelect').value;
+            if (!enterpriseId) {
+                document.getElementById('agentSelect').innerHTML = '<option value="">Select Agent...</option>';
+                return;
+            }
+            
+            try {
+                showStatus('Loading agents for enterprise...', 'info');
+                const response = await fetch(`/api/voice-agents?enterprise_id=${enterpriseId}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    allAgents = data.voice_agents || [];
+                    populateAgentSelect(allAgents);
+                    showStatus(`Loaded ${allAgents.length} agents`, 'success');
+                } else {
+                    showStatus('Failed to load agents', 'danger');
+                }
+            } catch (error) {
+                showStatus('Error loading agents: ' + error.message, 'danger');
+            }
+        }
+        
+        function populateAgentSelect(agents) {
+            const select = document.getElementById('agentSelect');
+            select.innerHTML = '<option value="">Select Agent...</option>';
+            
+            agents.forEach(agent => {
+                const option = document.createElement('option');
+                option.value = agent.id;
+                option.textContent = `${agent.name} (${agent.provider_type})`;
+                option.dataset.provider = agent.provider_type;
+                option.dataset.agentData = JSON.stringify(agent);
+                select.appendChild(option);
+            });
+        }
+        
+        function filterAgentsByProvider() {
+            const provider = document.getElementById('providerFilter').value;
+            if (!provider) {
+                populateAgentSelect(allAgents);
+                return;
+            }
+            
+            const filteredAgents = allAgents.filter(agent => agent.provider_type === provider);
+            populateAgentSelect(filteredAgents);
+            showStatus(`Filtered to ${filteredAgents.length} ${provider} agents`, 'info');
+        }
+        
+        async function loadAgentPrompt() {
+            const select = document.getElementById('agentSelect');
+            const selectedOption = select.options[select.selectedIndex];
+            
+            if (!selectedOption.value) {
+                document.getElementById('promptEditor').style.display = 'none';
+                document.getElementById('templates').style.display = 'none';
+                document.getElementById('agentInfo').style.display = 'none';
+                return;
+            }
+            
+            currentAgent = JSON.parse(selectedOption.dataset.agentData);
+            
+            // Show agent details
+            showAgentDetails();
+            
+            // Show editor
+            document.getElementById('promptEditor').style.display = 'block';
+            document.getElementById('templates').style.display = 'block';
+            
+            // Load prompt based on provider
+            if (currentAgent.provider_type === 'relevance_ai') {
+                await loadRelevanceAIPrompt();
+            } else {
+                await loadGenericPrompt();
+            }
+        }
+        
+        async function loadRelevanceAIPrompt() {
+            try {
+                showStatus('Loading RelevanceAI prompt...', 'info');
+                const response = await fetch(`/api/relevance-ai/agents/${currentAgent.id}/prompt`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    originalPrompt = data.system_prompt;
+                    document.getElementById('promptTextarea').value = originalPrompt;
+                    document.getElementById('lastUpdated').textContent = data.last_updated;
+                    updatePromptLength();
+                    showStatus('RelevanceAI prompt loaded successfully', 'success');
+                } else {
+                    showStatus('Failed to load RelevanceAI prompt', 'danger');
+                }
+            } catch (error) {
+                showStatus('Error loading RelevanceAI prompt: ' + error.message, 'danger');
+            }
+        }
+        
+        async function loadGenericPrompt() {
+            // For Bolna and OpenAI agents, load from database
+            try {
+                showStatus(`Loading ${currentAgent.provider_type} prompt...`, 'info');
+                const config = currentAgent.provider_config || {};
+                const prompt = config.system_prompt || config.prompt || 'No prompt configured for this agent.';
+                
+                originalPrompt = prompt;
+                document.getElementById('promptTextarea').value = prompt;
+                document.getElementById('lastUpdated').textContent = currentAgent.updated_at || 'Unknown';
+                updatePromptLength();
+                showStatus('Prompt loaded successfully', 'success');
+            } catch (error) {
+                showStatus('Error loading prompt: ' + error.message, 'danger');
+            }
+        }
+        
+        function showAgentDetails() {
+            if (!currentAgent) return;
+            
+            const providerClass = currentAgent.provider_type === 'relevance_ai' ? 'relevance' : 
+                                 currentAgent.provider_type === 'bolna' ? 'bolna' : 'openai';
+            
+            const details = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div><strong>🏷️ Name:</strong> ${currentAgent.name}</div>
+                    <div><strong>🔧 Provider:</strong> <span class="provider-badge ${providerClass}">${currentAgent.provider_type}</span></div>
+                    <div><strong>🆔 Agent ID:</strong> ${currentAgent.id}</div>
+                    <div><strong>🗣️ Language:</strong> ${currentAgent.language || 'Not specified'}</div>
+                    <div><strong>📱 Use Case:</strong> ${currentAgent.use_case || 'General'}</div>
+                    <div><strong>📅 Created:</strong> ${new Date(currentAgent.created_at).toLocaleDateString()}</div>
+                </div>
+                <div style="margin-top: 10px;">
+                    <strong>📝 Description:</strong> ${currentAgent.description || 'No description provided'}
+                </div>
+            `;
+            
+            document.getElementById('agentDetails').innerHTML = details;
+            document.getElementById('agentInfo').style.display = 'block';
+            document.getElementById('currentEnterprise').textContent = currentAgent.enterprise_id;
+        }
+        
+        async function updatePrompt() {
+            if (!currentAgent) {
+                showStatus('No agent selected', 'danger');
+                return;
+            }
+            
+            const newPrompt = document.getElementById('promptTextarea').value.trim();
+            if (!newPrompt) {
+                showStatus('Prompt cannot be empty', 'danger');
+                return;
+            }
+            
+            showStatus('Updating prompt...', 'info');
+            
+            try {
+                if (currentAgent.provider_type === 'relevance_ai') {
+                    await updateRelevanceAIPrompt(newPrompt);
+                } else {
+                    await updateGenericPrompt(newPrompt);
+                }
+            } catch (error) {
+                showStatus('Error updating prompt: ' + error.message, 'danger');
+            }
+        }
+        
+        async function updateRelevanceAIPrompt(newPrompt) {
+            const response = await fetch(`/api/relevance-ai/agents/${currentAgent.id}/prompt`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ system_prompt: newPrompt })
+            });
+            
+            if (response.ok) {
+                showStatus('RelevanceAI prompt updated successfully!', 'success');
+                document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+            } else {
+                const error = await response.json();
+                showStatus('Failed to update RelevanceAI prompt: ' + error.message, 'danger');
+            }
+        }
+        
+        async function updateGenericPrompt(newPrompt) {
+            // Update prompt in voice_agents table
+            const response = await fetch(`/api/voice-agents/${currentAgent.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    provider_config: {
+                        ...currentAgent.provider_config,
+                        system_prompt: newPrompt
+                    }
+                })
+            });
+            
+            if (response.ok) {
+                showStatus('Agent prompt updated successfully!', 'success');
+                document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+                currentAgent.provider_config.system_prompt = newPrompt;
+            } else {
+                showStatus('Failed to update prompt', 'danger');
+            }
+        }
+        
+        async function testPrompt() {
+            if (!currentAgent) {
+                showStatus('No agent selected', 'danger');
+                return;
+            }
+            
+            showStatus('Testing agent with current prompt...', 'info');
+            
+            if (currentAgent.provider_type === 'relevance_ai') {
+                try {
+                    const response = await fetch(`/api/relevance-ai/agents/${currentAgent.id}/test-prompt`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: 'Hello, this is a test message for the prompt' })
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        showStatus(`Test initiated! Conversation ID: ${result.conversation_id}`, 'success');
+                    } else {
+                        showStatus('Test failed', 'danger');
+                    }
+                } catch (error) {
+                    showStatus('Test error: ' + error.message, 'danger');
+                }
+            } else {
+                showStatus('Testing not implemented for this provider yet', 'info');
+            }
+        }
+        
+        function copyToClipboard() {
+            const textarea = document.getElementById('promptTextarea');
+            textarea.select();
+            document.execCommand('copy');
+            showStatus('Prompt copied to clipboard!', 'success');
+        }
+        
+        function resetPrompt() {
+            if (confirm('Reset to the original prompt? This will lose any unsaved changes.')) {
+                document.getElementById('promptTextarea').value = originalPrompt;
+                updatePromptLength();
+                showStatus('Prompt reset to original', 'info');
+            }
+        }
+        
+        function addTemplate(type) {
+            const textarea = document.getElementById('promptTextarea');
+            const templates = {
+                multilingual: '\\n\\n## Multi-language Support\\n• Detect caller language automatically\\n• Respond in Hindi, English, or regional language\\n• Use professional terminology in chosen language',
+                professional: '\\n\\n## Professional Communication\\n• Maintain formal, respectful tone\\n• Use industry-specific terminology appropriately\\n• Provide clear, structured responses',
+                emergency: '\\n\\n## Emergency Protocols\\n• Identify urgent situations immediately\\n• Escalate to human agents for emergencies\\n• Provide calm, reassuring guidance while transferring',
+                scheduling: '\\n\\n## Appointment Management\\n• Check availability before confirming\\n• Collect all required patient information\\n• Send confirmation via SMS/email\\n• Handle rescheduling requests professionally',
+                healthcare: '\\n\\n## Healthcare Guidelines\\n• Never provide medical diagnosis\\n• Ask about symptoms for triage purposes only\\n• Refer to qualified medical professionals\\n• Maintain patient confidentiality',
+                customer_service: '\\n\\n## Customer Service Excellence\\n• Listen actively to customer concerns\\n• Provide solutions within company policies\\n• Escalate complex issues appropriately\\n• Follow up to ensure satisfaction'
+            };
+            
+            if (templates[type]) {
+                textarea.value += templates[type];
+                updatePromptLength();
+                showStatus(`Added ${type} template`, 'success');
+            }
+        }
+        
+        function loadCurrentPrompt() {
+            if (currentAgent) {
+                loadAgentPrompt();
+            } else {
+                showStatus('No agent selected', 'danger');
+            }
+        }
+        
+        function loadAgents() {
+            loadEnterprises();
+        }
+        
+        // Initialize
+        document.getElementById('promptTextarea').addEventListener('input', updatePromptLength);
+        
+        // Load enterprises on page load
+        window.addEventListener('load', () => {
+            loadEnterprises();
+            showStatus('Universal Prompt Editor ready! Select an enterprise and agent to begin.', 'success');
+        });
+    </script>
+</body>
+</html>
