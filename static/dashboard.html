@@ -4658,6 +4658,25 @@
                 window.currentEditingOrg = null;
             }
         }
+
+        // Add the organizationsList div if it doesn't exist
+        if (!document.getElementById('organizationsList')) {
+            const orgDiv = document.createElement('div');
+            orgDiv.id = 'organizationsList';
+            orgDiv.style.margin = '32px auto';
+            orgDiv.style.maxWidth = '600px';
+            document.body.appendChild(orgDiv);
+        }
+
+        async function loadOrganizations() {
+            console.log('Force loading organizations data...');
+            const organizations = await fetchUserOrganizations();
+            displayOrganizations(organizations);
+            updateOrganizationCount(organizations.length);
+        }
+
+        // Initial load of organizations when the page loads
+        document.addEventListener('DOMContentLoaded', loadOrganizations);
     </script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -4670,6 +4689,12 @@
 
   async function submitOrganization(event) {
     event.preventDefault();
+
+    // Ensure user is authenticated and currentUser is loaded
+    if (!currentUser || !currentUser.user || !currentUser.user.id) {
+      alert('User authentication not loaded. Please refresh and login again.');
+      return;
+    }
 
     const typeValue = document.getElementById('orgType').value;
     if (!typeValue) {
@@ -4684,7 +4709,8 @@
       email: document.getElementById('orgEmail').value,
       phone: document.getElementById('orgPhone').value,
       address: document.getElementById('orgAddress').value,
-      description: document.getElementById('orgDescription').value
+      description: document.getElementById('orgDescription').value,
+      user_id: currentUser.user.id // Always set user_id from authenticated user
     };
 
     let result;
@@ -4718,22 +4744,32 @@
 
    // Fetch organizations for the current user only using Supabase
    async function fetchUserOrganizations() {
-        if (!currentUser || !currentUser.user || !currentUser.user.id) {
-            console.error('No current user found for fetching organizations.');
+        const token = localStorage.getItem('auth_token'); // Assuming token is stored in localStorage
+        if (!token) {
+            console.error('Authentication token not found.');
             return [];
         }
-        const userId = currentUser.user.id;
-        const { data, error } = await supabase
-            .from('organizations')
-            .select('*')
-            .eq('user_id', userId);
-        if (error) {
-            console.error('Error fetching organizations:', error);
+
+        try {
+            const response = await fetch('/api/organizations', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Fetched organizations from API:', data.organizations);
+            return data.organizations || [];
+        } catch (error) {
+            console.error('Error fetching organizations from backend API:', error);
             return [];
         }
-        console.log('Fetched organizations from API:', data);
-        return data;
-       
     }
 
     // Function to display organizations in the organizationsList div as rows only

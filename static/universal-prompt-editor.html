@@ -40,9 +40,13 @@
             <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">🎯 Select Agent to Edit</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div>
-                    <label for="enterpriseSelect" class="block font-medium mb-1">Enterprise</label>
-                    <select id="enterpriseSelect" onchange="loadEnterpriseAgents()" class="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary">
-                        <option value="">Select Enterprise...</option>
+                    <label for="Organization" class="block font-medium mb-1">Enterprise</label>
+                    <select id="Organization" onchange="loadOrganizationAgents()" class="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary">
+                        <option value="">Select Organization</option>
+                        <option value="org_hope">Hope Hospital</option>
+                        <option value="org_city_clinic">City Clinic</option>
+                        <option value="org_wellness">Wellness Center</option>
+                        <option value="org_medicare">Medicare Solutions</option>
                     </select>
                 </div>
                 <div>
@@ -58,6 +62,10 @@
                     <label for="agentSelect" class="block font-medium mb-1">AI Agent</label>
                     <select id="agentSelect" onchange="loadAgentPrompt()" class="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary">
                         <option value="">Select Agent...</option>
+                        <option value="dummy_agent_1">Hope Hospital Inbound Agent</option>
+                        <option value="dummy_agent_2">City Clinic Outbound Agent</option>
+                        <option value="dummy_agent_3">Wellness Center WhatsApp Agent</option>
+                        <option value="dummy_agent_4">Medicare Solutions General Agent</option>
                     </select>
                 </div>
             </div>

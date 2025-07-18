@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS organizations (
     type VARCHAR(100) DEFAULT 'general' CHECK (type IN ('healthcare', 'retail', 'finance', 'education', 'general')),
     status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'pending')),
     enterprise_id UUID REFERENCES enterprises(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
