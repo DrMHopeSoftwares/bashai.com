@@ -43,33 +43,27 @@
                     <label for="enterpriseSelect" class="block font-medium mb-1">Enterprise</label>
                     <select id="enterpriseSelect" onchange="loadEnterpriseAgents()" class="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary">
                         <option value="">Select Enterprise...</option>
-                        <option value="enterprise_a">Hope Hospital</option>
-                        <option value="enterprise_b">Global Corp</option>
-                        <option value="enterprise_c">Tech Solutions Inc.</option>
                     </select>
                 </div>
                 <div>
                     <label for="providerFilter" class="block font-medium mb-1">Provider</label>
                     <select id="providerFilter" onchange="filterAgentsByProvider()" class="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary">
                         <option value="">All Providers</option>
+                        <option value="relevance_ai">RelevanceAI</option>
                         <option value="bolna">Bolna</option>
-                        <option value="relevance_ai">Relevance</option>
-                        <option value="openai_realtime">OpenAI</option>
+                        <option value="openai_realtime">OpenAI Realtime</option>
                     </select>
                 </div>
                 <div>
                     <label for="agentSelect" class="block font-medium mb-1">AI Agent</label>
                     <select id="agentSelect" onchange="loadAgentPrompt()" class="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary">
                         <option value="">Select Agent...</option>
-                        <option value="agent_1">Customer Support Bot</option>
-                        <option value="agent_2">Billing Assistant AI</option>
-                        <option value="agent_3">HR Onboarding Agent</option>
                     </select>
                 </div>
             </div>
             <div class="flex flex-wrap gap-2 mt-2">
                 <button class="btn btn-primary px-4 py-2" onclick="loadAgents()">🔄 Refresh Agents</button>
-                <button class="btn bg-info text-white px-4 py-2" onclick="openAgentEditorModal()">Add/Edit Agent</button>
+                <button class="btn bg-info text-white px-4 py-2" onclick="showAgentDetails()">📊 Show Agent Details</button>
             </div>
         </div>
         <div id="agentInfo" class="bg-blue-50 border-l-4 border-primary rounded-lg p-4 mb-6 hidden">
@@ -93,7 +87,7 @@
                 <button class="btn bg-danger text-white px-4 py-2" onclick="resetPrompt()">↺ Reset to Original</button>
             </div>
         </div>
-        <div id="templates" class="bg-white rounded-xl shadow p-6 mb-8" style="display: none;">
+        <div class="bg-white rounded-xl shadow p-6 mb-8" id="templates" style="display: none;">
             <h4 class="font-semibold mb-3 flex items-center gap-2">📋 Quick Templates:</h4>
             <div class="flex flex-wrap gap-2">
                 <button class="btn bg-gray-700 text-white text-xs px-3 py-1.5" onclick="addTemplate('multilingual')">Add Multi-language Support</button>
@@ -104,19 +98,6 @@
                 <button class="btn bg-gray-700 text-white text-xs px-3 py-1.5" onclick="addTemplate('customer_service')">Add Customer Service</button>
             </div>
         </div>
-
-        <!-- Agent Editor Modal -->
-        <div id="agentEditorModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
-            <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-auto relative">
-                <h3 class="text-xl font-semibold mb-4">Add/Edit Agent Prompt</h3>
-                <textarea id="agentPromptTextarea" class="w-full h-40 rounded-lg border border-gray-300 p-4 font-mono text-base resize-vertical" placeholder="Enter new agent prompt or edit existing one..." style="pointer-events: auto !important;"></textarea>
-                <div class="flex justify-end gap-2 mt-4">
-                    <button class="btn bg-gray-300 text-gray-800 px-4 py-2 rounded-lg" onclick="closeAgentEditorModal()">Close</button>
-                    <button class="btn btn-primary px-4 py-2 rounded-lg" onclick="saveAgentPrompt()">Save Prompt</button>
-                </div>
-            </div>
-        </div>
-
         <div class="bg-gradient-to-r from-primary to-secondary rounded-xl p-6 text-white mt-8">
             <h4 class="font-semibold mb-2 flex items-center gap-2">🔧 Multi-tenant Features:</h4>
             <ul class="list-disc pl-6 space-y-1 text-base opacity-90">
@@ -129,93 +110,8 @@
         </div>
     </div>
     <script>
-        // Function to re-initialize Tailwind CSS
-        function initializeTailwind() {
-            if (window.tailwind && window.tailwind.config) {
-                window.tailwind.config = window.tailwind.config; // Re-assign to trigger re-scan
-            }
-        }
-
-        // Create a MutationObserver to watch for DOM changes
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.type === 'childList' || mutation.type === 'subtree') {
-                    initializeTailwind();
-                }
-            });
-        });
-
-        // Start observing the body for changes
-        observer.observe(document.body, { childList: true, subtree: true });
-
-        // Initial call to ensure Tailwind is set up on page load
-        document.addEventListener('DOMContentLoaded', initializeTailwind);
-
-        // New functions for the Agent Editor Modal
-        function openAgentEditorModal() {
-            document.getElementById('agentEditorModal').classList.remove('hidden');
-            // Ensure the textarea is editable and focus it
-            const agentPromptTextarea = document.getElementById('agentPromptTextarea');
-            agentPromptTextarea.readOnly = false;
-            agentPromptTextarea.focus();
-        }
-
-        function closeAgentEditorModal() {
-            document.getElementById('agentEditorModal').classList.add('hidden');
-        }
-
-        function saveAgentPrompt() {
-            const promptContent = document.getElementById('agentPromptTextarea').value;
-            const enterpriseSelect = document.getElementById('enterpriseSelect');
-            const selectedEnterpriseId = enterpriseSelect.value;
-            const selectedEnterpriseName = enterpriseSelect.options[enterpriseSelect.selectedIndex].text;
-
-            const providerFilter = document.getElementById('providerFilter');
-            const selectedProviderName = providerFilter.value;
-
-            const agentSelect = document.getElementById('agentSelect');
-            const selectedAgentId = agentSelect.value;
-            const selectedAgentName = agentSelect.options[agentSelect.selectedIndex].text;
-
-            if (!selectedAgentId || !selectedEnterpriseId || !promptContent) {
-                alert('Please select an Enterprise, an AI Agent, and enter prompt content.');
-                return;
-            }
-
-            const payload = {
-                voice_agent_id: selectedAgentId, // This should ideally be a UUID from your DB
-                enterprise_id: selectedEnterpriseId, // This should ideally be a UUID from your DB
-                provider_name: selectedProviderName || 'Unknown', // Default to 'Unknown' if no provider is selected
-                ai_agent_name: selectedAgentName,
-                prompt_content: promptContent
-            };
-
-            fetch('/api/agent_prompts', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // Add authorization header if your API requires it
-                    // 'Authorization': `Bearer ${yourAuthToken}`,
-                },
-                body: JSON.stringify(payload)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.message) {
-                    alert('Success: ' + data.message);
-                    closeAgentEditorModal();
-                } else if (data.error) {
-                    alert('Error: ' + data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error saving agent prompt:', error);
-                alert('An error occurred while saving the prompt.');
-            });
-        }
-
-        // Existing JavaScript code for the prompt editor goes here
-        // ... existing code ...
+// ... existing code ...
     </script>
 </body>
 </html>
+// ... existing code ...
