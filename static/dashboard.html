@@ -468,7 +468,7 @@
             <!-- Quick Actions -->
             <div class="mb-8">
                 <h2 class="text-xl font-bold text-gray-800 mb-4">Quick Actions</h2>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                     <button class="quick-action" onclick="window.location.href='/agent-setup.html'">
                         <i class="fas fa-robot mr-2"></i>
                         Setup Voice Agent
@@ -4742,34 +4742,24 @@
 
 
 
-   // Fetch organizations for the current user only using Supabase
-   async function fetchUserOrganizations() {
-        const token = localStorage.getItem('auth_token'); // Assuming token is stored in localStorage
-        if (!token) {
-            console.error('Authentication token not found.');
+  
+async function fetchUserOrganizations(){
+        if (!currentUser || !currentUser.user || !currentUser.user.id) {
+            console.error('No current user found for fetching organizations.');
             return [];
         }
-
-        try {
-            const response = await fetch('/api/organizations', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log('Fetched organizations from API:', data.organizations);
-            return data.organizations || [];
-        } catch (error) {
-            console.error('Error fetching organizations from backend API:', error);
+        const userId = currentUser.user.id;
+        const { data, error } = await supabase
+            .from('organizations')
+            .select('*')
+            .eq('user_id', userId);
+        if (error) {
+            console.error('Error fetching organizations:', error);
             return [];
         }
+        console.log('Fetched organizations from API:', data);
+        return data;
+       
     }
 
     // Function to display organizations in the organizationsList div as rows only
