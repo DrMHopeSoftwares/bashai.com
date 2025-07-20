@@ -2970,6 +2970,92 @@ def handle_sms_webhook():
         print(f"Error handling SMS webhook: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+# Organization Management Endpoints
+@app.route('/api/organizations', methods=['GET'])
+@login_required
+def get_organizations():
+    """Get organizations for the current user"""
+    try:
+        user_id = g.user_id
+        
+        # Get user's enterprise_id
+        user_data = supabase_request('GET', f'users?id=eq.{user_id}')
+        if not user_data or len(user_data) == 0:
+            return jsonify({'message': 'User not found'}), 404
+        
+        enterprise_id = user_data[0].get('enterprise_id')
+        if not enterprise_id:
+            return jsonify({'message': 'No enterprise associated with user'}), 400
+        
+        # Get organizations for the enterprise
+        organizations = supabase_request('GET', f'organizations?enterprise_id=eq.{enterprise_id}&order=name.asc')
+        
+        return jsonify({'data': organizations or []}), 200
+        
+    except Exception as e:
+        print(f"Get organizations error: {e}")
+        return jsonify({'message': 'Failed to get organizations'}), 500
+
+@app.route('/api/organizations/<org_id>', methods=['DELETE'])
+@login_required
+def delete_organization(org_id):
+    """Delete an organization"""
+    try:
+        user_id = g.user_id
+        
+        # Get user's enterprise_id
+        user_data = supabase_request('GET', f'users?id=eq.{user_id}')
+        if not user_data or len(user_data) == 0:
+            return jsonify({'message': 'User not found'}), 404
+        
+        enterprise_id = user_data[0].get('enterprise_id')
+        if not enterprise_id:
+            return jsonify({'message': 'No enterprise associated with user'}), 400
+        
+        # Check if organization exists and belongs to user's enterprise
+        org_data = supabase_request('GET', f'organizations?id=eq.{org_id}&enterprise_id=eq.{enterprise_id}')
+        if not org_data or len(org_data) == 0:
+            return jsonify({'message': 'Organization not found or access denied'}), 404
+        
+        # Delete the organization
+        result = supabase_request('DELETE', f'organizations?id=eq.{org_id}')
+        
+        return jsonify({'success': True, 'message': 'Organization deleted successfully'}), 200
+        
+    except Exception as e:
+        print(f"Delete organization error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/organizations/<org_id>/channels', methods=['GET'])
+@login_required
+def get_organization_channels(org_id):
+    """Get channels for an organization"""
+    try:
+        user_id = g.user_id
+        
+        # Get user's enterprise_id
+        user_data = supabase_request('GET', f'users?id=eq.{user_id}')
+        if not user_data or len(user_data) == 0:
+            return jsonify({'message': 'User not found'}), 404
+        
+        enterprise_id = user_data[0].get('enterprise_id')
+        if not enterprise_id:
+            return jsonify({'message': 'No enterprise associated with user'}), 400
+        
+        # Check if organization belongs to user's enterprise
+        org_data = supabase_request('GET', f'organizations?id=eq.{org_id}&enterprise_id=eq.{enterprise_id}')
+        if not org_data or len(org_data) == 0:
+            return jsonify({'message': 'Organization not found or access denied'}), 404
+        
+        # Get channels for the organization
+        channels = supabase_request('GET', f'channels?organization_id=eq.{org_id}&order=name.asc')
+        
+        return jsonify({'data': channels or []}), 200
+        
+    except Exception as e:
+        print(f"Get organization channels error: {e}")
+        return jsonify({'message': 'Failed to get channels'}), 500
+
 # RelevanceAI Webhook Handlers
 @app.route('/api/webhooks/relevance-ai', methods=['POST'])
 def handle_relevance_ai_webhook():

@@ -2715,6 +2715,13 @@
             }
         }
 
+        function purchasePhoneForOrg(orgId) {
+            // Store the organization ID for phone purchase
+            localStorage.setItem('purchasePhoneForOrgId', orgId);
+            // Redirect to phone number management page
+            window.location.href = '/phone-numbers.html';
+        }
+
         function selectChannelType(type) {
             // Filter channels by type and show channels of that type
             const channels = currentOrganization?.channels?.filter(c => c.type === type) || [];
@@ -3350,6 +3357,8 @@
                                 <div style="flex: 1; display: flex; gap: 8px; justify-content: flex-end; padding-right: 12px;">
                                     <button onclick="viewOrganization('${org.id}')" title="View" style="background:none; border:none; cursor:pointer; color:#6366f1; font-size: 18px;">👁️</button>
                                     <button onclick="editOrganization('${org.id}')" title="Edit" style="background:none; border:none; cursor:pointer; color:#10b981; font-size: 18px;">✏️</button>
+                                    <button onclick="purchasePhoneForOrg('${org.id}')" title="Purchase Phone" style="background:none; border:none; cursor:pointer; color:#0ea5e9; font-size: 18px;">📱</button>
+                                    <button onclick="deleteOrganization('${org.id}')" title="Delete" style="background:none; border:none; cursor:pointer; color:#ef4444; font-size: 18px;">🗑️</button>
                                 </div>
                             </div>
                         `).join('')}
