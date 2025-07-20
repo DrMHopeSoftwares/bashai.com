@@ -2222,11 +2222,12 @@
                         Cancel
                     </button>
                     <button id="modalPurchaseBtn"
-                            style="background: #2563eb; color: white; padding: 8px 24px; border-radius: 6px; border: none; cursor: pointer; font-weight: 500;"
-                            onmouseover="this.style.background='#1d4ed8'" 
-                            onmouseout="this.style.background='#2563eb'">
+                            onclick="console.log('Direct onclick triggered!'); confirmPhonePurchase();"
+                            style="background: #10b981; color: white; padding: 10px 32px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; font-size: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                            onmouseover="this.style.background='#059669'; this.style.transform='scale(1.02)'" 
+                            onmouseout="this.style.background='#10b981'; this.style.transform='scale(1)'">
                         <i class="fas fa-credit-card mr-2"></i>
-                        Purchase
+                        Complete Purchase
                     </button>
                 </div>
             </div>
