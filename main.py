@@ -4605,7 +4605,8 @@ def make_ai_conversation_call():
 
 # Razorpay Payment Integration
 @app.route('/api/payments/create-order', methods=['POST'])
-@trial_middleware
+@login_required
+@require_enterprise_context
 def create_razorpay_order():
     """Create Razorpay order for phone number purchase"""
     try:
@@ -4665,7 +4666,8 @@ def create_razorpay_order():
         }), 500
 
 @app.route('/api/payments/verify-payment', methods=['POST'])
-@trial_middleware
+@login_required
+@require_enterprise_context
 def verify_razorpay_payment():
     """Verify Razorpay payment and process phone number purchase"""
     try:
