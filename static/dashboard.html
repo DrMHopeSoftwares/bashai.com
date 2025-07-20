@@ -2489,6 +2489,11 @@
             // Animate metrics on load
             animateMetrics();
             
+            // Handle URL hash for direct navigation (e.g., from purchase phone button)
+            setTimeout(() => {
+                handleUrlHash();
+            }, 1500); // Wait for data to load
+            
             // Refresh data every 30 seconds
             setInterval(fetchDashboardData, 30000);
         });
@@ -2716,10 +2721,54 @@
         }
 
         function purchasePhoneForOrg(orgId) {
-            // Store the organization ID for phone purchase
+            // Store the organization ID for phone purchase context
             localStorage.setItem('purchasePhoneForOrgId', orgId);
-            // Redirect to phone number management page
-            window.location.href = '/phone-numbers.html';
+            
+            // If already on dashboard, just show the phone numbers section and open search modal
+            if (window.location.pathname === '/dashboard.html' || window.location.pathname === '/dashboard') {
+                // Switch to phone numbers section
+                showSection('phone-numbers');
+                
+                // Wait a moment for section to load, then open search modal
+                setTimeout(() => {
+                    if (typeof showPhoneSearchModal === 'function') {
+                        showPhoneSearchModal();
+                    }
+                }, 200);
+            } else {
+                // Redirect to dashboard with phone numbers section active
+                window.location.href = '/dashboard.html#phone-numbers';
+            }
+        }
+
+        // Handle URL hash for direct navigation
+        function handleUrlHash() {
+            const hash = window.location.hash.substring(1); // Remove the #
+            
+            if (hash === 'phone-numbers') {
+                console.log('📱 Navigating to phone numbers section from URL hash');
+                
+                // Switch to phone numbers section
+                showSection('phone-numbers');
+                
+                // Check if this is from a purchase phone action
+                const orgId = localStorage.getItem('purchasePhoneForOrgId');
+                if (orgId) {
+                    console.log('🔍 Opening search modal for organization:', orgId);
+                    
+                    // Wait for section to load, then open search modal
+                    setTimeout(() => {
+                        if (typeof showPhoneSearchModal === 'function') {
+                            showPhoneSearchModal();
+                        }
+                        // Clear the stored org ID after use
+                        localStorage.removeItem('purchasePhoneForOrgId');
+                    }, 500);
+                }
+                
+                // Clear the hash from URL for cleaner navigation
+                history.replaceState(null, null, window.location.pathname);
+            }
         }
 
         function selectChannelType(type) {
