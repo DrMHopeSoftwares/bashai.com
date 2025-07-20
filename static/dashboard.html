@@ -2221,7 +2221,7 @@
                     <button onclick="closePurchaseModal()" class="btn btn-secondary px-4 py-2">
                         Cancel
                     </button>
-                    <button onclick="console.log('Button clicked!'); confirmPhonePurchase();" 
+                    <button id="modalPurchaseBtn"
                             style="background: #2563eb; color: white; padding: 8px 24px; border-radius: 6px; border: none; cursor: pointer; font-weight: 500;"
                             onmouseover="this.style.background='#1d4ed8'" 
                             onmouseout="this.style.background='#2563eb'">
@@ -5384,7 +5384,21 @@ async function fetchUserOrganizations(){
         orgDiv.style.margin = '32px auto';
         orgDiv.style.maxWidth = '600px';
         document.body.appendChild(orgDiv);
-  }
+    }
+    
+    // Add event listener for modal purchase button
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalPurchaseBtn = document.getElementById('modalPurchaseBtn');
+        if (modalPurchaseBtn) {
+            modalPurchaseBtn.addEventListener('click', function() {
+                console.log('🔴 Modal Purchase button clicked via event listener!');
+                confirmPhonePurchase();
+            });
+            console.log('✅ Event listener added to modal purchase button');
+        } else {
+            console.log('⚠️ Modal purchase button not found during initialization');
+        }
+    });
 </script>
 
    
