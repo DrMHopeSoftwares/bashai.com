@@ -2221,7 +2221,10 @@
                     <button onclick="closePurchaseModal()" class="btn btn-secondary px-4 py-2">
                         Cancel
                     </button>
-                    <button onclick="confirmPhonePurchase()" class="btn btn-primary px-6 py-2">
+                    <button onclick="console.log('Button clicked!'); confirmPhonePurchase();" 
+                            style="background: #2563eb; color: white; padding: 8px 24px; border-radius: 6px; border: none; cursor: pointer; font-weight: 500;"
+                            onmouseover="this.style.background='#1d4ed8'" 
+                            onmouseout="this.style.background='#2563eb'">
                         <i class="fas fa-credit-card mr-2"></i>
                         Purchase
                     </button>
@@ -4164,7 +4167,7 @@
                 return;
             }
             
-            const purchaseButton = document.querySelector('#phonePurchaseModal button[onclick="confirmPhonePurchase()"]');
+            const purchaseButton = document.querySelector('#phonePurchaseModal button:last-child');
             const originalButtonText = purchaseButton.innerHTML;
 
             try {
@@ -4300,7 +4303,7 @@
                         ondismiss: function() {
                             console.log('Razorpay payment cancelled');
                             // Reset button state if payment was cancelled
-                            const purchaseButton = document.querySelector('#phonePurchaseModal button[onclick="confirmPhonePurchase()"]');
+                            const purchaseButton = document.querySelector('#phonePurchaseModal button:last-child');
                             if (purchaseButton) {
                                 purchaseButton.disabled = false;
                                 purchaseButton.innerHTML = '<i class="fas fa-shopping-cart mr-1"></i>Purchase';
