@@ -2730,6 +2730,129 @@ def get_owned_phone_numbers():
             'error': str(e)
         }), 500
 
+@app.route('/api/phone-numbers/stats', methods=['GET'])
+@login_required
+@require_enterprise_context
+def get_phone_number_stats():
+    """Get phone number statistics for the enterprise"""
+    try:
+        enterprise_id = g.enterprise_id
+
+        # Get owned phone numbers
+        phone_numbers = supabase_request('GET', 'purchased_phone_numbers', params={
+            'enterprise_id': f'eq.{enterprise_id}',
+            'status': 'neq.released'
+        }) or []
+
+        # Get call logs for statistics
+        call_logs = supabase_request('GET', 'call_logs', params={
+            'enterprise_id': f'eq.{enterprise_id}'
+        }) or []
+
+        # Calculate statistics
+        active_numbers = len([p for p in phone_numbers if p.get('status') == 'active'])
+        total_calls = len(call_logs)
+        monthly_cost = sum(float(p.get('monthly_cost', 0)) for p in phone_numbers)
+
+        # Calculate average duration
+        durations = [float(log.get('duration', 0)) for log in call_logs if log.get('duration')]
+        avg_duration = sum(durations) / len(durations) if durations else 0
+
+        # Calculate current month calls
+        from datetime import datetime, timezone
+        current_month = datetime.now(timezone.utc).strftime('%Y-%m')
+        current_month_calls = len([log for log in call_logs if log.get('created_at', '').startswith(current_month)])
+
+        return jsonify({
+            'success': True,
+            'stats': {
+                'active_numbers': active_numbers,
+                'total_calls': total_calls,
+                'monthly_cost': monthly_cost,
+                'avg_duration_minutes': round(avg_duration / 60, 1) if avg_duration > 0 else 0,
+                'current_month_calls': current_month_calls
+            }
+        })
+
+    except Exception as e:
+        print(f"Error fetching phone number stats: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/phone-numbers/detailed', methods=['GET'])
+@login_required
+@require_enterprise_context
+def get_detailed_phone_numbers():
+    """Get detailed phone number information with usage statistics"""
+    try:
+        enterprise_id = g.enterprise_id
+
+        # Get phone numbers with provider info
+        query_params = {
+            'select': 'id,phone_number,friendly_name,country_code,country_name,monthly_cost,setup_cost,capabilities,status,voice_url,sms_url,purchased_at,created_at,updated_at,phone_number_providers(name)',
+            'enterprise_id': f'eq.{enterprise_id}',
+            'status': 'neq.released'
+        }
+
+        phone_numbers_raw = supabase_request('GET', 'purchased_phone_numbers', params=query_params) or []
+
+        # Get call logs for each phone number
+        detailed_numbers = []
+        for phone in phone_numbers_raw:
+            # Get call logs for this phone number
+            call_logs = supabase_request('GET', 'call_logs', params={
+                'phone_number': f'eq.{phone["phone_number"]}',
+                'enterprise_id': f'eq.{enterprise_id}'
+            }) or []
+
+            # Calculate statistics for this number
+            total_calls = len(call_logs)
+            successful_calls = len([log for log in call_logs if log.get('status') == 'completed'])
+            success_rate = (successful_calls / total_calls * 100) if total_calls > 0 else 0
+
+            # Current month calls
+            from datetime import datetime, timezone
+            current_month = datetime.now(timezone.utc).strftime('%Y-%m')
+            current_month_calls = len([log for log in call_logs if log.get('created_at', '').startswith(current_month)])
+
+            # Calculate average duration for this number
+            durations = [float(log.get('duration', 0)) for log in call_logs if log.get('duration')]
+            avg_duration = sum(durations) / len(durations) if durations else 0
+
+            phone_data = {
+                'id': phone['id'],
+                'phone_number': phone['phone_number'],
+                'friendly_name': phone['friendly_name'],
+                'country_code': phone['country_code'],
+                'monthly_cost': phone['monthly_cost'],
+                'status': phone['status'],
+                'provider': phone['phone_number_providers']['name'] if phone.get('phone_number_providers') else 'Unknown',
+                'capabilities': phone.get('capabilities', {}),
+                'purchased_at': phone['purchased_at'],
+                'usage_stats': {
+                    'total_calls': total_calls,
+                    'current_month_calls': current_month_calls,
+                    'success_rate': round(success_rate, 1),
+                    'avg_duration_minutes': round(avg_duration / 60, 1) if avg_duration > 0 else 0
+                }
+            }
+            detailed_numbers.append(phone_data)
+
+        return jsonify({
+            'success': True,
+            'data': detailed_numbers,
+            'total_count': len(detailed_numbers)
+        })
+
+    except Exception as e:
+        print(f"Error fetching detailed phone numbers: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 @app.route('/api/phone-numbers/<phone_id>/release', methods=['DELETE'])
 @login_required
 @require_enterprise_context
