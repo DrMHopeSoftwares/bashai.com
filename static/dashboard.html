@@ -4228,20 +4228,33 @@
         
         // Initiate Razorpay payment for Bolna phone numbers
         async function initiateBolnaPayment() {
-            if (!selectedPhoneNumber) return;
+            console.log('🔥 initiateBolnaPayment called!');
+            console.log('Selected phone:', selectedPhoneNumber);
+            
+            if (!selectedPhoneNumber) {
+                console.error('❌ No selected phone number');
+                return;
+            }
             
             try {
+                console.log('💰 Starting Razorpay payment process...');
                 // Create order on backend
+                console.log('📡 Making API request to create Razorpay order...');
+                const orderPayload = {
+                    amount: selectedPhoneNumber.monthly_cost * 100, // Convert to paise
+                    currency: 'INR',
+                    phone_number: selectedPhoneNumber.phone_number,
+                    provider: selectedPhoneNumber.provider,
+                    organization_id: localStorage.getItem('purchasePhoneForOrgId')
+                };
+                console.log('📦 Order payload:', orderPayload);
+                
                 const orderResponse = await apiRequest('/api/payments/create-order', {
                     method: 'POST',
-                    body: JSON.stringify({
-                        amount: selectedPhoneNumber.monthly_cost * 100, // Convert to paise
-                        currency: 'INR',
-                        phone_number: selectedPhoneNumber.phone_number,
-                        provider: selectedPhoneNumber.provider,
-                        organization_id: localStorage.getItem('purchasePhoneForOrgId')
-                    })
+                    body: JSON.stringify(orderPayload)
                 });
+                
+                console.log('📨 Order response:', orderResponse);
                 
                 if (!orderResponse.success) {
                     throw new Error(orderResponse.error || 'Failed to create payment order');
@@ -4288,7 +4301,14 @@
                 };
                 
                 // Open Razorpay checkout
+                console.log('🚀 Opening Razorpay checkout with options:', options);
+                
+                if (typeof Razorpay === 'undefined') {
+                    throw new Error('Razorpay script not loaded');
+                }
+                
                 const rzp = new Razorpay(options);
+                console.log('✅ Razorpay instance created, opening checkout...');
                 rzp.open();
                 
             } catch (error) {
