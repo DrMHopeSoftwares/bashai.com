@@ -449,7 +449,7 @@ def create_voice_agent():
 
         # Get provider type (default to bolna for backward compatibility)
         provider_type = data.get('provider', 'bolna').lower()
-        allowed_providers = ['bolna', 'relevance_ai', 'openai_realtime']
+        allowed_providers = ['bolna', 'relevance_ai', 'openai_realtime', 'elevenlabs']
         
         if provider_type not in allowed_providers:
             return jsonify({
@@ -470,7 +470,7 @@ def create_voice_agent():
             if provider_type == 'relevance_ai':
                 return jsonify({
                     'message': 'RelevanceAI is a premium feature. Please upgrade your plan.',
-                    'allowed_providers': ['bolna', 'openai_realtime']
+                    'allowed_providers': ['bolna', 'openai_realtime', 'elevenlabs']
                 }), 403
 
         # Base voice agent data
@@ -541,6 +541,49 @@ def create_voice_agent():
                 'temperature': data.get('temperature', 0.7),
                 'system_prompt': data.get('system_prompt', 'You are a helpful AI assistant.')
             }
+
+        elif provider_type == 'elevenlabs':
+            try:
+                # Initialize ElevenLabs manager
+                from elevenlabs_integration import ElevenLabsAgentManager
+                elevenlabs_manager = ElevenLabsAgentManager()
+
+                # Create agent in ElevenLabs
+                elevenlabs_config = {
+                    'name': data['name'],
+                    'description': data.get('description', f"AI voice agent for {data['use_case']}"),
+                    'language': data['language'],
+                    'use_case': data['use_case'],
+                    'voice_id': data.get('voice_id', 'pNInz6obpgDQGcFmaJgB'),  # Default to Adam
+                    'model_id': data.get('model_id', 'eleven_multilingual_v2'),
+                    'voice_settings': data.get('voice_settings', {
+                        'stability': 0.75,
+                        'similarity_boost': 0.75,
+                        'style': 0.0,
+                        'use_speaker_boost': True
+                    }),
+                    'system_prompt': data.get('system_prompt', 'You are a helpful AI assistant.')
+                }
+
+                elevenlabs_agent = elevenlabs_manager.create_voice_agent(elevenlabs_config)
+
+                external_agent_id = elevenlabs_agent.get('agent', {}).get('agent_id')
+                external_config = elevenlabs_agent.get('agent', {})
+
+                # Add ElevenLabs specific fields
+                voice_agent_data.update({
+                    'elevenlabs_agent_id': external_agent_id,
+                    'elevenlabs_config': external_config
+                })
+
+                print(f"✅ ElevenLabs agent created: {external_agent_id}")
+
+            except Exception as e:
+                print(f"❌ Failed to create ElevenLabs agent: {e}")
+                return jsonify({
+                    'message': f'Failed to create ElevenLabs agent: {str(e)}',
+                    'provider': 'elevenlabs'
+                }), 500
 
         # Create voice agent in database
         voice_agent = supabase_request('POST', 'voice_agents', data=voice_agent_data)

@@ -123,8 +123,12 @@
             background: linear-gradient(135deg, #8b5cf6, #7c3aed);
         }
 
-        .openai-icon { 
+        .openai-icon {
             background: linear-gradient(135deg, #3b82f6, #1e40af);
+        }
+
+        .elevenlabs-icon {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
         }
 
         .use-case-card {
@@ -253,6 +257,14 @@
             margin-top: 20px;
         }
 
+        .elevenlabs-config {
+            background: rgba(245, 158, 11, 0.05);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
         .provider-comparison {
             background: rgba(255, 255, 255, 0.9);
             border-radius: 16px;
@@ -373,7 +385,7 @@
                 <h2 class="text-3xl font-bold text-gray-800 mb-4">Step 1: Choose Your AI Provider</h2>
                 <p class="text-gray-600 mb-8">Select the AI platform that best fits your needs. Each provider offers unique capabilities.</p>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     <div class="provider-card slide-in" onclick="selectProvider('bolna')" id="bolna-card">
                         <div class="provider-icon bolna-icon">
                             <i class="fas fa-phone-volume"></i>
@@ -424,6 +436,23 @@
                             <strong>Best for:</strong> Complex conversations, support, analysis
                         </div>
                     </div>
+
+                    <div class="provider-card slide-in" onclick="selectProvider('elevenlabs')" id="elevenlabs-card" style="animation-delay: 0.3s;">
+                        <div class="provider-icon elevenlabs-icon">
+                            <i class="fas fa-microphone-alt"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">ElevenLabs</h3>
+                        <p class="text-gray-600 mb-4">Premium conversational AI with natural voice synthesis and phone integration.</p>
+                        <div class="space-y-2">
+                            <div class="feature-badge">📞 Phone Calls</div>
+                            <div class="feature-badge">🎙️ Voice Cloning</div>
+                            <div class="feature-badge">🔗 Webhook Ready</div>
+                            <div class="feature-badge">🌍 Multilingual</div>
+                        </div>
+                        <div class="mt-4 text-sm text-gray-600">
+                            <strong>Best for:</strong> Phone calls, custom voices, professional branding
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Provider Comparison Table -->
@@ -436,6 +465,7 @@
                                 <th>Bolna AI</th>
                                 <th>Relevance AI</th>
                                 <th>OpenAI Realtime</th>
+                                <th>ElevenLabs</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -444,23 +474,34 @@
                                 <td>✅ Excellent</td>
                                 <td>⚠️ Limited</td>
                                 <td>✅ Good</td>
+                                <td>✅ Excellent</td>
                             </tr>
                             <tr>
                                 <td>Hindi Support</td>
                                 <td>✅ Native</td>
                                 <td>✅ Supported</td>
                                 <td>✅ Supported</td>
+                                <td>✅ Supported</td>
                             </tr>
                             <tr>
-                                <td>Multi-Agent</td>
-                                <td>❌ Single</td>
-                                <td>✅ Multiple</td>
-                                <td>❌ Single</td>
+                                <td>Voice Cloning</td>
+                                <td>❌ No</td>
+                                <td>❌ No</td>
+                                <td>❌ No</td>
+                                <td>✅ Yes</td>
                             </tr>
                             <tr>
-                                <td>Custom Tools</td>
-                                <td>⚠️ Basic</td>
-                                <td>✅ Advanced</td>
+                                <td>Phone Integration</td>
+                                <td>✅ Native</td>
+                                <td>⚠️ Limited</td>
+                                <td>⚠️ Limited</td>
+                                <td>✅ Native</td>
+                            </tr>
+                            <tr>
+                                <td>Webhook Support</td>
+                                <td>✅ Yes</td>
+                                <td>✅ Yes</td>
+                                <td>⚠️ Limited</td>
                                 <td>✅ Advanced</td>
                             </tr>
                             <tr>
@@ -468,6 +509,7 @@
                                 <td>💰 Low</td>
                                 <td>💰💰 Medium</td>
                                 <td>💰💰💰 High</td>
+                                <td>💰💰 Medium</td>
                             </tr>
                         </tbody>
                     </table>
@@ -824,6 +866,100 @@
                         </div>
                     </div>
                 `
+            },
+            elevenlabs: {
+                useCases: [
+                    {
+                        id: 'phone_support',
+                        name: 'Phone Support',
+                        description: 'Professional phone-based customer support with natural voices',
+                        icon: '📞'
+                    },
+                    {
+                        id: 'voice_branding',
+                        name: 'Voice Branding',
+                        description: 'Custom branded voice experiences with voice cloning',
+                        icon: '🎭'
+                    },
+                    {
+                        id: 'multilingual_calls',
+                        name: 'Multilingual Calls',
+                        description: 'International phone support in multiple languages',
+                        icon: '🌍'
+                    },
+                    {
+                        id: 'appointment_calls',
+                        name: 'Appointment Calls',
+                        description: 'Automated appointment booking and confirmation calls',
+                        icon: '📅'
+                    }
+                ],
+                configFields: `
+                    <div class="elevenlabs-config space-y-4">
+                        <h4 class="font-semibold text-gray-800">
+                            <i class="fas fa-microphone-alt mr-2 text-orange-600"></i>
+                            ElevenLabs Configuration
+                        </h4>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">API Key</label>
+                            <input type="password" id="elevenlabsApiKey" class="form-input" placeholder="Enter your ElevenLabs API key">
+                            <p class="text-sm text-gray-600 mt-1">Get your API key from ElevenLabs dashboard</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Voice Selection</label>
+                            <select id="elevenlabsVoice" class="form-input" onchange="updateVoicePreview()">
+                                <option value="pNInz6obpgDQGcFmaJgB">Adam - Deep, authoritative male voice</option>
+                                <option value="21m00Tcm4TlvDq8ikWAM">Rachel - Calm, professional female voice</option>
+                                <option value="AZnzlk1XvdvUeBnXmlld">Domi - Strong, confident female voice</option>
+                                <option value="EXAVITQu4vr4xnSDxMaL">Bella - Friendly, warm female voice</option>
+                                <option value="ErXwobaYiN019PkySvjV">Antoni - Smooth, articulate male voice</option>
+                                <option value="custom">Custom Voice (Voice Cloning)</option>
+                            </select>
+                        </div>
+                        <div id="customVoiceConfig" style="display: none;">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Custom Voice ID</label>
+                            <input type="text" class="form-input" placeholder="Enter your custom voice ID">
+                            <p class="text-sm text-gray-600 mt-1">Upload and train your custom voice in ElevenLabs dashboard</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Voice Settings</label>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">Stability</label>
+                                    <input type="range" class="w-full" min="0" max="1" step="0.1" value="0.75" id="stabilitySlider">
+                                    <span class="text-xs text-gray-500">0.75</span>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">Similarity Boost</label>
+                                    <input type="range" class="w-full" min="0" max="1" step="0.1" value="0.75" id="similaritySlider">
+                                    <span class="text-xs text-gray-500">0.75</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Phone Integration</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="mr-2" checked>
+                                    <span class="text-sm">Enable phone call webhooks</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="mr-2" checked>
+                                    <span class="text-sm">Auto-generate conversation summaries</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="mr-2">
+                                    <span class="text-sm">Enable call recording</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Webhook URL</label>
+                            <input type="url" class="form-input" placeholder="https://your-domain.com/webhook/elevenlabs" readonly>
+                            <p class="text-sm text-gray-600 mt-1">This will be auto-generated after agent creation</p>
+                        </div>
+                    </div>
+                `
             }
         };
 
@@ -883,17 +1019,61 @@
         function loadProviderConfig() {
             const configContainer = document.getElementById('providerConfig');
             configContainer.innerHTML = providerConfigs[selectedProvider].configFields;
+
+            // Initialize provider-specific features
+            if (selectedProvider === 'elevenlabs') {
+                setTimeout(initializeElevenLabsSliders, 100);
+            }
         }
 
         // Update Relevance AI specific configuration
         function updateRelevanceConfig() {
             const agentType = document.getElementById('relevanceAgentType').value;
             const teamConfig = document.getElementById('agentTeamConfig');
-            
+
             if (agentType === 'multi') {
                 teamConfig.style.display = 'block';
             } else {
                 teamConfig.style.display = 'none';
+            }
+        }
+
+        // Update ElevenLabs voice preview
+        function updateVoicePreview() {
+            const voiceSelect = document.getElementById('elevenlabsVoice');
+            const customVoiceConfig = document.getElementById('customVoiceConfig');
+
+            if (voiceSelect.value === 'custom') {
+                customVoiceConfig.style.display = 'block';
+            } else {
+                customVoiceConfig.style.display = 'none';
+            }
+        }
+
+        // Update slider values for ElevenLabs
+        function updateSliderValue(sliderId, displayId) {
+            const slider = document.getElementById(sliderId);
+            const display = document.getElementById(displayId);
+            if (slider && display) {
+                display.textContent = slider.value;
+            }
+        }
+
+        // Initialize ElevenLabs sliders
+        function initializeElevenLabsSliders() {
+            const stabilitySlider = document.getElementById('stabilitySlider');
+            const similaritySlider = document.getElementById('similaritySlider');
+
+            if (stabilitySlider) {
+                stabilitySlider.addEventListener('input', function() {
+                    this.nextElementSibling.textContent = this.value;
+                });
+            }
+
+            if (similaritySlider) {
+                similaritySlider.addEventListener('input', function() {
+                    this.nextElementSibling.textContent = this.value;
+                });
             }
         }
 
@@ -1044,6 +1224,30 @@
                         region: document.getElementById('relevanceRegion')?.value,
                         agent_type: document.getElementById('relevanceAgentType')?.value
                     };
+                } else if (selectedProvider === 'elevenlabs') {
+                    agentData.provider_config = {
+                        api_key: document.getElementById('elevenlabsApiKey')?.value,
+                        voice_id: document.getElementById('elevenlabsVoice')?.value,
+                        voice_settings: {
+                            stability: parseFloat(document.getElementById('stabilitySlider')?.value || 0.75),
+                            similarity_boost: parseFloat(document.getElementById('similaritySlider')?.value || 0.75),
+                            style: 0.0,
+                            use_speaker_boost: true
+                        },
+                        phone_integration: {
+                            webhooks_enabled: true,
+                            conversation_summaries: true,
+                            call_recording: false
+                        }
+                    };
+
+                    // Add custom voice ID if selected
+                    if (agentData.provider_config.voice_id === 'custom') {
+                        const customVoiceId = document.querySelector('#customVoiceConfig input')?.value;
+                        if (customVoiceId) {
+                            agentData.provider_config.voice_id = customVoiceId;
+                        }
+                    }
                 }
                 
                 // Get organization and channel from URL or localStorage

@@ -9,6 +9,7 @@ from plivo_integration import PlivoAPI
 from twilio_integration import TwilioAPI
 from telnyx_integration import TelnyxAPI
 from bolna_integration import BolnaAPI
+from elevenlabs_integration import ElevenLabsAPI
 
 
 class PhoneProviderManager:
@@ -20,6 +21,7 @@ class PhoneProviderManager:
             'twilio': TwilioAPI(),
             'telnyx': TelnyxAPI(),
             'bolna': BolnaAPI(),
+            'elevenlabs': ElevenLabsAPI(),
         }
         
         # Provider availability based on credentials
@@ -31,7 +33,7 @@ class PhoneProviderManager:
         """Get provider instance by name"""
         provider = self.providers.get(provider_name.lower())
         if not provider:
-            raise ValueError(f"Unsupported provider: {provider_name}. Supported: plivo, twilio, telnyx, bolna")
+            raise ValueError(f"Unsupported provider: {provider_name}. Supported: plivo, twilio, telnyx, bolna, elevenlabs")
         return provider
     
     def search_phone_numbers(self, 
@@ -317,8 +319,97 @@ class PhoneProviderManager:
         return provider_countries.get(provider_name.lower(), [])
 
 
-# Global instance
+class VoiceProviderManager:
+    """Unified manager for voice synthesis and AI voice providers"""
+
+    def __init__(self):
+        self.voice_providers = {
+            'bolna': BolnaAPI(),
+            'elevenlabs': ElevenLabsAPI(),
+        }
+
+        # Voice provider availability based on credentials
+        self.available_voice_providers = {}
+        for name, provider in self.voice_providers.items():
+            self.available_voice_providers[name] = not getattr(provider, 'use_mock', True)
+
+    def get_voice_provider(self, provider_name: str):
+        """Get voice provider instance by name"""
+        provider = self.voice_providers.get(provider_name.lower())
+        if not provider:
+            raise ValueError(f"Unsupported voice provider: {provider_name}. Supported: bolna, elevenlabs")
+        return provider
+
+    def get_available_voices(self, provider_name: str) -> Dict:
+        """Get available voices from a voice provider"""
+        try:
+            provider = self.get_voice_provider(provider_name)
+
+            if hasattr(provider, 'get_available_voices'):
+                return provider.get_available_voices()
+            else:
+                return {
+                    'success': False,
+                    'error': f'Provider {provider_name} does not support voice listing'
+                }
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Error getting voices from {provider_name}: {str(e)}'
+            }
+
+    def create_voice_agent(self, provider_name: str, config: Dict) -> Dict:
+        """Create a voice agent with specified provider"""
+        try:
+            provider = self.get_voice_provider(provider_name)
+
+            if hasattr(provider, 'create_voice_agent'):
+                return provider.create_voice_agent(config)
+            else:
+                return {
+                    'success': False,
+                    'error': f'Provider {provider_name} does not support voice agent creation'
+                }
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Error creating voice agent with {provider_name}: {str(e)}'
+            }
+
+    def handle_voice_call(self, provider_name: str, agent_id: str, call_data: Dict) -> Dict:
+        """Handle voice call with specified provider and agent"""
+        try:
+            provider = self.get_voice_provider(provider_name)
+
+            if hasattr(provider, 'handle_voice_call'):
+                return provider.handle_voice_call(agent_id, call_data)
+            else:
+                return {
+                    'success': False,
+                    'error': f'Provider {provider_name} does not support voice call handling'
+                }
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Error handling voice call with {provider_name}: {str(e)}'
+            }
+
+    def get_voice_provider_status(self) -> Dict:
+        """Get status of all voice providers"""
+        status = {}
+        for name, available in self.available_voice_providers.items():
+            status[name] = {
+                'available': available,
+                'has_credentials': available,
+                'mock_mode': not available,
+                'type': 'voice_synthesis' if name == 'elevenlabs' else 'voice_agent'
+            }
+        return status
+
+
+# Global instances
 phone_provider_manager = PhoneProviderManager()
+voice_provider_manager = VoiceProviderManager()
 
 
 # Example usage and testing
