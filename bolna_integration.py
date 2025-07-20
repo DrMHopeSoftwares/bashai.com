@@ -236,8 +236,9 @@ class BolnaAPI:
                 'country_name': 'India',
                 'provider': 'bolna',
                 'capabilities': {'voice': True, 'sms': True},
-                'monthly_cost': 2.50,
+                'monthly_cost': 1000.00,  # ₹1000 for Bolna Indian numbers
                 'setup_cost': 0.00,
+                'currency': 'INR',
                 'locality': 'Karnataka',
                 'region': 'Bangalore',
                 'note': 'Configured sender phone'
@@ -254,8 +255,9 @@ class BolnaAPI:
                     'country_name': 'India',
                     'provider': 'bolna',
                     'capabilities': {'voice': True, 'sms': True},
-                    'monthly_cost': 2.50,
+                    'monthly_cost': 1000.00,  # ₹1000 for Bolna Indian numbers
                     'setup_cost': 0.00,
+                    'currency': 'INR',
                     'locality': 'India',
                     'region': 'Various',
                     'note': 'Additional configured phone'

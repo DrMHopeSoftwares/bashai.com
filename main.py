@@ -6,6 +6,7 @@ import sys
 import requests
 import json
 import uuid
+import time
 from datetime import datetime, timezone, timedelta
 from flask import Flask, request, jsonify, send_from_directory, g, redirect
 from flask_cors import CORS
@@ -4600,6 +4601,177 @@ def make_ai_conversation_call():
         return jsonify({
             'success': False,
             'error': str(e)
+        }), 500
+
+# Razorpay Payment Integration
+@app.route('/api/payments/create-order', methods=['POST'])
+@trial_middleware
+def create_razorpay_order():
+    """Create Razorpay order for phone number purchase"""
+    try:
+        import razorpay
+        
+        data = request.get_json()
+        amount = data.get('amount')  # Amount in paise
+        currency = data.get('currency', 'INR')
+        phone_number = data.get('phone_number')
+        provider = data.get('provider')
+        
+        if not amount or not phone_number:
+            return jsonify({
+                'success': False,
+                'error': 'Amount and phone number are required'
+            }), 400
+        
+        # Initialize Razorpay client
+        razorpay_key = os.getenv('RAZORPAY_KEY_ID')
+        razorpay_secret = os.getenv('RAZORPAY_KEY_SECRET')
+        
+        if not razorpay_key or not razorpay_secret:
+            return jsonify({
+                'success': False,
+                'error': 'Razorpay credentials not configured'
+            }), 500
+        
+        client = razorpay.Client(auth=(razorpay_key, razorpay_secret))
+        
+        # Create order
+        order_data = {
+            'amount': amount,
+            'currency': currency,
+            'receipt': f'phone_{phone_number}_{int(time.time())}',
+            'notes': {
+                'phone_number': phone_number,
+                'provider': provider,
+                'enterprise_id': g.enterprise_id
+            }
+        }
+        
+        order = client.order.create(data=order_data)
+        
+        return jsonify({
+            'success': True,
+            'order_id': order['id'],
+            'amount': order['amount'],
+            'currency': order['currency'],
+            'razorpay_key': razorpay_key
+        })
+        
+    except Exception as e:
+        print(f"Error creating Razorpay order: {e}")
+        return jsonify({
+            'success': False,
+            'error': f'Failed to create payment order: {str(e)}'
+        }), 500
+
+@app.route('/api/payments/verify-payment', methods=['POST'])
+@trial_middleware
+def verify_razorpay_payment():
+    """Verify Razorpay payment and process phone number purchase"""
+    try:
+        import razorpay
+        import hmac
+        import hashlib
+        
+        data = request.get_json()
+        razorpay_order_id = data.get('razorpay_order_id')
+        razorpay_payment_id = data.get('razorpay_payment_id')
+        razorpay_signature = data.get('razorpay_signature')
+        phone_number = data.get('phone_number')
+        provider = data.get('provider')
+        organization_id = data.get('organization_id')
+        
+        if not all([razorpay_order_id, razorpay_payment_id, razorpay_signature]):
+            return jsonify({
+                'success': False,
+                'error': 'Missing payment verification data'
+            }), 400
+        
+        # Initialize Razorpay client
+        razorpay_key = os.getenv('RAZORPAY_KEY_ID')
+        razorpay_secret = os.getenv('RAZORPAY_KEY_SECRET')
+        
+        client = razorpay.Client(auth=(razorpay_key, razorpay_secret))
+        
+        # Verify payment signature
+        generated_signature = hmac.new(
+            razorpay_secret.encode(),
+            f"{razorpay_order_id}|{razorpay_payment_id}".encode(),
+            hashlib.sha256
+        ).hexdigest()
+        
+        if generated_signature != razorpay_signature:
+            return jsonify({
+                'success': False,
+                'error': 'Payment signature verification failed'
+            }), 400
+        
+        # Get payment details
+        payment = client.payment.fetch(razorpay_payment_id)
+        
+        if payment['status'] != 'captured':
+            return jsonify({
+                'success': False,
+                'error': 'Payment not captured'
+            }), 400
+        
+        # Record successful payment and activate phone number
+        enterprise_id = g.enterprise_id
+        
+        # Create phone number record
+        phone_record = {
+            'id': str(uuid.uuid4()),
+            'enterprise_id': enterprise_id,
+            'organization_id': organization_id,
+            'phone_number': phone_number,
+            'provider': provider,
+            'friendly_name': f"BhashAI - {phone_number}",
+            'monthly_cost': payment['amount'] / 100,  # Convert from paise
+            'setup_cost': 0.00,
+            'currency': payment['currency'],
+            'capabilities': {'voice': True, 'sms': True},
+            'status': 'active',
+            'payment_id': razorpay_payment_id,
+            'order_id': razorpay_order_id,
+            'purchased_at': datetime.now(timezone.utc).isoformat(),
+            'created_at': datetime.now(timezone.utc).isoformat(),
+            'updated_at': datetime.now(timezone.utc).isoformat()
+        }
+        
+        db_result = supabase_request('POST', 'purchased_phone_numbers', data=phone_record)
+        
+        if db_result:
+            # Create transaction record for payment
+            transaction_record = {
+                'id': str(uuid.uuid4()),
+                'enterprise_id': enterprise_id,
+                'amount': payment['amount'] / 100,
+                'currency': payment['currency'],
+                'transaction_type': 'phone_purchase',
+                'description': f'Phone number purchase: {phone_number}',
+                'payment_id': razorpay_payment_id,
+                'status': 'completed',
+                'created_at': datetime.now(timezone.utc).isoformat()
+            }
+            
+            supabase_request('POST', 'transactions', data=transaction_record)
+            
+            return jsonify({
+                'success': True,
+                'message': 'Payment verified and phone number activated',
+                'phone_number': phone_number
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to activate phone number'
+            }), 500
+            
+    except Exception as e:
+        print(f"Error verifying Razorpay payment: {e}")
+        return jsonify({
+            'success': False,
+            'error': f'Payment verification failed: {str(e)}'
         }), 500
 
 # Vercel serverless function handler

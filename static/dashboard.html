@@ -9,6 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
         :root {
             --primary: #6366f1;
@@ -3981,11 +3982,11 @@
                         </div>
                     </td>
                     <td class="py-3 px-4">
-                        <span class="font-medium text-green-600">$${(phone.monthly_cost || 0).toFixed(2)}</span>
+                        <span class="font-medium text-green-600">${formatCurrency(phone.monthly_cost || 0, phone.currency, phone.provider)}</span>
                         <div class="text-xs text-gray-500">per month</div>
                     </td>
                     <td class="py-3 px-4">
-                        <span class="font-medium">$${(phone.setup_cost || 0).toFixed(2)}</span>
+                        <span class="font-medium">${formatCurrency(phone.setup_cost || 0, phone.currency, phone.provider)}</span>
                         <div class="text-xs text-gray-500">one-time</div>
                     </td>
                     <td class="py-3 px-4">
@@ -4114,6 +4115,12 @@
         async function confirmPhonePurchase() {
             if (!selectedPhoneNumber) return;
             
+            // Check if this is a Bolna number requiring Razorpay payment
+            if (selectedPhoneNumber.provider === 'bolna') {
+                initiateBolnaPayment();
+                return;
+            }
+            
             const purchaseButton = document.querySelector('#phonePurchaseModal button[onclick="confirmPhonePurchase()"]');
             const originalButtonText = purchaseButton.innerHTML;
 
@@ -4185,6 +4192,140 @@
             }
         }
         
+        // Initiate Razorpay payment for Bolna phone numbers
+        async function initiateBolnaPayment() {
+            if (!selectedPhoneNumber) return;
+            
+            try {
+                // Create order on backend
+                const orderResponse = await apiRequest('/api/payments/create-order', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        amount: selectedPhoneNumber.monthly_cost * 100, // Convert to paise
+                        currency: 'INR',
+                        phone_number: selectedPhoneNumber.phone_number,
+                        provider: selectedPhoneNumber.provider,
+                        organization_id: localStorage.getItem('purchasePhoneForOrgId')
+                    })
+                });
+                
+                if (!orderResponse.success) {
+                    throw new Error(orderResponse.error || 'Failed to create payment order');
+                }
+                
+                // Get user info for Razorpay
+                const userInfo = await getCurrentUser();
+                
+                // Configure Razorpay options
+                const options = {
+                    key: orderResponse.razorpay_key, // Get from backend
+                    amount: orderResponse.amount,
+                    currency: 'INR',
+                    name: 'BhashAI',
+                    description: `Phone Number: ${selectedPhoneNumber.phone_number}`,
+                    image: '/static/logo.png', // Add your logo
+                    order_id: orderResponse.order_id,
+                    handler: function (response) {
+                        handleRazorpaySuccess(response);
+                    },
+                    prefill: {
+                        name: userInfo.name || 'User',
+                        email: userInfo.email || '',
+                        contact: userInfo.phone || ''
+                    },
+                    notes: {
+                        phone_number: selectedPhoneNumber.phone_number,
+                        provider: 'bolna'
+                    },
+                    theme: {
+                        color: '#6366f1'
+                    },
+                    modal: {
+                        ondismiss: function() {
+                            console.log('Razorpay payment cancelled');
+                            // Reset button state if payment was cancelled
+                            const purchaseButton = document.querySelector('#phonePurchaseModal button[onclick="confirmPhonePurchase()"]');
+                            if (purchaseButton) {
+                                purchaseButton.disabled = false;
+                                purchaseButton.innerHTML = '<i class="fas fa-shopping-cart mr-1"></i>Purchase';
+                            }
+                        }
+                    }
+                };
+                
+                // Open Razorpay checkout
+                const rzp = new Razorpay(options);
+                rzp.open();
+                
+            } catch (error) {
+                console.error('Error initiating Bolna payment:', error);
+                showErrorMessage('Failed to initiate payment: ' + error.message);
+            }
+        }
+        
+        // Handle successful Razorpay payment
+        async function handleRazorpaySuccess(response) {
+            try {
+                showPurchaseProgress('Verifying payment...');
+                
+                // Verify payment on backend
+                const verifyResponse = await apiRequest('/api/payments/verify-payment', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_signature: response.razorpay_signature,
+                        phone_number: selectedPhoneNumber.phone_number,
+                        provider: selectedPhoneNumber.provider,
+                        organization_id: localStorage.getItem('purchasePhoneForOrgId')
+                    })
+                });
+                
+                if (verifyResponse.success) {
+                    showPurchaseProgress('Payment verified! Activating phone number...');
+                    
+                    setTimeout(() => {
+                        showPurchaseSuccess(selectedPhoneNumber.phone_number);
+                        closePurchaseModal();
+                        closePhoneSearchModal();
+                        loadPhoneNumbers(); // Refresh the owned numbers list
+                        
+                        // Clear the organization context
+                        localStorage.removeItem('purchasePhoneForOrgId');
+                    }, 1500);
+                    
+                } else {
+                    throw new Error(verifyResponse.error || 'Payment verification failed');
+                }
+                
+            } catch (error) {
+                console.error('Error verifying payment:', error);
+                showErrorMessage('Payment verification failed: ' + error.message);
+            }
+        }
+        
+        // Get current user information
+        async function getCurrentUser() {
+            try {
+                const authToken = localStorage.getItem('auth_token') || getCookie('auth_token');
+                const response = await fetch('/api/auth/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    return await response.json();
+                } else {
+                    return {};
+                }
+            } catch (error) {
+                console.error('Error getting user info:', error);
+                return {};
+            }
+        }
+        
         // Show purchase progress messages
         function showPurchaseProgress(message) {
             const progressDiv = document.querySelector('#phonePurchaseModal .p-6');
@@ -4235,6 +4376,15 @@
         }
 
         // Utility functions for phone number management
+        function formatCurrency(amount, currency, provider) {
+            // Format currency based on provider and currency type
+            if (provider === 'bolna' && currency === 'INR') {
+                return `₹${amount.toFixed(0)}`;
+            } else {
+                return `$${amount.toFixed(2)}`;
+            }
+        }
+        
         function getProviderBadgeClass(provider) {
             switch (provider?.toLowerCase()) {
                 case 'bolna': return 'bg-orange-100 text-orange-800';
