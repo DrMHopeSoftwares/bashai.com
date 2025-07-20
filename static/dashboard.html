@@ -4032,10 +4032,38 @@
         // Show purchase confirmation modal
         function showPurchaseModal(phoneIndex) {
             try {
+                console.log('🔔 Purchase button clicked! Phone index:', phoneIndex);
+                console.log('Available phone numbers:', availablePhoneNumbers);
+                
+                if (!availablePhoneNumbers || availablePhoneNumbers.length === 0) {
+                    console.error('❌ No phone numbers available in array');
+                    alert('Error: No phone numbers available. Please search again.');
+                    return;
+                }
+                
+                if (phoneIndex < 0 || phoneIndex >= availablePhoneNumbers.length) {
+                    console.error('❌ Invalid phone index:', phoneIndex);
+                    alert('Error: Invalid phone selection. Please try again.');
+                    return;
+                }
+                
                 selectedPhoneNumber = availablePhoneNumbers[phoneIndex];
+                console.log('✅ Selected phone number:', selectedPhoneNumber);
 
                 const modal = document.getElementById('phonePurchaseModal');
                 const detailsDiv = document.getElementById('purchaseDetails');
+                
+                if (!modal) {
+                    console.error('❌ Purchase modal not found!');
+                    alert('Error: Purchase modal not found. Please refresh the page.');
+                    return;
+                }
+                
+                if (!detailsDiv) {
+                    console.error('❌ Purchase details div not found!');
+                    alert('Error: Purchase details section not found. Please refresh the page.');
+                    return;
+                }
 
                 const totalCost = (selectedPhoneNumber.setup_cost || 0) + (selectedPhoneNumber.monthly_cost || 0);
 
@@ -4102,10 +4130,12 @@
                 `;
 
                 modal.classList.remove('hidden');
+                console.log('✅ Purchase modal displayed successfully!');
 
             } catch (error) {
-                console.error('Error showing purchase modal:', error);
-                alert('Error displaying purchase details');
+                console.error('❌ Error showing purchase modal:', error);
+                console.error('Error details:', error.stack);
+                alert('Error displaying purchase details: ' + error.message);
             }
         }
 
