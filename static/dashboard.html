@@ -2178,7 +2178,8 @@
                 <!-- Loading State -->
                 <div id="phoneSearchLoading" class="hidden text-center py-8">
                     <i class="fas fa-spinner fa-spin text-3xl text-blue-500 mb-4"></i>
-                    <p class="text-gray-600">Searching available phone numbers...</p>
+                    <p id="loadingMessage" class="text-gray-600">Searching available phone numbers in your area...</p>
+                    <p class="text-sm text-gray-500 mt-2">Please wait while we connect to providers...</p>
                 </div>
             </div>
         </div>
@@ -3772,13 +3773,22 @@
             if (includeTelnyx) providers.push('telnyx');
 
             if (providers.length === 0) {
-                alert('Please select at least one provider');
+                showErrorMessage('Please select at least one provider to search for phone numbers.');
                 return;
             }
 
-            // Show loading state
+            // Show loading state with progressive messages
             document.getElementById('phoneSearchLoading').classList.remove('hidden');
             document.getElementById('phoneSearchResults').classList.add('hidden');
+            
+            const loadingMessage = document.getElementById('loadingMessage');
+            
+            // Progressive loading messages
+            loadingMessage.textContent = 'Initializing search for available phone numbers...';
+            
+            setTimeout(() => {
+                loadingMessage.textContent = `Connecting to ${providers.join(' and ')} provider${providers.length > 1 ? 's' : ''}...`;
+            }, 500);
 
             try {
                 const searchParams = new URLSearchParams({
@@ -3791,16 +3801,67 @@
                 if (pattern) searchParams.append('pattern', pattern);
                 if (capabilities) searchParams.append('capabilities', capabilities);
 
+                // Update message while searching
+                setTimeout(() => {
+                    loadingMessage.textContent = `Searching for numbers in ${country}${areaCode ? ` with area code ${areaCode}` : ''}...`;
+                }, 1000);
+
                 const response = await apiRequest(`/api/phone-numbers/search?${searchParams}`);
                 currentSearchResults = response.data || [];
 
-                displaySearchResults(currentSearchResults);
+                // Final message before showing results
+                loadingMessage.textContent = 'Processing search results...';
+                
+                setTimeout(() => {
+                    displaySearchResults(currentSearchResults);
+                }, 300);
 
             } catch (error) {
                 console.error('Error searching phone numbers:', error);
                 document.getElementById('phoneSearchLoading').classList.add('hidden');
-                alert('Error searching phone numbers: ' + error.message);
+                
+                let errorMessage = 'Unable to search for phone numbers at this time. ';
+                if (error.message.includes('network') || error.message.includes('fetch')) {
+                    errorMessage += 'Please check your internet connection and try again.';
+                } else if (error.message.includes('auth')) {
+                    errorMessage += 'Please log in again and try searching.';
+                } else {
+                    errorMessage += 'The providers may be temporarily unavailable. Please try again in a few minutes.';
+                }
+                
+                showErrorMessage(errorMessage);
             }
+        }
+        
+        // Show error message in a user-friendly way
+        function showErrorMessage(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'bg-red-50 border border-red-200 rounded-lg p-4 mb-4';
+            errorDiv.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-triangle text-red-500 mr-3"></i>
+                    <div>
+                        <h4 class="text-red-800 font-medium">Search Error</h4>
+                        <p class="text-red-700 text-sm mt-1">${message}</p>
+                    </div>
+                </div>
+            `;
+            
+            // Insert error message before the search form
+            const searchContainer = document.querySelector('#phoneSearchModal .p-6');
+            const existingError = searchContainer.querySelector('.bg-red-50');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            searchContainer.insertBefore(errorDiv, searchContainer.firstChild);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (errorDiv.parentNode) {
+                    errorDiv.remove();
+                }
+            }, 5000);
         }
 
         // Display search results
@@ -3813,9 +3874,18 @@
             if (results.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="6" class="text-center py-8 text-gray-500">
-                            <i class="fas fa-search text-4xl mb-4 opacity-50"></i>
-                            <p>No phone numbers found matching your criteria.</p>
+                        <td colspan="6" class="text-center py-12 text-gray-500">
+                            <i class="fas fa-phone-slash text-4xl mb-4 opacity-50"></i>
+                            <h3 class="text-lg font-medium text-gray-700 mb-2">No Numbers Available</h3>
+                            <p class="mb-4">No phone numbers found matching your search criteria.</p>
+                            <div class="text-sm space-y-1">
+                                <p>• Try selecting a different country or area code</p>
+                                <p>• Remove the number pattern requirement</p>
+                                <p>• Select additional providers for more options</p>
+                            </div>
+                            <button onclick="resetSearchForm()" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+                                Reset Search
+                            </button>
                         </td>
                     </tr>
                 `;
@@ -3857,6 +3927,26 @@
                     </td>
                 </tr>
             `).join('');
+        }
+        
+        // Reset search form to default values
+        function resetSearchForm() {
+            document.getElementById('searchCountry').value = 'US';
+            document.getElementById('searchAreaCode').value = '';
+            document.getElementById('searchPattern').value = '';
+            document.getElementById('searchCapabilities').value = '';
+            document.getElementById('searchTwilio').checked = true;
+            document.getElementById('searchTelnyx').checked = true;
+            
+            // Hide results and show fresh search interface
+            document.getElementById('phoneSearchResults').classList.add('hidden');
+            document.getElementById('phoneSearchLoading').classList.add('hidden');
+            
+            // Clear any error messages
+            const existingError = document.querySelector('#phoneSearchModal .bg-red-50');
+            if (existingError) {
+                existingError.remove();
+            }
         }
 
         // Show purchase confirmation modal
@@ -3948,8 +4038,26 @@
         // Confirm phone number purchase
         async function confirmPhonePurchase() {
             if (!selectedPhoneNumber) return;
+            
+            const purchaseButton = document.querySelector('#phonePurchaseModal button[onclick="confirmPhonePurchase()"]');
+            const originalButtonText = purchaseButton.innerHTML;
 
             try {
+                // Show loading state on purchase button
+                purchaseButton.disabled = true;
+                purchaseButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing Purchase...';
+                
+                // Show purchase progress
+                showPurchaseProgress('Contacting payment provider...');
+                
+                setTimeout(() => {
+                    showPurchaseProgress('Reserving phone number with provider...');
+                }, 1000);
+                
+                setTimeout(() => {
+                    showPurchaseProgress('Configuring webhooks and settings...');
+                }, 2000);
+
                 const response = await apiRequest('/api/phone-numbers/purchase', {
                     method: 'POST',
                     body: JSON.stringify({
@@ -3957,23 +4065,98 @@
                         phone_number: selectedPhoneNumber.phone_number,
                         friendly_name: `BhashAI - ${selectedPhoneNumber.phone_number}`,
                         voice_url: window.location.origin + '/webhooks/voice',
-                        sms_url: window.location.origin + '/webhooks/sms'
+                        sms_url: window.location.origin + '/webhooks/sms',
+                        organization_id: localStorage.getItem('purchasePhoneForOrgId')
                     })
                 });
 
                 if (response.success) {
-                    alert('✅ Phone number purchased successfully!');
-                    closePurchaseModal();
-                    closePhoneSearchModal();
-                    loadPhoneNumbers(); // Refresh the owned numbers list
+                    showPurchaseProgress('Purchase completed successfully!');
+                    
+                    setTimeout(() => {
+                        showPurchaseSuccess(selectedPhoneNumber.phone_number);
+                        closePurchaseModal();
+                        closePhoneSearchModal();
+                        loadPhoneNumbers(); // Refresh the owned numbers list
+                        
+                        // Clear the organization context
+                        localStorage.removeItem('purchasePhoneForOrgId');
+                    }, 1000);
+                    
                 } else {
                     throw new Error(response.error || 'Purchase failed');
                 }
 
             } catch (error) {
                 console.error('Error purchasing phone number:', error);
-                alert('❌ Error purchasing phone number: ' + error.message);
+                
+                // Reset button state
+                purchaseButton.disabled = false;
+                purchaseButton.innerHTML = originalButtonText;
+                
+                // Show detailed error message
+                let errorMessage = 'Unable to complete the purchase. ';
+                if (error.message.includes('insufficient')) {
+                    errorMessage += 'Please check your account balance and billing information.';
+                } else if (error.message.includes('network')) {
+                    errorMessage += 'Please check your connection and try again.';
+                } else if (error.message.includes('unavailable')) {
+                    errorMessage += 'This number is no longer available. Please search for another number.';
+                } else {
+                    errorMessage += error.message;
+                }
+                
+                showErrorMessage(errorMessage);
             }
+        }
+        
+        // Show purchase progress messages
+        function showPurchaseProgress(message) {
+            const progressDiv = document.querySelector('#phonePurchaseModal .p-6');
+            let progressIndicator = document.getElementById('purchaseProgress');
+            
+            if (!progressIndicator) {
+                progressIndicator = document.createElement('div');
+                progressIndicator.id = 'purchaseProgress';
+                progressIndicator.className = 'bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4';
+                progressDiv.insertBefore(progressIndicator, progressDiv.firstChild);
+            }
+            
+            progressIndicator.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-spinner fa-spin text-blue-500 mr-3"></i>
+                    <div>
+                        <h4 class="text-blue-800 font-medium">Processing Purchase</h4>
+                        <p class="text-blue-700 text-sm mt-1">${message}</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Show purchase success message
+        function showPurchaseSuccess(phoneNumber) {
+            // Create success notification
+            const successDiv = document.createElement('div');
+            successDiv.className = 'fixed top-4 right-4 bg-green-50 border border-green-200 rounded-lg p-4 max-w-md shadow-lg z-50';
+            successDiv.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle text-green-500 mr-3 text-xl"></i>
+                    <div>
+                        <h4 class="text-green-800 font-medium">Purchase Successful!</h4>
+                        <p class="text-green-700 text-sm mt-1">Phone number ${phoneNumber} has been added to your account.</p>
+                        <p class="text-green-600 text-xs mt-2">You can now use this number for voice calls and SMS.</p>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(successDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (successDiv.parentNode) {
+                    successDiv.remove();
+                }
+            }, 5000);
         }
 
         // Utility functions for phone number management
@@ -4670,9 +4853,7 @@
             document.getElementById('phoneSearchModal').classList.remove('hidden');
         }
 
-        function searchPhoneNumbers() {
-            alert('Searching for available phone numbers...');
-        }
+        // Removed duplicate function - using the complete searchPhoneNumbers function above
 
         function confirmPhonePurchase() {
             alert('Phone number purchased successfully!');
