@@ -2500,14 +2500,17 @@ def search_phone_numbers_production():
         area_code = request.args.get('area_code')
         pattern = request.args.get('pattern')
         capabilities = request.args.get('capabilities')
-        providers_param = request.args.get('providers', 'twilio,telnyx')
+        providers_param = request.args.get('providers', 'bolna,twilio,telnyx')
         limit = int(request.args.get('limit', 20))
 
         providers = [p.strip() for p in providers_param.split(',') if p.strip()]
 
         all_results = []
+        search_errors = []
+        
         for provider_name in providers:
             try:
+                print(f"Searching {provider_name} for phone numbers...")
                 search_params = {
                     'country_code': country_code,
                     'limit': limit // len(providers)  # Distribute limit across providers
@@ -2525,14 +2528,25 @@ def search_phone_numbers_production():
                     **search_params
                 )
 
+                print(f"{provider_name} search result: {results.get('success', False)}, numbers: {len(results.get('available_numbers', []))}")
+
                 if results['success']:
                     # Add provider info to each result
                     for number in results['available_numbers']:
                         number['provider'] = provider_name
                     all_results.extend(results['available_numbers'])
+                    print(f"Added {len(results['available_numbers'])} numbers from {provider_name}")
+                else:
+                    error_msg = f"{provider_name}: {results.get('error', 'Unknown error')}"
+                    search_errors.append(error_msg)
+                    print(f"Error from {provider_name}: {results.get('error', 'Unknown error')}")
 
             except Exception as e:
-                print(f"Error searching {provider_name}: {e}")
+                error_msg = f"{provider_name}: {str(e)}"
+                search_errors.append(error_msg)
+                print(f"Exception searching {provider_name}: {e}")
+                import traceback
+                traceback.print_exc()
                 continue
 
         # Sort by monthly cost (lowest first)
@@ -2542,7 +2556,12 @@ def search_phone_numbers_production():
             'success': True,
             'data': all_results[:limit],
             'total_found': len(all_results),
-            'providers_searched': providers
+            'providers_searched': providers,
+            'search_errors': search_errors,
+            'debug_info': {
+                'providers_attempted': providers,
+                'total_results_before_limit': len(all_results)
+            }
         })
 
     except Exception as e:

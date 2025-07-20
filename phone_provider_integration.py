@@ -93,6 +93,27 @@ class PhoneProviderManager:
                     features=['voice', 'sms'],
                     limit=limit
                 )
+            elif provider_name.lower() == 'bolna':
+                # For Bolna, extract area code from pattern and pass capabilities
+                area_code = None
+                if pattern and pattern.isdigit() and len(pattern) == 3:
+                    area_code = pattern
+                
+                # Convert capabilities from any format to list
+                capabilities = None
+                if hasattr(self, 'capabilities') and self.capabilities:
+                    if isinstance(self.capabilities, str):
+                        capabilities = self.capabilities.split(',')
+                    elif isinstance(self.capabilities, list):
+                        capabilities = self.capabilities
+                
+                return provider.search_phone_numbers(
+                    country_code=country_code,
+                    area_code=area_code,
+                    pattern=pattern,
+                    capabilities=capabilities,
+                    limit=limit
+                )
             else:
                 return {
                     'success': False,
@@ -141,6 +162,11 @@ class PhoneProviderManager:
                 billing_group_id = kwargs.get('billing_group_id')
                 return provider.purchase_phone_number(
                     phone_number, connection_id, customer_reference, billing_group_id
+                )
+            elif provider_name.lower() == 'bolna':
+                friendly_name = kwargs.get('friendly_name')
+                return provider.purchase_phone_number(
+                    phone_number, friendly_name
                 )
             else:
                 return {
