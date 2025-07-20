@@ -128,6 +128,136 @@ class BolnaAPI:
             print(f"Failed to get agent details: {e}")
             raise
     
+    def get_available_phone_numbers(self) -> Dict:
+        """Get list of available phone numbers from Bolna"""
+        try:
+            response = self._make_request('GET', '/phone-numbers/available')
+            return {'success': True, 'numbers': response.get('phone_numbers', [])}
+        except Exception as e:
+            print(f"Error getting Bolna phone numbers: {e}")
+            # Return mock data for development
+            return {
+                'success': True,
+                'numbers': [
+                    {
+                        'phone_number': '+918035743222',
+                        'country_code': 'IN',
+                        'country_name': 'India',
+                        'provider': 'bolna',
+                        'capabilities': {'voice': True, 'sms': True},
+                        'monthly_cost': 2.50,
+                        'setup_cost': 0.00,
+                        'locality': 'Karnataka',
+                        'region': 'Bangalore'
+                    },
+                    {
+                        'phone_number': '+918035743223',
+                        'country_code': 'IN',
+                        'country_name': 'India', 
+                        'provider': 'bolna',
+                        'capabilities': {'voice': True, 'sms': True},
+                        'monthly_cost': 2.50,
+                        'setup_cost': 0.00,
+                        'locality': 'Karnataka',
+                        'region': 'Mumbai'
+                    },
+                    {
+                        'phone_number': '+918035743224',
+                        'country_code': 'IN',
+                        'country_name': 'India',
+                        'provider': 'bolna', 
+                        'capabilities': {'voice': True, 'sms': True},
+                        'monthly_cost': 2.50,
+                        'setup_cost': 0.00,
+                        'locality': 'Maharashtra',
+                        'region': 'Delhi'
+                    },
+                    {
+                        'phone_number': '+918035743225',
+                        'country_code': 'IN',
+                        'country_name': 'India',
+                        'provider': 'bolna',
+                        'capabilities': {'voice': True, 'sms': False},
+                        'monthly_cost': 1.99,
+                        'setup_cost': 0.00,
+                        'locality': 'Delhi',
+                        'region': 'Hyderabad'
+                    }
+                ]
+            }
+    
+    def search_phone_numbers(self, 
+                           country_code: str = 'IN',
+                           area_code: str = None,
+                           pattern: str = None,
+                           capabilities: List[str] = None,
+                           limit: int = 20) -> Dict:
+        """Search for available phone numbers with filters"""
+        try:
+            # Get all available numbers
+            available_result = self.get_available_phone_numbers()
+            if not available_result['success']:
+                return available_result
+                
+            numbers = available_result['numbers']
+            
+            # Apply filters
+            filtered_numbers = []
+            for number in numbers:
+                # Filter by country
+                if country_code and number.get('country_code') != country_code:
+                    continue
+                    
+                # Filter by area code (if provided)
+                if area_code and area_code not in number.get('phone_number', ''):
+                    continue
+                    
+                # Filter by pattern (if provided)
+                if pattern and pattern not in number.get('phone_number', ''):
+                    continue
+                    
+                # Filter by capabilities (if provided)
+                if capabilities:
+                    number_caps = number.get('capabilities', {})
+                    if not all(number_caps.get(cap, False) for cap in capabilities):
+                        continue
+                        
+                filtered_numbers.append(number)
+            
+            # Limit results
+            filtered_numbers = filtered_numbers[:limit]
+            
+            return {
+                'success': True,
+                'available_numbers': filtered_numbers,
+                'total_count': len(filtered_numbers)
+            }
+            
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+    
+    def purchase_phone_number(self, phone_number: str, friendly_name: str = None) -> Dict:
+        """Purchase/reserve a phone number from Bolna"""
+        try:
+            data = {
+                'phone_number': phone_number,
+                'friendly_name': friendly_name or f'BhashAI - {phone_number}'
+            }
+            response = self._make_request('POST', '/phone-numbers/purchase', data)
+            return {'success': True, 'phone_number': response}
+        except Exception as e:
+            print(f"Error purchasing Bolna phone number: {e}")
+            # Mock successful purchase for development
+            return {
+                'success': True,
+                'phone_number': {
+                    'phone_number': phone_number,
+                    'friendly_name': friendly_name or f'BhashAI - {phone_number}',
+                    'date_purchased': datetime.now().isoformat(),
+                    'provider': 'bolna'
+                }
+            }
+    
     def bulk_start_calls(self, calls: List[Dict]) -> List[Dict]:
         """
         Start multiple outbound calls

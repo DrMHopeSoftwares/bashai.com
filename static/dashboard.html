@@ -2138,6 +2138,10 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-4">
                                 <label class="flex items-center">
+                                    <input type="checkbox" id="searchBolna" checked class="mr-1">
+                                    <span class="text-xs text-gray-700">Bolna</span>
+                                </label>
+                                <label class="flex items-center">
                                     <input type="checkbox" id="searchTwilio" checked class="mr-1">
                                     <span class="text-xs text-gray-700">Twilio</span>
                                 </label>
@@ -3790,10 +3794,12 @@
             const areaCode = document.getElementById('searchAreaCode').value;
             const pattern = document.getElementById('searchPattern').value;
             const capabilities = document.getElementById('searchCapabilities').value;
+            const includeBolna = document.getElementById('searchBolna').checked;
             const includeTwilio = document.getElementById('searchTwilio').checked;
             const includeTelnyx = document.getElementById('searchTelnyx').checked;
 
             const providers = [];
+            if (includeBolna) providers.push('bolna');
             if (includeTwilio) providers.push('twilio');
             if (includeTelnyx) providers.push('telnyx');
 
@@ -3977,6 +3983,7 @@
             document.getElementById('searchAreaCode').value = '';
             document.getElementById('searchPattern').value = '';
             document.getElementById('searchCapabilities').value = '';
+            document.getElementById('searchBolna').checked = true;
             document.getElementById('searchTwilio').checked = true;
             document.getElementById('searchTelnyx').checked = true;
             
@@ -4208,6 +4215,7 @@
         // Utility functions for phone number management
         function getProviderBadgeClass(provider) {
             switch (provider?.toLowerCase()) {
+                case 'bolna': return 'bg-orange-100 text-orange-800';
                 case 'twilio': return 'bg-blue-100 text-blue-800';
                 case 'telnyx': return 'bg-purple-100 text-purple-800';
                 case 'plivo': return 'bg-green-100 text-green-800';

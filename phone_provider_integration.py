@@ -8,6 +8,7 @@ from typing import Dict, List, Optional
 from plivo_integration import PlivoAPI
 from twilio_integration import TwilioAPI
 from telnyx_integration import TelnyxAPI
+from bolna_integration import BolnaAPI
 
 
 class PhoneProviderManager:
@@ -18,6 +19,7 @@ class PhoneProviderManager:
             'plivo': PlivoAPI(),
             'twilio': TwilioAPI(),
             'telnyx': TelnyxAPI(),
+            'bolna': BolnaAPI(),
         }
         
         # Provider availability based on credentials
@@ -29,7 +31,7 @@ class PhoneProviderManager:
         """Get provider instance by name"""
         provider = self.providers.get(provider_name.lower())
         if not provider:
-            raise ValueError(f"Unsupported provider: {provider_name}. Supported: plivo, twilio, telnyx")
+            raise ValueError(f"Unsupported provider: {provider_name}. Supported: plivo, twilio, telnyx, bolna")
         return provider
     
     def search_phone_numbers(self, 
