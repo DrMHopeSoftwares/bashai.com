@@ -4681,11 +4681,11 @@
             console.log('Force loading organizations data...');
             const organizations = await fetchUserOrganizations();
             displayOrganizations(organizations);
-            updateOrganizationCount(organizations.length);
+            // updateOrganizationCount(organizations.length); // Function not defined, commenting out
         }
 
         // Initial load of organizations when the page loads
-        document.addEventListener('DOMContentLoaded', loadOrganizations);
+        // Removed - loadOrganizations is already called after authentication in fetchDashboardData
     </script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -4825,6 +4825,8 @@ async function fetchUserOrganizations(){
                             <div style="flex: 1; display: flex; gap: 8px; justify-content: flex-end; padding-right: 12px;">
                                 <button onclick="viewOrganization('${org.id}')" title="View" style="background:none; border:none; cursor:pointer; color:#6366f1; font-size: 18px;">👁️</button>
                                 <button onclick="editOrganization('${org.id}')" title="Edit" style="background:none; border:none; cursor:pointer; color:#10b981; font-size: 18px;">✏️</button>
+                                <button onclick="purchasePhoneForOrg('${org.id}')" title="Purchase Phone" style="background:none; border:none; cursor:pointer; color:#0ea5e9; font-size: 18px;">📱</button>
+                                <button onclick="deleteOrganization('${org.id}')" title="Delete" style="background:none; border:none; cursor:pointer; color:#ef4444; font-size: 18px;">🗑️</button>
                             </div>
                         </div>
                     `).join('')}
