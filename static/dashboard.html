@@ -3767,6 +3767,12 @@
             document.getElementById('phoneSearchModal').classList.remove('hidden');
             document.getElementById('phoneSearchLoading').classList.add('hidden');
             
+            // Clear any existing results first
+            const tableBody = document.getElementById('phoneSearchResultsTable');
+            if (tableBody) {
+                tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500">Loading available numbers...</td></tr>';
+            }
+            
             // Initially hide search filters to make room for results
             const filters = document.getElementById('searchFilters');
             const icon = document.getElementById('filterToggleIcon');
@@ -3776,10 +3782,11 @@
             icon.className = 'fas fa-chevron-down mr-1';
             text.textContent = 'Show Filters';
             
-            // Auto-search for available numbers when modal opens
+            // Auto-search for available numbers when modal opens - always trigger
+            console.log('Triggering auto-search for phone numbers...');
             setTimeout(() => {
                 searchPhoneNumbers();
-            }, 300);
+            }, 500);
         }
 
         // Close phone search modal
@@ -3790,6 +3797,8 @@
 
         // Search for available phone numbers
         async function searchPhoneNumbers() {
+            console.log('searchPhoneNumbers function called');
+            
             const country = document.getElementById('searchCountry').value;
             const areaCode = document.getElementById('searchAreaCode').value;
             const pattern = document.getElementById('searchPattern').value;
@@ -3802,6 +3811,12 @@
             if (includeBolna) providers.push('bolna');
             if (includeTwilio) providers.push('twilio');
             if (includeTelnyx) providers.push('telnyx');
+            
+            console.log('Search parameters:', {
+                country, areaCode, pattern, capabilities,
+                includeBolna, includeTwilio, includeTelnyx,
+                providers
+            });
 
             if (providers.length === 0) {
                 showErrorMessage('Please select at least one provider to search for phone numbers.');
@@ -3810,7 +3825,7 @@
 
             // Show loading state with progressive messages
             document.getElementById('phoneSearchLoading').classList.remove('hidden');
-            document.getElementById('phoneSearchResults').classList.add('hidden');
+            // Keep results section visible but clear content
             
             const loadingMessage = document.getElementById('loadingMessage');
             
@@ -3837,13 +3852,18 @@
                     loadingMessage.textContent = `Searching for numbers in ${country}${areaCode ? ` with area code ${areaCode}` : ''}...`;
                 }, 1000);
 
+                console.log('Making API request to:', `/api/phone-numbers/search?${searchParams}`);
                 const response = await apiRequest(`/api/phone-numbers/search?${searchParams}`);
+                console.log('API response:', response);
+                
                 currentSearchResults = response.data || [];
+                console.log('Search results count:', currentSearchResults.length);
 
                 // Final message before showing results
                 loadingMessage.textContent = 'Processing search results...';
                 
                 setTimeout(() => {
+                    console.log('Calling displaySearchResults with:', currentSearchResults.length, 'results');
                     displaySearchResults(currentSearchResults);
                 }, 300);
 
@@ -3914,10 +3934,12 @@
 
         // Display search results
         function displaySearchResults(results) {
+            console.log('displaySearchResults called with:', results.length, 'results');
             document.getElementById('phoneSearchLoading').classList.add('hidden');
             // Results section is now always visible
 
             const tableBody = document.getElementById('phoneSearchResultsTable');
+            console.log('Table body element:', tableBody);
 
             if (results.length === 0) {
                 tableBody.innerHTML = `
