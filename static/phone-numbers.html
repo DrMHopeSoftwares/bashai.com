@@ -827,31 +827,66 @@
         // Authentication and API functions
         async function getAuthToken() {
             try {
-                const response = await fetch('/api/auth/validate');
+                // Check for auth token in localStorage or cookies
+                const authToken = localStorage.getItem('auth_token') || getCookie('auth_token');
+                
+                if (!authToken) {
+                    console.log('❌ No auth token found, redirecting to login');
+                    window.location.href = '/login';
+                    return null;
+                }
+
+                // Verify token with server
+                const response = await fetch('/api/auth/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
                 if (response.ok) {
-                    return await response.json();
+                    const userData = await response.json();
+                    console.log('✅ User authenticated:', userData.user?.email);
+                    return userData;
                 } else {
-                    window.location.href = '/login.html';
+                    console.log('❌ Authentication failed, redirecting to login');
+                    window.location.href = '/login';
                     return null;
                 }
             } catch (error) {
                 console.error('Auth error:', error);
-                window.location.href = '/login.html';
+                window.location.href = '/login';
                 return null;
             }
         }
 
+        // Cookie helper function
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
         async function apiRequest(url, options = {}) {
             try {
+                // Get auth token for API requests
+                const authToken = localStorage.getItem('auth_token') || getCookie('auth_token');
+                
                 const response = await fetch(url, {
                     ...options,
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': authToken ? `Bearer ${authToken}` : '',
                         ...options.headers
                     }
                 });
                 
                 if (!response.ok) {
+                    if (response.status === 401) {
+                        console.log('❌ Unauthorized, redirecting to login');
+                        window.location.href = '/login';
+                        return null;
+                    }
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
