@@ -384,40 +384,40 @@
             </div>
 
             <nav class="space-y-2">
-                <a href="#" class="nav-item active flex items-center p-3 text-white" onclick="showSection('dashboard')">
+                <a href="#" class="nav-item active flex items-center p-3 text-white" onclick="showSection('dashboard', event)">
                     <i class="fas fa-chart-pie mr-3"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="#" class="nav-item flex items-center p-3 text-white/80" onclick="showSection('organizations')">
+                <a href="#" class="nav-item flex items-center p-3 text-white/80" onclick="showSection('organizations', event)">
                     <i class="fas fa-building mr-3"></i>
                     <span>Organizations</span>
                     <span class="ml-auto bg-blue-500 text-xs px-2 py-1 rounded-full" id="orgNavCount">0</span>
                 </a>
-                <a href="#" class="nav-item flex items-center p-3 text-white/80" onclick="showSection('channels')" id="channelsNav" style="display: none;">
+                <a href="#" class="nav-item flex items-center p-3 text-white/80" onclick="showSection('channels', event)" id="channelsNav" style="display: none;">
                     <i class="fas fa-satellite-dish mr-3 ml-4"></i>
                     <span>Channels</span>
                     <span class="ml-auto bg-purple-500 text-xs px-2 py-1 rounded-full" id="channelNavCount">0</span>
                 </a>
-                <a href="#" class="nav-item flex items-center p-3 text-white/80" onclick="showSection('agents')" id="agentsNav" style="display: none;">
+                <a href="#" class="nav-item flex items-center p-3 text-white/80" onclick="showSection('agents', event)" id="agentsNav" style="display: none;">
                     <i class="fas fa-robot mr-3 ml-8"></i>
                     <span>Voice Agents</span>
                     <span class="ml-auto bg-green-500 text-xs px-2 py-1 rounded-full" id="agentNavCount">0</span>
                 </a>
-                <a href="#" class="nav-item flex items-center p-3 text-white/80" onclick="showSection('contacts')" id="contactsNav" style="display: none;">
+                <a href="#" class="nav-item flex items-center p-3 text-white/80" onclick="showSection('contacts', event)" id="contactsNav" style="display: none;">
                     <i class="fas fa-address-book mr-3 ml-12"></i>
                     <span>Contacts</span>
                     <span class="ml-auto bg-orange-500 text-xs px-2 py-1 rounded-full" id="contactNavCount">0</span>
                 </a>
-                <a href="#" class="nav-item flex items-center p-3 text-white/80" onclick="showSection('phone-numbers')">
+                <a href="#" class="nav-item flex items-center p-3 text-white/80" onclick="showSection('phone-numbers', event)">
                     <i class="fas fa-phone mr-3"></i>
                     <span>My Phone Numbers</span>
                     <span class="ml-auto bg-cyan-500 text-xs px-2 py-1 rounded-full" id="phoneNavCount">0</span>
                 </a>
-                <a href="#" class="nav-item flex items-center p-3 text-white/80" onclick="showSection('analytics')">
+                <a href="#" class="nav-item flex items-center p-3 text-white/80" onclick="showSection('analytics', event)">
                     <i class="fas fa-chart-line mr-3"></i>
                     <span>Analytics</span>
                 </a>
-                <a href="#" class="nav-item flex items-center p-3 text-white/80" onclick="showSection('settings')">
+                <a href="#" class="nav-item flex items-center p-3 text-white/80" onclick="showSection('settings', event)">
                     <i class="fas fa-cog mr-3"></i>
                     <span>Settings</span>
                 </a>
@@ -494,7 +494,7 @@
 
             <!-- Metrics Overview -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="metric-card glassmorphism rounded-2xl p-6 hover-scale" onclick="showSection('organizations')" style="cursor: pointer;">
+                <div class="metric-card glassmorphism rounded-2xl p-6 hover-scale" onclick="showSection('organizations', event)" style="cursor: pointer;">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">
                             <i class="fas fa-building text-white"></i>
@@ -673,11 +673,11 @@
             <!-- Breadcrumb -->
             <div class="glassmorphism rounded-2xl p-4 mb-6">
                 <div class="flex items-center text-gray-600">
-                    <button onclick="showSection('organizations')" class="hover:text-blue-600 transition-colors">
+                    <button onclick="showSection('organizations', event)" class="hover:text-blue-600 transition-colors">
                         <i class="fas fa-building mr-2"></i>Organizations
                     </button>
                     <i class="fas fa-chevron-right mx-3 text-gray-400"></i>
-                    <button onclick="showSection('channels')" class="hover:text-blue-600 transition-colors" id="currentOrgBreadcrumb">
+                    <button onclick="showSection('channels', event)" class="hover:text-blue-600 transition-colors" id="currentOrgBreadcrumb">
                         Organization
                     </button>
                     <i class="fas fa-chevron-right mx-3 text-gray-400"></i>
@@ -1030,7 +1030,7 @@
             <!-- Breadcrumb -->
             <div class="glassmorphism rounded-2xl p-4 mb-6">
                 <div class="flex items-center text-gray-600">
-                    <button onclick="showSection('organizations')" class="hover:text-blue-600 transition-colors">
+                    <button onclick="showSection('organizations', event)" class="hover:text-blue-600 transition-colors">
                         <i class="fas fa-building mr-2"></i>Organizations
                     </button>
                     <i class="fas fa-chevron-right mx-3 text-gray-400"></i>
@@ -1133,15 +1133,15 @@
             <!-- Breadcrumb -->
             <div class="glassmorphism rounded-2xl p-4 mb-6">
                 <div class="flex items-center text-gray-600">
-                    <button onclick="showSection('organizations')" class="hover:text-blue-600 transition-colors">
+                    <button onclick="showSection('organizations', event)" class="hover:text-blue-600 transition-colors">
                         <i class="fas fa-building mr-2"></i>Organizations
                     </button>
                     <i class="fas fa-chevron-right mx-3 text-gray-400"></i>
-                    <button onclick="showSection('channels')" class="hover:text-blue-600 transition-colors" id="contactOrgBreadcrumb">
+                    <button onclick="showSection('channels', event)" class="hover:text-blue-600 transition-colors" id="contactOrgBreadcrumb">
                         Organization
                     </button>
                     <i class="fas fa-chevron-right mx-3 text-gray-400"></i>
-                    <button onclick="showSection('agents')" class="hover:text-blue-600 transition-colors" id="contactChannelBreadcrumb">
+                    <button onclick="showSection('agents', event)" class="hover:text-blue-600 transition-colors" id="contactChannelBreadcrumb">
                         Channel
                     </button>
                     <i class="fas fa-chevron-right mx-3 text-gray-400"></i>
@@ -2507,7 +2507,7 @@
         let currentAgent = null;
 
         // Navigation
-        function showSection(sectionName) {
+        function showSection(sectionName, event = null) {
             // Hide all sections
             document.querySelectorAll('.section').forEach(section => {
                 section.style.display = 'none';
@@ -2519,11 +2519,29 @@
             });
             
             // Show selected section
-            document.getElementById(sectionName).style.display = 'block';
+            const targetSection = document.getElementById(sectionName);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+            } else {
+                console.error(`Section with id '${sectionName}' not found`);
+                return;
+            }
             
-            // Add active class to clicked nav item
+            // Add active class to clicked nav item (only if event is provided)
             if (event && event.target) {
-                event.target.closest('.nav-item').classList.add('active');
+                const navItem = event.target.closest('.nav-item');
+                if (navItem) {
+                    navItem.classList.add('active');
+                }
+            } else {
+                // If no event, find and activate the corresponding nav item by section name
+                const navItem = document.querySelector(`[onclick*="showSection('${sectionName}')"]`);
+                if (navItem) {
+                    const parentNavItem = navItem.closest('.nav-item');
+                    if (parentNavItem) {
+                        parentNavItem.classList.add('active');
+                    }
+                }
             }
             
             // Update breadcrumb and navigation visibility
