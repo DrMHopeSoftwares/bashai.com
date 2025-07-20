@@ -130,61 +130,138 @@ class BolnaAPI:
     
     def get_available_phone_numbers(self) -> Dict:
         """Get list of available phone numbers from Bolna"""
-        try:
-            response = self._make_request('GET', '/phone-numbers/available')
-            return {'success': True, 'numbers': response.get('phone_numbers', [])}
-        except Exception as e:
-            print(f"Error getting Bolna phone numbers: {e}")
-            # Return mock data for development
-            return {
-                'success': True,
-                'numbers': [
-                    {
-                        'phone_number': '+918035743222',
-                        'country_code': 'IN',
-                        'country_name': 'India',
-                        'provider': 'bolna',
-                        'capabilities': {'voice': True, 'sms': True},
-                        'monthly_cost': 2.50,
-                        'setup_cost': 0.00,
-                        'locality': 'Karnataka',
-                        'region': 'Bangalore'
+        
+        # Try multiple potential endpoints for phone numbers
+        endpoints_to_try = [
+            '/phone-numbers',           # Standard REST endpoint
+            '/phone-numbers/available', # Available numbers
+            '/phone-numbers/owned',     # Owned/purchased numbers  
+            '/numbers',                 # Simplified endpoint
+            '/v1/phone-numbers',        # Versioned endpoint
+            '/v2/phone-numbers'         # V2 endpoint
+        ]
+        
+        for endpoint in endpoints_to_try:
+            try:
+                print(f"Trying Bolna endpoint: {endpoint}")
+                response = self._make_request('GET', endpoint)
+                
+                # Check if response contains phone numbers
+                if 'phone_numbers' in response:
+                    numbers = response['phone_numbers']
+                elif 'numbers' in response:
+                    numbers = response['numbers']
+                elif 'data' in response:
+                    numbers = response['data']
+                elif isinstance(response, list):
+                    numbers = response
+                else:
+                    continue
+                    
+                if numbers:
+                    print(f"✅ Found {len(numbers)} real phone numbers from Bolna API at {endpoint}")
+                    return {'success': True, 'numbers': self._format_bolna_numbers(numbers)}
+                    
+            except Exception as e:
+                print(f"Endpoint {endpoint} failed: {e}")
+                continue
+        
+        # If no API endpoint works, try to get numbers from environment or config
+        print("No Bolna API endpoint worked, checking for configured phone numbers...")
+        
+        configured_numbers = self._get_configured_phone_numbers()
+        if configured_numbers:
+            print(f"✅ Using {len(configured_numbers)} configured Bolna phone numbers")
+            return {'success': True, 'numbers': configured_numbers}
+        
+        # Final fallback to mock data with clear indication
+        print("⚠️  Using mock data - no real Bolna phone numbers configured")
+        return {
+            'success': True,
+            'numbers': [
+                {
+                    'phone_number': '+918035743222',
+                    'country_code': 'IN',
+                    'country_name': 'India',
+                    'provider': 'bolna',
+                    'capabilities': {'voice': True, 'sms': True},
+                    'monthly_cost': 2.50,
+                    'setup_cost': 0.00,
+                    'locality': 'Karnataka',
+                    'region': 'Bangalore',
+                    'note': 'MOCK DATA - Configure real Bolna numbers'
+                }
+            ]
+        }
+    
+    def _format_bolna_numbers(self, raw_numbers) -> List[Dict]:
+        """Format raw Bolna API response into standard format"""
+        formatted_numbers = []
+        
+        for number in raw_numbers:
+            # Handle different possible response formats
+            phone_number = number.get('phone_number') or number.get('number') or number.get('phoneNumber')
+            
+            if phone_number:
+                formatted_number = {
+                    'phone_number': phone_number,
+                    'country_code': number.get('country_code', 'IN'),
+                    'country_name': number.get('country_name', 'India'),
+                    'provider': 'bolna',
+                    'capabilities': {
+                        'voice': number.get('voice_enabled', True),
+                        'sms': number.get('sms_enabled', True)
                     },
-                    {
-                        'phone_number': '+918035743223',
-                        'country_code': 'IN',
-                        'country_name': 'India', 
-                        'provider': 'bolna',
-                        'capabilities': {'voice': True, 'sms': True},
-                        'monthly_cost': 2.50,
-                        'setup_cost': 0.00,
-                        'locality': 'Karnataka',
-                        'region': 'Mumbai'
-                    },
-                    {
-                        'phone_number': '+918035743224',
-                        'country_code': 'IN',
-                        'country_name': 'India',
-                        'provider': 'bolna', 
-                        'capabilities': {'voice': True, 'sms': True},
-                        'monthly_cost': 2.50,
-                        'setup_cost': 0.00,
-                        'locality': 'Maharashtra',
-                        'region': 'Delhi'
-                    },
-                    {
-                        'phone_number': '+918035743225',
-                        'country_code': 'IN',
-                        'country_name': 'India',
-                        'provider': 'bolna',
-                        'capabilities': {'voice': True, 'sms': False},
-                        'monthly_cost': 1.99,
-                        'setup_cost': 0.00,
-                        'locality': 'Delhi',
-                        'region': 'Hyderabad'
-                    }
-                ]
-            }
+                    'monthly_cost': number.get('monthly_cost', 2.50),
+                    'setup_cost': number.get('setup_cost', 0.00),
+                    'locality': number.get('locality', 'Unknown'),
+                    'region': number.get('region', 'India')
+                }
+                formatted_numbers.append(formatted_number)
+        
+        return formatted_numbers
+    
+    def _get_configured_phone_numbers(self) -> List[Dict]:
+        """Get phone numbers from environment configuration"""
+        import os
+        
+        # Check for configured phone numbers in environment
+        configured_numbers = []
+        
+        # Primary sender phone
+        if self.default_sender_phone:
+            configured_numbers.append({
+                'phone_number': self.default_sender_phone,
+                'country_code': 'IN',
+                'country_name': 'India',
+                'provider': 'bolna',
+                'capabilities': {'voice': True, 'sms': True},
+                'monthly_cost': 2.50,
+                'setup_cost': 0.00,
+                'locality': 'Karnataka',
+                'region': 'Bangalore',
+                'note': 'Configured sender phone'
+            })
+        
+        # Check for additional configured numbers
+        additional_numbers = os.getenv('BOLNA_ADDITIONAL_PHONES', '').split(',')
+        for phone in additional_numbers:
+            phone = phone.strip()
+            if phone and phone.startswith('+'):
+                configured_numbers.append({
+                    'phone_number': phone,
+                    'country_code': 'IN',
+                    'country_name': 'India',
+                    'provider': 'bolna',
+                    'capabilities': {'voice': True, 'sms': True},
+                    'monthly_cost': 2.50,
+                    'setup_cost': 0.00,
+                    'locality': 'India',
+                    'region': 'Various',
+                    'note': 'Additional configured phone'
+                })
+        
+        return configured_numbers
     
     def search_phone_numbers(self, 
                            country_code: str = 'IN',

@@ -3783,8 +3783,7 @@
             text.textContent = 'Show Filters';
             
             // Auto-search for available numbers when modal opens - always trigger
-            console.log('🔍 DEBUGGING: Triggering auto-search for phone numbers... (v1.2)');
-            alert('Debug: Modal opened - check console for search logs');
+            console.log('🔍 Triggering auto-search for phone numbers...');
             setTimeout(() => {
                 searchPhoneNumbers();
             }, 500);
@@ -3798,8 +3797,7 @@
 
         // Search for available phone numbers
         async function searchPhoneNumbers() {
-            console.log('🔍 DEBUGGING: searchPhoneNumbers function called (v1.2)');
-            alert('Debug: Search function called - check Network tab for API calls');
+            console.log('🔍 searchPhoneNumbers function called');
             
             const country = document.getElementById('searchCountry').value;
             const areaCode = document.getElementById('searchAreaCode').value;
