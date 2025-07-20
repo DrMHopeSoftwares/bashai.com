@@ -18,14 +18,48 @@ class BolnaAPI:
         self.base_url = os.getenv('BOLNA_API_URL', 'https://api.bolna.ai')
         self.api_key = os.getenv('BOLNA_API_KEY')
         self.default_sender_phone = os.getenv('BOLNA_SENDER_PHONE', '+918035743222')
-        
+
         if not self.api_key:
-            raise ValueError("BOLNA_API_KEY environment variable is required")
-    
+            print("⚠️  BOLNA_API_KEY not found. Bolna integration will use mock mode.")
+            self.use_mock = True
+            self.api_key = "mock_api_key"  # Prevent None errors
+        else:
+            self.use_mock = False
+
+    def _mock_request(self, method: str, endpoint: str, data: Dict = None) -> Dict:
+        """Mock request for when API key is not available"""
+        import uuid
+        from datetime import datetime
+
+        if 'agents' in endpoint and method == 'POST':
+            return {
+                'success': True,
+                'agent_id': str(uuid.uuid4()),
+                'message': 'Mock Bolna agent created',
+                'mock': True
+            }
+        elif 'call' in endpoint and method == 'POST':
+            return {
+                'success': True,
+                'call_id': str(uuid.uuid4()),
+                'status': 'mock_initiated',
+                'message': 'Mock call initiated',
+                'mock': True
+            }
+        else:
+            return {
+                'success': True,
+                'message': 'Mock response',
+                'mock': True
+            }
+
     def _make_request(self, method: str, endpoint: str, data: Dict = None) -> Dict:
         """Make HTTP request to Bolna API"""
+        if self.use_mock:
+            return self._mock_request(method, endpoint, data)
+
         url = f"{self.base_url}/{endpoint.lstrip('/')}"
-        
+
         headers = {
             'Authorization': f'Bearer {self.api_key}',
             'Content-Type': 'application/json',
