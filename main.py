@@ -4043,6 +4043,11 @@ def serve_universal_prompt_editor():
     """Serve Universal Multi-tenant Prompt Editor interface"""
     return send_from_directory(app.static_folder, 'universal-prompt-editor.html')
 
+@app.route('/test-elevenlabs-call.html')
+def serve_test_elevenlabs_call():
+    """Serve ElevenLabs test call interface"""
+    return send_from_directory(app.static_folder, 'test-elevenlabs-call.html')
+
 # OpenAI Realtime Phone Call API Endpoints
 @app.route('/api/realtime/make-call', methods=['POST'])
 @login_required
@@ -4168,6 +4173,281 @@ def get_call_analytics(call_id):
             'error': str(e)
         }), 500
 
+# ElevenLabs Voice Call Endpoints
+@app.route('/api/elevenlabs/make-test-call', methods=['POST'])
+@login_required
+def make_elevenlabs_test_call():
+    """Make a test phone call using ElevenLabs agent"""
+    try:
+        data = request.get_json()
+        phone_number = data.get('phone_number')
+        agent_id = data.get('agent_id')
+        voice_id = data.get('voice_id', 'pNInz6obpgDQGcFmaJgB')  # Default to Adam
+        message = data.get('message', 'Hello! This is a test call from BhashAI using ElevenLabs. How can I help you today?')
+        language = data.get('language', 'en')
+
+        if not phone_number:
+            return jsonify({
+                'success': False,
+                'error': 'Phone number is required'
+            }), 400
+
+        # Get user info
+        user_info = g.get('user')
+        user_id = user_info.get('user_id') if user_info else 'anonymous'
+
+        # Import ElevenLabs integration
+        from elevenlabs_integration import ElevenLabsAgentManager
+
+        # Create or get ElevenLabs agent
+        manager = ElevenLabsAgentManager()
+
+        if not agent_id:
+            # Create a test agent
+            test_agent_config = {
+                'name': 'Test Call Agent',
+                'description': 'Test agent for phone call testing',
+                'language': language,
+                'use_case': 'phone_support',
+                'voice_id': voice_id,
+                'system_prompt': f'You are a helpful AI assistant making a test call. Your initial message is: "{message}". Be friendly and professional.',
+                'webhook_url': f"{request.host_url}api/elevenlabs/webhook"
+            }
+
+            agent_result = manager.create_voice_agent(test_agent_config)
+            if not agent_result['success']:
+                return jsonify({
+                    'success': False,
+                    'error': f'Failed to create test agent: {agent_result.get("error", "Unknown error")}'
+                }), 500
+
+            agent_id = agent_result['external_agent_id']
+
+        # Prepare call data
+        call_data = {
+            'phone_number': phone_number,
+            'call_id': f'test-call-{int(datetime.now().timestamp())}',
+            'initial_message': message,
+            'language': language,
+            'voice_id': voice_id,
+            'voice_settings': {
+                'stability': 0.75,
+                'similarity_boost': 0.75,
+                'style': 0.0,
+                'use_speaker_boost': True
+            },
+            'user_id': user_id,
+            'test_mode': True
+        }
+
+        # Handle the phone call
+        call_result = manager.handle_voice_call(agent_id, call_data)
+
+        # Log the call attempt
+        call_log = {
+            'phone_number': phone_number,
+            'provider': 'elevenlabs',
+            'agent_id': agent_id,
+            'call_id': call_data['call_id'],
+            'status': call_result.get('status', 'unknown'),
+            'user_id': user_id,
+            'timestamp': datetime.now(timezone.utc).isoformat(),
+            'test_mode': True,
+            'initial_message': message
+        }
+
+        # In a real implementation, you would store this in the database
+        print(f"📞 ElevenLabs Test Call Log: {json.dumps(call_log, indent=2)}")
+
+        return jsonify({
+            'success': True,
+            'message': f'ElevenLabs test call initiated to {phone_number}',
+            'call_id': call_data['call_id'],
+            'agent_id': agent_id,
+            'session_id': call_result.get('session_id'),
+            'phone_number': phone_number,
+            'voice_id': voice_id,
+            'provider': 'elevenlabs',
+            'call_result': call_result
+        })
+
+    except Exception as e:
+        print(f"ElevenLabs test call error: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/elevenlabs/webhook', methods=['POST'])
+def elevenlabs_webhook():
+    """Handle ElevenLabs webhook events"""
+    try:
+        data = request.get_json()
+        event_type = data.get('event_type', 'unknown')
+
+        print(f"📞 ElevenLabs Webhook Event: {event_type}")
+        print(f"📞 Webhook Data: {json.dumps(data, indent=2)}")
+
+        # Handle different event types
+        if event_type == 'conversation.started':
+            print("🎙️ Conversation started")
+        elif event_type == 'conversation.ended':
+            print("🎙️ Conversation ended")
+            # Here you could process conversation summary, analytics, etc.
+        elif event_type == 'message.received':
+            print("💬 Message received")
+
+        return jsonify({
+            'success': True,
+            'message': 'Webhook processed successfully'
+        })
+
+    except Exception as e:
+        print(f"ElevenLabs webhook error: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# Twilio + ElevenLabs Integration Endpoints
+@app.route('/api/twilio-elevenlabs/make-call', methods=['POST'])
+@login_required
+def make_twilio_elevenlabs_call():
+    """Make a real phone call using Twilio + ElevenLabs integration"""
+    try:
+        data = request.get_json()
+        phone_number = data.get('phone_number')
+        message = data.get('message', 'Hello! This is a call from BhashAI using ElevenLabs AI.')
+        voice_id = data.get('voice_id', '21m00Tcm4TlvDq8ikWAM')  # Rachel
+        language = data.get('language', 'en')
+
+        if not phone_number:
+            return jsonify({
+                'success': False,
+                'error': 'Phone number is required'
+            }), 400
+
+        # Get user info
+        user_info = g.get('user')
+        user_id = user_info.get('user_id') if user_info else 'anonymous'
+
+        # Import Twilio + ElevenLabs integration
+        from twilio_elevenlabs_integration import twilio_elevenlabs_integration
+
+        # Prepare call configuration
+        call_config = {
+            'phone_number': phone_number,
+            'agent_name': f'BhashAI Agent for {phone_number}',
+            'language': language,
+            'voice_id': voice_id,
+            'initial_message': message,
+            'system_prompt': f'You are a helpful AI assistant from BhashAI calling {phone_number}. Be professional, friendly, and helpful.',
+            'record_call': data.get('record_call', False),
+            'user_id': user_id
+        }
+
+        # Make the call
+        call_result = twilio_elevenlabs_integration.make_outbound_call(call_config)
+
+        # Log the call
+        call_log = {
+            'phone_number': phone_number,
+            'provider': 'twilio_elevenlabs',
+            'call_id': call_result.get('call_id'),
+            'twilio_call_sid': call_result.get('twilio_call_sid'),
+            'agent_id': call_result.get('agent_id'),
+            'user_id': user_id,
+            'timestamp': datetime.now(timezone.utc).isoformat(),
+            'status': call_result.get('status'),
+            'voice_id': voice_id,
+            'language': language
+        }
+
+        print(f"📞 Twilio + ElevenLabs Call Log: {json.dumps(call_log, indent=2)}")
+
+        return jsonify(call_result)
+
+    except Exception as e:
+        print(f"Twilio + ElevenLabs call error: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/elevenlabs/voice-webhook', methods=['POST'])
+def elevenlabs_voice_webhook():
+    """Handle Twilio voice webhook for ElevenLabs integration"""
+    try:
+        agent_id = request.args.get('agent_id')
+        call_id = request.args.get('call_id')
+
+        # Import integration
+        from twilio_elevenlabs_integration import twilio_elevenlabs_integration
+
+        # Generate TwiML response
+        twiml = twilio_elevenlabs_integration.generate_voice_twiml(
+            agent_id=agent_id,
+            call_id=call_id,
+            initial_message=request.args.get('message')
+        )
+
+        return twiml, 200, {'Content-Type': 'text/xml'}
+
+    except Exception as e:
+        print(f"Voice webhook error: {e}")
+        from twilio.twiml import VoiceResponse
+        response = VoiceResponse()
+        response.say("Sorry, there was an error. Please try again later.")
+        return str(response), 200, {'Content-Type': 'text/xml'}
+
+@app.route('/api/elevenlabs/process-speech', methods=['POST'])
+def elevenlabs_process_speech():
+    """Process speech input from Twilio and generate ElevenLabs response"""
+    try:
+        agent_id = request.args.get('agent_id')
+        call_id = request.args.get('call_id')
+        speech_result = request.form.get('SpeechResult', '')
+
+        print(f"🗣️  Speech from {call_id}: '{speech_result}'")
+
+        # Import integration
+        from twilio_elevenlabs_integration import twilio_elevenlabs_integration
+
+        # Process speech and generate response
+        twiml = twilio_elevenlabs_integration.process_speech_input(
+            speech_result=speech_result,
+            agent_id=agent_id,
+            call_id=call_id
+        )
+
+        return twiml, 200, {'Content-Type': 'text/xml'}
+
+    except Exception as e:
+        print(f"Speech processing error: {e}")
+        from twilio.twiml import VoiceResponse
+        response = VoiceResponse()
+        response.say("Sorry, I couldn't process what you said. Please try again.")
+        return str(response), 200, {'Content-Type': 'text/xml'}
+
+@app.route('/api/elevenlabs/voice-webhook/status', methods=['POST'])
+def elevenlabs_call_status():
+    """Handle Twilio call status updates for ElevenLabs calls"""
+    try:
+        # Import integration
+        from twilio_elevenlabs_integration import twilio_elevenlabs_integration
+
+        # Process call status
+        status_result = twilio_elevenlabs_integration.handle_call_status(request.form.to_dict())
+
+        return jsonify(status_result)
+
+    except Exception as e:
+        print(f"Call status error: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 # Real Twilio Voice Call Endpoints
 @app.route('/api/twilio/make-real-call', methods=['POST'])
 def make_real_twilio_call():
@@ -4179,17 +4459,17 @@ def make_real_twilio_call():
         voice_model = data.get('voice_model', 'alloy')
         language = data.get('language', 'hi-IN')
         call_type = data.get('call_type', 'ai_conversation')
-        
+
         if not phone_number:
             return jsonify({
                 'success': False,
                 'error': 'Phone number is required'
             }), 400
-        
+
         # Import enhanced call system
         from enhanced_twilio_openai_call import make_enhanced_call
         import asyncio
-        
+
         async def make_async_enhanced_call():
             return await make_enhanced_call(
                 phone_number=phone_number,
@@ -4198,15 +4478,15 @@ def make_real_twilio_call():
                 language=language,
                 call_type=call_type
             )
-        
+
         # Run the async call
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         call_result = loop.run_until_complete(make_async_enhanced_call())
         loop.close()
-        
+
         return jsonify(call_result)
-        
+
     except Exception as e:
         return jsonify({
             'success': False,
