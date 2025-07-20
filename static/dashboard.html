@@ -4147,10 +4147,19 @@
 
         // Confirm phone number purchase
         async function confirmPhonePurchase() {
-            if (!selectedPhoneNumber) return;
+            console.log('💳 confirmPhonePurchase called!');
+            console.log('Selected phone for purchase:', selectedPhoneNumber);
+            
+            if (!selectedPhoneNumber) {
+                console.error('❌ No phone number selected');
+                return;
+            }
+            
+            console.log('Provider check:', selectedPhoneNumber.provider, 'is bolna?', selectedPhoneNumber.provider === 'bolna');
             
             // Check if this is a Bolna number requiring Razorpay payment
             if (selectedPhoneNumber.provider === 'bolna') {
+                console.log('✅ Bolna provider detected, initiating Razorpay payment...');
                 initiateBolnaPayment();
                 return;
             }
