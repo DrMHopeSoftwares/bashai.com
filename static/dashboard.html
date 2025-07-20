@@ -2365,35 +2365,38 @@
                 let totalContacts = 0;
                 
                 for (const org of organizations) {
-                    // Fetch channels for each organization
-                    try {
-                        const channelsResponse = await apiRequest(`/api/organizations/${org.id}/channels`);
-                        const channels = channelsResponse.data || [];
-                        totalChannels += channels.length;
-                        
-                        for (const channel of channels) {
-                            // Fetch agents for each channel
-                            try {
-                                const agentsResponse = await apiRequest(`/api/channels/${channel.id}/agents`);
-                                const agents = agentsResponse.data || [];
-                                totalAgents += agents.length;
-                                
-                                for (const agent of agents) {
-                                    // Fetch contacts for each agent
-                                    try {
-                                        const contactsResponse = await apiRequest(`/api/agents/${agent.id}/contacts`);
-                                        totalContacts += (contactsResponse.data || []).length;
-                                    } catch (err) {
-                                        console.warn(`Failed to fetch contacts for agent ${agent.id}:`, err);
-                                    }
-                                }
-                            } catch (err) {
-                                console.warn(`Failed to fetch agents for channel ${channel.id}:`, err);
-                            }
-                        }
-                    } catch (err) {
-                        console.warn(`Failed to fetch channels for organization ${org.id}:`, err);
-                    }
+                    // For now, skip the nested API calls that don't exist yet
+                    // TODO: Implement proper channels/agents/contacts endpoints
+                    // 
+                    // Fetch channels for each organization (if endpoint exists)
+                    // try {
+                    //     const channelsResponse = await apiRequest(`/api/organizations/${org.id}/channels`);
+                    //     const channels = channelsResponse.data || [];
+                    //     totalChannels += channels.length;
+                    //     
+                    //     for (const channel of channels) {
+                    //         // Fetch agents for each channel
+                    //         try {
+                    //             const agentsResponse = await apiRequest(`/api/channels/${channel.id}/agents`);
+                    //             const agents = agentsResponse.data || [];
+                    //             totalAgents += agents.length;
+                    //             
+                    //             for (const agent of agents) {
+                    //                 // Fetch contacts for each agent
+                    //                 try {
+                    //                     const contactsResponse = await apiRequest(`/api/agents/${agent.id}/contacts`);
+                    //                     totalContacts += (contactsResponse.data || []).length;
+                    //                 } catch (err) {
+                    //                     console.warn(`Failed to fetch contacts for agent ${agent.id}:`, err);
+                    //                 }
+                    //             }
+                    //         } catch (err) {
+                    //             console.warn(`Failed to fetch agents for channel ${channel.id}:`, err);
+                    //         }
+                    //     }
+                    // } catch (err) {
+                    //     console.warn(`Failed to fetch channels for organization ${org.id}:`, err);
+                    // }
                 }
                 
                 // Update hierarchical metrics
@@ -2801,8 +2804,12 @@
             }
             
             try {
-                const response = await apiRequest(`/api/organizations/${currentOrganization.id}/channels`);
-                const channels = response.channels || [];
+                // TODO: Implement channels endpoint properly
+                // const response = await apiRequest(`/api/organizations/${currentOrganization.id}/channels`);
+                // const channels = response.channels || [];
+                
+                // For now, set default values to prevent errors
+                const channels = [];
                 
                 // Update channel counts
                 const inboundCount = channels.filter(c => c.type === 'inbound').length;
