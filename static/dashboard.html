@@ -2234,6 +2234,7 @@
         // Authentication state
         let currentUser = null;
         let authToken = null;
+        let availablePhoneNumbers = []; // Global array to store phone numbers for purchase
 
         // Initialize Authentication
         async function initializeAuth() {
@@ -3963,7 +3964,10 @@
                 return;
             }
 
-            tableBody.innerHTML = results.map(phone => `
+            // Store phone numbers in global array for purchase functionality
+            availablePhoneNumbers = results;
+            
+            tableBody.innerHTML = results.map((phone, index) => `
                 <tr class="border-b border-gray-100 hover:bg-gray-50">
                     <td class="py-3 px-4">
                         <div class="font-medium text-gray-800">${phone.phone_number}</div>
@@ -3990,8 +3994,8 @@
                         <div class="text-xs text-gray-500">one-time</div>
                     </td>
                     <td class="py-3 px-4">
-                        <button onclick="showPurchaseModal('${JSON.stringify(phone).replace(/'/g, "\\'")}')"
-                                class="btn btn-primary px-4 py-2 text-sm">
+                        <button onclick="showPurchaseModal(${index})" 
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm rounded transition-colors">
                             <i class="fas fa-shopping-cart mr-1"></i>
                             Purchase
                         </button>
@@ -4026,9 +4030,9 @@
         }
 
         // Show purchase confirmation modal
-        function showPurchaseModal(phoneDataStr) {
+        function showPurchaseModal(phoneIndex) {
             try {
-                selectedPhoneNumber = JSON.parse(phoneDataStr);
+                selectedPhoneNumber = availablePhoneNumbers[phoneIndex];
 
                 const modal = document.getElementById('phonePurchaseModal');
                 const detailsDiv = document.getElementById('purchaseDetails');
