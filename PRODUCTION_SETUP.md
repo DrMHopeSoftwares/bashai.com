@@ -23,12 +23,12 @@ This will automatically:
 ### **What the Automatic Setup Does**
 
 ✅ **ElevenLabs Configuration**:
-- API Key: `sk_97fa57d9766f4fee1b9632e8987595ba3de79f630ed2d14c` (Active)
+- API Key: `your_elevenlabs_api_key_here` (Active)
 - 22 voices available including Rachel (Professional Female)
 - API connection verified and working
 
 ✅ **Twilio Configuration**:
-- Account SID: `ACb4f43ae70f647972a12b7c27ef1c0c0f` (Configured)
+- Account SID: `your_twilio_account_sid_here` (Configured)
 - Mock mode enabled for development testing
 - Ready for real calls when auth token is added
 

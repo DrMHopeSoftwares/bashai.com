@@ -15,14 +15,14 @@ def get_production_environment_variables():
     # Core API Keys we have
     env_vars = {
         # ElevenLabs Configuration (WORKING)
-        "ELEVENLABS_API_KEY": "sk_97fa57d9766f4fee1b9632e8987595ba3de79f630ed2d14c",
+        "ELEVENLABS_API_KEY": "your_elevenlabs_api_key_here",
         "ELEVENLABS_API_URL": "https://api.elevenlabs.io/v1",
         "ELEVENLABS_WEBSOCKET_URL": "wss://api.elevenlabs.io/v1/text-to-speech",
         "ELEVENLABS_DEFAULT_VOICE_ID": "21m00Tcm4TlvDq8ikWAM",
         "ELEVENLABS_MODEL_ID": "eleven_multilingual_v2",
         
         # Twilio Configuration (PARTIAL - need auth token)
-        "TWILIO_ACCOUNT_SID": "ACb4f43ae70f647972a12b7c27ef1c0c0f",
+        "TWILIO_ACCOUNT_SID": "your_twilio_account_sid_here",
         "TWILIO_AUTH_TOKEN": "your_twilio_auth_token_here",  # NEED THIS
         "TWILIO_PHONE_NUMBER": "+1234567890",  # NEED THIS
         

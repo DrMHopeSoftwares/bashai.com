@@ -13,9 +13,9 @@ def setup_production_credentials():
     print("🚀 Setting up Production Credentials for ElevenLabs Integration")
     print("=" * 60)
     
-    # Known credentials
-    elevenlabs_api_key = "sk_97fa57d9766f4fee1b9632e8987595ba3de79f630ed2d14c"
-    twilio_account_sid = "ACb4f43ae70f647972a12b7c27ef1c0c0f"
+    # Known credentials (replace with actual values when running)
+    elevenlabs_api_key = "your_elevenlabs_api_key_here"
+    twilio_account_sid = "your_twilio_account_sid_here"
     
     # Check if .env exists
     env_file = ".env"
