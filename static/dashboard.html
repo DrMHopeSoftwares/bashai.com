@@ -2092,58 +2092,70 @@
                     </button>
                 </div>
 
-                <!-- Search Form -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Country</label>
-                        <select id="searchCountry" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="US">United States</option>
-                            <option value="IN">India</option>
-                            <option value="GB">United Kingdom</option>
-                            <option value="CA">Canada</option>
-                            <option value="AU">Australia</option>
-                        </select>
+                <!-- Compact Search Form -->
+                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="text-sm font-medium text-gray-700">Search Filters</h4>
+                        <button onclick="toggleSearchFilters()" class="text-sm text-blue-600 hover:text-blue-800">
+                            <i id="filterToggleIcon" class="fas fa-chevron-up mr-1"></i>
+                            <span id="filterToggleText">Hide Filters</span>
+                        </button>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Area Code</label>
-                        <input type="text" id="searchAreaCode" placeholder="e.g., 555"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Pattern</label>
-                        <input type="text" id="searchPattern" placeholder="e.g., *123*"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Capabilities</label>
-                        <select id="searchCapabilities" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">All</option>
-                            <option value="voice">Voice Only</option>
-                            <option value="sms">SMS Only</option>
-                            <option value="voice,sms">Voice + SMS</option>
-                        </select>
-                    </div>
-                </div>
+                    
+                    <div id="searchFilters" class="space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Country</label>
+                                <select id="searchCountry" class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                    <option value="IN">India</option>
+                                    <option value="US">United States</option>
+                                    <option value="GB">United Kingdom</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="AU">Australia</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Area Code</label>
+                                <input type="text" id="searchAreaCode" placeholder="e.g., 555"
+                                       class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Pattern</label>
+                                <input type="text" id="searchPattern" placeholder="e.g., *123*"
+                                       class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Capabilities</label>
+                                <select id="searchCapabilities" class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                    <option value="">All</option>
+                                    <option value="voice">Voice Only</option>
+                                    <option value="sms">SMS Only</option>
+                                    <option value="voice,sms">Voice + SMS</option>
+                                </select>
+                            </div>
+                        </div>
 
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center space-x-4">
-                        <label class="flex items-center">
-                            <input type="checkbox" id="searchTwilio" checked class="mr-2">
-                            <span class="text-sm text-gray-700">Twilio</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" id="searchTelnyx" checked class="mr-2">
-                            <span class="text-sm text-gray-700">Telnyx</span>
-                        </label>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="searchTwilio" checked class="mr-1">
+                                    <span class="text-xs text-gray-700">Twilio</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="searchTelnyx" checked class="mr-1">
+                                    <span class="text-xs text-gray-700">Telnyx</span>
+                                </label>
+                            </div>
+                            <button onclick="searchPhoneNumbers()" class="btn btn-primary px-4 py-1 text-sm">
+                                <i class="fas fa-search mr-1"></i>
+                                Search Again
+                            </button>
+                        </div>
                     </div>
-                    <button onclick="searchPhoneNumbers()" class="btn btn-primary px-6 py-2">
-                        <i class="fas fa-shopping-cart mr-2"></i>
-                        Purchase Phone Number
-                    </button>
                 </div>
 
                 <!-- Search Results -->
-                <div id="phoneSearchResults" class="hidden">
+                <div id="phoneSearchResults">
                     <div class="flex items-center justify-between mb-4">
                         <h4 class="text-lg font-semibold text-gray-800">Available Numbers</h4>
                         <div class="flex items-center space-x-2">
@@ -3749,8 +3761,21 @@
         // Show phone search modal
         function showPhoneSearchModal() {
             document.getElementById('phoneSearchModal').classList.remove('hidden');
-            document.getElementById('phoneSearchResults').classList.add('hidden');
             document.getElementById('phoneSearchLoading').classList.add('hidden');
+            
+            // Initially hide search filters to make room for results
+            const filters = document.getElementById('searchFilters');
+            const icon = document.getElementById('filterToggleIcon');
+            const text = document.getElementById('filterToggleText');
+            
+            filters.style.display = 'none';
+            icon.className = 'fas fa-chevron-down mr-1';
+            text.textContent = 'Show Filters';
+            
+            // Auto-search for available numbers when modal opens
+            setTimeout(() => {
+                searchPhoneNumbers();
+            }, 300);
         }
 
         // Close phone search modal
@@ -3833,6 +3858,23 @@
             }
         }
         
+        // Toggle search filters visibility
+        function toggleSearchFilters() {
+            const filters = document.getElementById('searchFilters');
+            const icon = document.getElementById('filterToggleIcon');
+            const text = document.getElementById('filterToggleText');
+            
+            if (filters.style.display === 'none' || filters.style.display === '') {
+                filters.style.display = 'block';
+                icon.className = 'fas fa-chevron-up mr-1';
+                text.textContent = 'Hide Filters';
+            } else {
+                filters.style.display = 'none';
+                icon.className = 'fas fa-chevron-down mr-1';
+                text.textContent = 'Show Filters';
+            }
+        }
+        
         // Show error message in a user-friendly way
         function showErrorMessage(message) {
             const errorDiv = document.createElement('div');
@@ -3867,7 +3909,7 @@
         // Display search results
         function displaySearchResults(results) {
             document.getElementById('phoneSearchLoading').classList.add('hidden');
-            document.getElementById('phoneSearchResults').classList.remove('hidden');
+            // Results section is now always visible
 
             const tableBody = document.getElementById('phoneSearchResultsTable');
 
@@ -3931,15 +3973,14 @@
         
         // Reset search form to default values
         function resetSearchForm() {
-            document.getElementById('searchCountry').value = 'US';
+            document.getElementById('searchCountry').value = 'IN';
             document.getElementById('searchAreaCode').value = '';
             document.getElementById('searchPattern').value = '';
             document.getElementById('searchCapabilities').value = '';
             document.getElementById('searchTwilio').checked = true;
             document.getElementById('searchTelnyx').checked = true;
             
-            // Hide results and show fresh search interface
-            document.getElementById('phoneSearchResults').classList.add('hidden');
+            // Clear loading state
             document.getElementById('phoneSearchLoading').classList.add('hidden');
             
             // Clear any error messages
@@ -3947,6 +3988,11 @@
             if (existingError) {
                 existingError.remove();
             }
+            
+            // Auto-search with new criteria
+            setTimeout(() => {
+                searchPhoneNumbers();
+            }, 200);
         }
 
         // Show purchase confirmation modal
