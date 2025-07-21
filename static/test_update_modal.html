@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Update Agent Modal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+        }
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto p-8">
+        <div class="glassmorphism rounded-2xl p-8 max-w-2xl mx-auto">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">🧪 Test Update Agent Modal</h1>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Agent ID</label>
+                    <input type="text" id="testAgentId" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="Enter agent ID to test"
+                           value="15554373-b8e1-4b00-8c25-c4742dc8e480">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                    <input type="text" id="testPhoneNumber" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="Enter phone number"
+                           value="+918035315328">
+                </div>
+                
+                <div class="flex space-x-4">
+                    <button onclick="testAgentDetailsFetch()" 
+                            class="flex-1 bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-all">
+                        <i class="fas fa-search mr-2"></i>
+                        Test API Fetch
+                    </button>
+                    
+                    <button onclick="testUpdateModal()" 
+                            class="flex-1 bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-all">
+                        <i class="fas fa-edit mr-2"></i>
+                        Test Update Modal
+                    </button>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">API Response</label>
+                    <pre id="apiResponse" class="w-full p-4 bg-gray-100 rounded-lg text-sm overflow-auto max-h-96">
+Click "Test API Fetch" to see the response...
+                    </pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Test agent details fetch
+        async function testAgentDetailsFetch() {
+            const agentId = document.getElementById('testAgentId').value;
+            const responseDiv = document.getElementById('apiResponse');
+            
+            try {
+                responseDiv.textContent = 'Fetching agent details...';
+                
+                const response = await fetch(`/api/bolna/agents/${agentId}/details`);
+                const data = await response.json();
+                
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+                
+                if (response.ok) {
+                    console.log('✅ Agent details fetched successfully:', data);
+                } else {
+                    console.error('❌ Failed to fetch agent details:', data);
+                }
+                
+                return data;
+                
+            } catch (error) {
+                console.error('❌ Error fetching agent details:', error);
+                responseDiv.textContent = `Error: ${error.message}`;
+                return null;
+            }
+        }
+        
+        // Test update modal
+        async function testUpdateModal() {
+            const agentId = document.getElementById('testAgentId').value;
+            const phoneNumber = document.getElementById('testPhoneNumber').value;
+            
+            if (!agentId || !phoneNumber) {
+                alert('Please enter both Agent ID and Phone Number');
+                return;
+            }
+            
+            try {
+                // Fetch agent details first
+                const data = await testAgentDetailsFetch();
+                
+                if (data && !data.message) {
+                    // Show the update modal with fetched data
+                    showUpdateAgentModal(phoneNumber, data);
+                } else {
+                    alert('Failed to fetch agent details: ' + (data?.message || 'Unknown error'));
+                }
+                
+            } catch (error) {
+                console.error('❌ Error testing update modal:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        // Copy the showUpdateAgentModal function from dashboard.html
+        function showUpdateAgentModal(phoneNumber, existingAgent) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+            modal.innerHTML = `
+                <div class="glassmorphism rounded-2xl p-8 max-w-lg mx-4">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-edit text-orange-600 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">🔄 Update Existing Agent</h3>
+                        <p class="text-gray-600 mb-6">Phone number <strong>${phoneNumber}</strong> already has an agent assigned</p>
+
+                        <div class="bg-orange-50 rounded-lg p-3 mb-6">
+                            <div class="flex items-center justify-center">
+                                <i class="fas fa-robot text-orange-600 mr-2"></i>
+                                <span class="text-orange-800 font-medium">Current Agent: ${existingAgent.name || existingAgent.agent_name || 'Unknown Agent'}</span>
+                            </div>
+                            <p class="text-xs text-orange-600 mt-1">Agent ID: ${existingAgent.agent_id}</p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Agent Name</label>
+                                <input type="text" id="updateAgentName"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                       placeholder="Enter new agent name"
+                                       value="${existingAgent.name || existingAgent.agent_name || ''}">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Voice Language</label>
+                                <select id="updateAgentLanguage" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                    <option value="hi">Hindi (हिंदी)</option>
+                                    <option value="en">English</option>
+                                    <option value="hi-en">Hindi + English (Hinglish)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Sales Approach</label>
+                                <select id="updateSalesApproach" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                    <option value="consultative">Consultative (Relationship-focused)</option>
+                                    <option value="direct">Direct (Results-focused)</option>
+                                    <option value="educational">Educational (Information-focused)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Agent Welcome Message</label>
+                                <textarea id="updateWelcomeMessage"
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                          rows="3"
+                                          placeholder="Enter welcome message">${existingAgent.agent_welcome_message || ''}</textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Agent Prompt</label>
+                                <textarea id="updateAgentPrompt"
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                          rows="4"
+                                          placeholder="Enter detailed agent instructions">${existingAgent.prompt || ''}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="flex space-x-3 mt-8">
+                            <button onclick="this.closest('.fixed').remove()"
+                                    class="flex-1 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all">
+                                Cancel
+                            </button>
+                            <button onclick="alert('Update functionality would be called here')"
+                                    class="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all"
+                                    id="updateAgentBtn">
+                                <i class="fas fa-edit mr-2"></i>
+                                Update Agent (Test)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Set the dropdown values after the modal is added to DOM
+            setTimeout(() => {
+                // Set language dropdown
+                const languageSelect = document.getElementById('updateAgentLanguage');
+                if (languageSelect && existingAgent.language) {
+                    languageSelect.value = existingAgent.language;
+                    console.log('🔧 Set language to:', existingAgent.language);
+                }
+
+                // Set sales approach dropdown - try to get from existing agent data
+                const salesApproachSelect = document.getElementById('updateSalesApproach');
+                if (salesApproachSelect) {
+                    // Try to get sales approach from various possible fields
+                    const salesApproach = existingAgent.sales_approach || 
+                                        existingAgent.approach || 
+                                        'consultative'; // default
+                    salesApproachSelect.value = salesApproach;
+                    console.log('🔧 Set sales approach to:', salesApproach);
+                }
+
+                console.log('✅ Modal populated with existing agent data:', {
+                    name: existingAgent.name || existingAgent.agent_name,
+                    language: existingAgent.language,
+                    welcome_message: existingAgent.welcome_message,
+                    prompt: existingAgent.prompt,
+                    sales_approach: existingAgent.sales_approach || existingAgent.approach
+                });
+            }, 100);
+        }
+    </script>
+</body>
+</html>

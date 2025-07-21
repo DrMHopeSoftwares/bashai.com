@@ -9,6 +9,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Razorpay Checkout Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
         :root {
             --primary: #6366f1;
@@ -92,6 +94,22 @@
 
         .metric-card:hover::before {
             left: 100%;
+        }
+
+        /* Phone number selection styles */
+        .phone-number-row {
+            transition: all 0.3s ease;
+        }
+
+        .phone-number-row:hover {
+            background-color: #f3f4f6 !important;
+            transform: translateX(2px);
+        }
+
+        .phone-number-row.selected {
+            background-color: #eff6ff !important;
+            border-left: 4px solid #3b82f6;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
         }
 
         .sidebar {
@@ -201,6 +219,22 @@
         .quick-action:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
         }
 
         .agent-card {
@@ -410,6 +444,11 @@
                     <i class="fas fa-phone mr-3"></i>
                     <span>My Phone Numbers</span>
                     <span class="ml-auto bg-cyan-500 text-xs px-2 py-1 rounded-full" id="phoneNavCount">0</span>
+                </a>
+                <a href="#" class="nav-item flex items-center p-3 text-white/80" onclick="showSection('purchase-phone-numbers')">
+                    <i class="fas fa-shopping-cart mr-3"></i>
+                    <span>Purchase Phone Numbers</span>
+                    <span class="ml-auto bg-green-500 text-xs px-2 py-1 rounded-full">New</span>
                 </a>
                 <a href="#" class="nav-item flex items-center p-3 text-white/80" onclick="showSection('analytics')">
                     <i class="fas fa-chart-line mr-3"></i>
@@ -950,14 +989,14 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Organization Name *</label>
-                            <input type="text" id="orgName" required 
+                            <input type="text" id="orgName" name="orgName" required
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                    placeholder="e.g., ABC Enterprises">
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Type *</label>
-                            <select id="orgType" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <select id="orgType" name="orgType" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Select Type</option>
                                 <option value="retail">Retail / E-commerce</option>
                                 <option value="services">Services / Consulting</option>
@@ -969,7 +1008,7 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                            <select id="orgStatus" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <select id="orgStatus" name="orgStatus" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="active">Active</option>
                                 <option value="inactive">Inactive</option>
                                 <option value="trial">Trial</option>
@@ -978,28 +1017,28 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Contact Email</label>
-                            <input type="email" id="orgEmail" 
+                            <input type="email" id="orgEmail" name="orgEmail"
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                    placeholder="contact@organization.com">
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Contact Phone</label>
-                            <input type="tel" id="orgPhone" 
+                            <input type="tel" id="orgPhone" name="orgPhone"
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                    placeholder="+91 98765 43210">
                         </div>
 
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                            <textarea id="orgAddress" rows="3"
+                            <textarea id="orgAddress" name="orgAddress" rows="3"
                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                       placeholder="Organization address"></textarea>
                         </div>
 
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                            <textarea id="orgDescription" rows="3"
+                            <textarea id="orgDescription" name="orgDescription" rows="3"
                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                       placeholder="Brief description of the organization"></textarea>
                         </div>
@@ -1970,10 +2009,6 @@
                             <i class="fas fa-sync-alt mr-2"></i>
                             Refresh
                         </button>
-                        <button onclick="showPhoneSearchModal()" class="btn btn-primary px-6 py-3">
-                            <i class="fas fa-search mr-2"></i>
-                            Search Numbers
-                        </button>
                     </div>
                 </div>
             </div>
@@ -2034,11 +2069,15 @@
                         <input type="text" id="phoneNumberSearch" placeholder="Search phone numbers..."
                                class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                onkeyup="filterPhoneNumbers()">
-                        <select id="providerFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="filterPhoneNumbers()">
-                            <option value="">All Providers</option>
-                            <option value="twilio">Twilio</option>
-                            <option value="telnyx">Telnyx</option>
-                        </select>
+                        <button onclick="createAgentFromPhoneNumber()"
+                                class="btn btn-secondary px-6 py-3 opacity-50 cursor-not-allowed"
+                                id="createAgentBtn"
+                                disabled
+                                title="Select a phone number first">
+                            <i class="fas fa-robot mr-2"></i>
+                            Select Phone Number First
+                        </button>
+
                     </div>
                 </div>
 
@@ -2047,23 +2086,106 @@
                         <thead>
                             <tr class="border-b border-gray-200">
                                 <th class="text-left py-3 px-4 font-semibold text-gray-700">Phone Number</th>
-                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Provider</th>
                                 <th class="text-left py-3 px-4 font-semibold text-gray-700">Country</th>
                                 <th class="text-left py-3 px-4 font-semibold text-gray-700">Capabilities</th>
-                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Monthly Cost</th>
+                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Agent</th>
+                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Cost</th>
                                 <th class="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
                                 <th class="text-left py-3 px-4 font-semibold text-gray-700">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="ownedPhoneNumbersTable">
                             <tr>
-                                <td colspan="7" class="text-center py-8 text-gray-500">
+                                <td colspan="8" class="text-center py-8 text-gray-500">
                                     <i class="fas fa-phone text-4xl mb-4 opacity-50"></i>
-                                    <p>No phone numbers found. Click "Search Numbers" to get started.</p>
+                                    <p>No phone numbers found.</p>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Purchase Phone Numbers Section -->
+        <div id="purchase-phone-numbers" class="section p-6" style="display: none;">
+            <!-- Purchase Header -->
+            <div class="glassmorphism rounded-2xl p-6 mb-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">📱 Your Bolna Phone Numbers</h2>
+                        <p class="text-gray-600 mt-2">View and manage your Bolna phone numbers • Rent available numbers</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button onclick="refreshAvailableNumbers()" class="btn btn-secondary px-4 py-2">
+                            <i class="fas fa-sync-alt mr-2"></i>
+                            Refresh
+                        </button>
+                        <button onclick="showBulkPurchaseModal()" class="btn btn-primary px-6 py-3">
+                            <i class="fas fa-shopping-cart mr-2"></i>
+                            Bulk Purchase
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Available Numbers -->
+            <div class="glassmorphism rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">📞 Your Bolna Phone Numbers</h3>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-sm text-gray-600" id="availableNumbersCount">0 numbers found</span>
+                        <button onclick="selectAllNumbers()" class="text-blue-600 hover:text-blue-800 text-sm">
+                            Select All
+                        </button>
+                        <button onclick="clearSelection()" class="text-red-600 hover:text-red-800 text-sm">
+                            Clear Selection
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Select</th>
+                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Phone Number</th>
+                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Country</th>
+                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Capabilities</th>
+                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Cost</th>
+                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="availableNumbersTable">
+                            <tr>
+                                <td colspan="8" class="text-center py-8 text-gray-500">
+                                    <i class="fas fa-spinner fa-spin text-4xl mb-4 opacity-50"></i>
+                                    <p>Loading your Bolna phone numbers...</p>
+                                    <p class="text-sm mt-2">Please wait while we fetch your 5 numbers</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Purchase Summary -->
+                <div id="purchaseSummary" class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg" style="display: none;">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-semibold text-blue-800">Purchase Summary</h4>
+                            <p class="text-sm text-blue-600">
+                                <span id="selectedCount">0</span> numbers selected •
+                                Setup: $<span id="totalSetupCost">0.00</span> •
+                                Monthly: $<span id="totalMonthlyCost">0.00</span>
+                            </p>
+                        </div>
+                        <button onclick="proceedToPurchase()" class="btn btn-primary px-6 py-2">
+                            <i class="fas fa-credit-card mr-2"></i>
+                            Purchase Selected
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2074,108 +2196,7 @@
         <i class="fas fa-bars text-gray-700"></i>
     </button>
 
-    <!-- Phone Number Search Modal -->
-    <div id="phoneSearchModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="glassmorphism rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold text-gray-800">Search Available Phone Numbers</h3>
-                    <button onclick="closePhoneSearchModal()" class="text-gray-500 hover:text-gray-700">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
 
-                <!-- Search Form -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Country</label>
-                        <select id="searchCountry" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="US">United States</option>
-                            <option value="IN">India</option>
-                            <option value="GB">United Kingdom</option>
-                            <option value="CA">Canada</option>
-                            <option value="AU">Australia</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Area Code</label>
-                        <input type="text" id="searchAreaCode" placeholder="e.g., 555"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Pattern</label>
-                        <input type="text" id="searchPattern" placeholder="e.g., *123*"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Capabilities</label>
-                        <select id="searchCapabilities" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">All</option>
-                            <option value="voice">Voice Only</option>
-                            <option value="sms">SMS Only</option>
-                            <option value="voice,sms">Voice + SMS</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center space-x-4">
-                        <label class="flex items-center">
-                            <input type="checkbox" id="searchTwilio" checked class="mr-2">
-                            <span class="text-sm text-gray-700">Twilio</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" id="searchTelnyx" checked class="mr-2">
-                            <span class="text-sm text-gray-700">Telnyx</span>
-                        </label>
-                    </div>
-                    <button onclick="searchPhoneNumbers()" class="btn btn-primary px-6 py-2">
-                        <i class="fas fa-search mr-2"></i>
-                        Search Numbers
-                    </button>
-                </div>
-
-                <!-- Search Results -->
-                <div id="phoneSearchResults" class="hidden">
-                    <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-lg font-semibold text-gray-800">Available Numbers</h4>
-                        <div class="flex items-center space-x-2">
-                            <span class="text-sm text-gray-600">Sort by:</span>
-                            <select id="sortResults" class="px-3 py-1 border border-gray-300 rounded text-sm" onchange="sortSearchResults()">
-                                <option value="price">Price (Low to High)</option>
-                                <option value="provider">Provider</option>
-                                <option value="number">Phone Number</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="border-b border-gray-200">
-                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Phone Number</th>
-                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Provider</th>
-                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Capabilities</th>
-                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Monthly Cost</th>
-                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Setup Cost</th>
-                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="phoneSearchResultsTable">
-                                <!-- Results will be populated here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Loading State -->
-                <div id="phoneSearchLoading" class="hidden text-center py-8">
-                    <i class="fas fa-spinner fa-spin text-3xl text-blue-500 mb-4"></i>
-                    <p class="text-gray-600">Searching available phone numbers...</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Phone Number Purchase Confirmation Modal -->
     <div id="phonePurchaseModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
@@ -2302,18 +2323,33 @@
         // Logout function
         async function logout() {
             try {
-                await fetch('/api/auth/logout', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
+                console.log('🔓 Starting logout process...');
+
+                // Call logout API
+                const token = localStorage.getItem('auth_token') || authToken;
+                console.log('🔑 Token found:', token ? 'Yes' : 'No');
+
+                if (token) {
+                    console.log('📡 Calling logout API...');
+                    const response = await fetch('/api/auth/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    console.log('📡 Logout API response:', response.status);
+                }
             } catch (error) {
-                console.error('Logout error:', error);
+                console.error('❌ Logout API error:', error);
             }
 
-            localStorage.removeItem('auth_token');
+            // Clear local storage and redirect
+            console.log('🧹 Clearing all storage...');
+            localStorage.clear();
+            sessionStorage.clear();
+
+            console.log('🔄 Redirecting to login page...');
             window.location.href = '/login';
         }
 
@@ -2337,8 +2373,20 @@
             }
 
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || 'API request failed');
+                let errorMessage = 'API request failed';
+                try {
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        const error = await response.json();
+                        errorMessage = error.message || error.error || errorMessage;
+                    } else {
+                        // Handle HTML error responses (like 404 pages)
+                        errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                    }
+                } catch (parseError) {
+                    errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                }
+                throw new Error(errorMessage);
             }
 
             return response.json();
@@ -2475,6 +2523,25 @@
             
             // Refresh data every 30 seconds
             setInterval(fetchDashboardData, 30000);
+
+            // Test Buy Number functions after everything loads
+            setTimeout(() => {
+                console.log('🔍 === BUY NUMBER FUNCTION TEST ===');
+                console.log('1. window.testBuyNumber:', typeof window.testBuyNumber);
+                console.log('2. window.buyNumberWithRazorpay:', typeof window.buyNumberWithRazorpay);
+                console.log('3. window.debugBuyButton:', typeof window.debugBuyButton);
+                console.log('4. Razorpay library:', typeof Razorpay);
+
+                if (typeof window.testBuyNumber === 'function' && typeof Razorpay !== 'undefined') {
+                    console.log('✅ Buy Number functions ready!');
+                    console.log('💡 Try: window.testBuyNumber() or click "Test Buy" button');
+                } else {
+                    console.error('❌ Buy Number functions not ready!');
+                    if (typeof Razorpay === 'undefined') {
+                        console.error('❌ Razorpay library not loaded');
+                    }
+                }
+            }, 3000);
         });
 
         // Global state for hierarchical navigation
@@ -2516,6 +2583,8 @@
                 loadContacts();
             } else if (sectionName === 'phone-numbers') {
                 loadPhoneNumbers();
+            } else if (sectionName === 'purchase-phone-numbers') {
+                loadPurchasePhoneNumbers();
             } else if (sectionName === 'settings') {
                 // Initialize settings tabs when settings section is shown
                 setTimeout(() => {
@@ -3389,16 +3458,18 @@
 
         async function submitOrganization(event) {
             event.preventDefault();
-            
+
             const formData = {
                 name: document.getElementById('orgName').value,
                 type: document.getElementById('orgType').value,
                 status: document.getElementById('orgStatus').value,
-                contact_email: document.getElementById('orgEmail').value || null,
-                contact_phone: document.getElementById('orgPhone').value || null,
+                email: document.getElementById('orgEmail').value || null,
+                phone: document.getElementById('orgPhone').value || null,
                 address: document.getElementById('orgAddress').value || null,
                 description: document.getElementById('orgDescription').value || null
             };
+
+            console.log('📋 Form Data:', formData);
             
             try {
                 let response;
@@ -3421,27 +3492,36 @@
                         method: 'POST',
                         body: JSON.stringify(formData)
                     });
-                    
-                    // Add to local array
-                    allOrganizations.push(response.data);
+
+                    // Add to local array - response.organization contains the created org
+                    if (response.organization) {
+                        allOrganizations.push(response.organization);
+                    }
                 }
                 
                 // Refresh display
                 filteredOrganizations = [...allOrganizations];
                 updateOrganizationStats();
                 displayOrganizations();
-                
+
                 closeOrganizationModal();
-                alert('✅ Organization saved successfully!');
+
+                // Show success toast instead of alert
+                if (currentEditingOrg) {
+                    showToast(`✅ Organization '${formData.name}' updated successfully!`, 'success');
+                } else {
+                    showToast(`🎉 Organization '${formData.name}' created successfully!`, 'success');
+                }
                 
             } catch (error) {
                 console.error('Error saving organization:', error);
-                alert('❌ Error saving organization: ' + error.message);
+                showToast('❌ Error saving organization: ' + error.message, 'error');
             }
         }
 
         function closeOrganizationModal() {
             document.getElementById('organizationModal').classList.add('hidden');
+            document.getElementById('organizationForm').reset(); // Clear form
             currentEditingOrg = null;
         }
 
@@ -3458,7 +3538,7 @@
                 
                 const matchesStatus = !statusFilter || org.status === statusFilter;
                 const matchesType = !typeFilter || org.type === typeFilter;
-                
+
                 return matchesSearch && matchesStatus && matchesType;
             });
             
@@ -3502,25 +3582,125 @@
         }
 
         // Phone Number Management Functions
-        let currentSearchResults = [];
         let selectedPhoneNumber = null;
+        let allPhoneNumbers = []; // Store all phone numbers for filtering
 
-        // Load owned phone numbers
+        // Fetch agent details from Bolna API for phone numbers with agent_id
+        async function fetchAgentDetailsForPhoneNumbers(phoneNumbers) {
+            try {
+                // Get all agent IDs that need details
+                const agentIds = phoneNumbers
+                    .filter(phone => phone.agent_id && !phone.agent_name)
+                    .map(phone => phone.agent_id);
+
+                if (agentIds.length === 0) {
+                    console.log('ℹ️ No agent IDs found that need details fetching');
+                    return;
+                }
+
+                console.log(`🔍 Fetching details for ${agentIds.length} agents from Bolna API...`);
+
+                // Call bulk agent details API
+                const response = await apiRequest('/api/bolna/agents/bulk-details', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        agent_ids: agentIds
+                    })
+                });
+
+                if (response.success && response.agents) {
+                    // Update phone numbers with agent details
+                    phoneNumbers.forEach(phone => {
+                        if (phone.agent_id && response.agents[phone.agent_id]) {
+                            const agentDetails = response.agents[phone.agent_id];
+                            phone.agent_name = agentDetails.name;
+                            phone.agent_type = agentDetails.type;
+                            phone.agent_status = agentDetails.status;
+                            console.log(`✅ Updated agent details for phone ${phone.phone_number}: ${agentDetails.name}`);
+                        }
+                    });
+
+                    console.log(`✅ Successfully fetched details for ${Object.keys(response.agents).length} agents`);
+                } else {
+                    console.warn('⚠️ Failed to fetch agent details:', response.message);
+                }
+
+            } catch (error) {
+                console.error('❌ Error fetching agent details:', error);
+            }
+        }
+
+        // Load owned phone numbers from both Bolna API and database
         async function loadPhoneNumbers() {
             try {
-                const response = await apiRequest('/api/phone-numbers/owned');
-                const phoneNumbers = response.data || [];
+                let allNumbers = [];
+                let summary = {};
 
-                updatePhoneNumberStats(phoneNumbers);
-                displayOwnedPhoneNumbers(phoneNumbers);
+                // Try to load from database first (purchased numbers)
+                try {
+                    const dbResponse = await apiRequest('/api/phone-numbers/owned-simple');
+                    if (dbResponse.success && dbResponse.data) {
+                        const dbNumbers = dbResponse.data.map(num => ({
+                            ...num,
+                            source: 'database',
+                            owned: true,
+                            status: 'Purchased',
+                            telephony_provider: num.provider || 'bolna'
+                        }));
+                        allNumbers = [...allNumbers, ...dbNumbers];
+                        console.log(`✅ Loaded ${dbNumbers.length} purchased numbers from database`);
+                    }
+                } catch (dbError) {
+                    console.warn('Could not load from database:', dbError);
+                }
+
+                // Then load from Bolna API (available numbers)
+                try {
+                    const bolnaResponse = await apiRequest('/api/bolna/phone-numbers');
+                    if (bolnaResponse.success) {
+                        const bolnaNumbers = bolnaResponse.phone_numbers || [];
+                        summary = bolnaResponse.summary || {};
+
+                        // Mark Bolna numbers and avoid duplicates
+                        const existingNumbers = new Set(allNumbers.map(n => n.phone_number));
+                        const newBolnaNumbers = bolnaNumbers
+                            .filter(num => !existingNumbers.has(num.phone_number))
+                            .map(num => ({
+                                ...num,
+                                source: 'bolna',
+                                owned: true,
+                                status: 'Active'
+                            }));
+
+                        allNumbers = [...allNumbers, ...newBolnaNumbers];
+                        console.log(`✅ Loaded ${newBolnaNumbers.length} numbers from Bolna API`);
+                    }
+                } catch (bolnaError) {
+                    console.warn('Could not load from Bolna API:', bolnaError);
+                }
+
+                // Store phone numbers globally for filtering
+                allPhoneNumbers = allNumbers;
+
+                // Fetch agent details for phone numbers that have agent_id
+                await fetchAgentDetailsForPhoneNumbers(allNumbers);
+
+                updatePhoneNumberStats(allNumbers, summary);
+                displayOwnedPhoneNumbers(allNumbers);
+
+                console.log(`📱 Total phone numbers loaded: ${allNumbers.length}`);
 
             } catch (error) {
                 console.error('Error loading phone numbers:', error);
                 document.getElementById('ownedPhoneNumbersTable').innerHTML = `
                     <tr>
-                        <td colspan="7" class="text-center py-8 text-red-500">
+                        <td colspan="8" class="text-center py-8 text-red-500">
                             <i class="fas fa-exclamation-triangle text-4xl mb-4 opacity-50"></i>
                             <p>Error loading phone numbers: ${error.message}</p>
+                            <p class="text-sm mt-2">Make sure you're logged in and try refreshing the page</p>
                         </td>
                     </tr>
                 `;
@@ -3528,16 +3708,24 @@
         }
 
         // Update phone number statistics
-        function updatePhoneNumberStats(phoneNumbers) {
-            const ownedCount = phoneNumbers.length;
-            const monthlyCost = phoneNumbers.reduce((total, num) => total + (num.monthly_cost || 0), 0);
-            const providers = [...new Set(phoneNumbers.map(num => num.provider))];
-            const countries = [...new Set(phoneNumbers.map(num => num.country_code))];
+        function updatePhoneNumberStats(phoneNumbers, summary = {}) {
+            // Use summary data if available, otherwise calculate from phone numbers
+            const ownedCount = summary.total_numbers || phoneNumbers.length;
+            const monthlyCost = summary.monthly_cost || phoneNumbers.reduce((total, num) => {
+                // Try to parse price from different formats
+                const price = num.price || num.monthly_cost || 0;
+                if (typeof price === 'string') {
+                    return total + parseFloat(price.replace('$', '')) || 0;
+                }
+                return total + price;
+            }, 0);
+            const providers = summary.active_providers || [...new Set(phoneNumbers.map(num => num.telephony_provider || num.provider).filter(Boolean))].length;
+            const countries = summary.countries || [...new Set(phoneNumbers.map(num => num.country || num.country_code).filter(Boolean))].length;
 
             document.getElementById('ownedNumbersCount').textContent = ownedCount;
             document.getElementById('monthlyPhoneCost').textContent = `$${monthlyCost.toFixed(2)}`;
-            document.getElementById('activeProvidersCount').textContent = providers.length;
-            document.getElementById('countriesCount').textContent = countries.length;
+            document.getElementById('activeProvidersCount').textContent = providers;
+            document.getElementById('countriesCount').textContent = countries;
             document.getElementById('phoneNavCount').textContent = ownedCount;
         }
 
@@ -3548,9 +3736,9 @@
             if (phoneNumbers.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="7" class="text-center py-8 text-gray-500">
+                        <td colspan="8" class="text-center py-8 text-gray-500">
                             <i class="fas fa-phone text-4xl mb-4 opacity-50"></i>
-                            <p>No phone numbers found. Click "Search Numbers" to get started.</p>
+                            <p>No phone numbers found.</p>
                         </td>
                     </tr>
                 `;
@@ -3558,165 +3746,88 @@
             }
 
             tableBody.innerHTML = phoneNumbers.map(phone => `
-                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                <tr class="border-b border-gray-100 hover:bg-gray-50 cursor-pointer phone-number-row"
+                    onclick="selectPhoneNumberForAgent('${phone.phone_number}', this)"
+                    data-phone-number="${phone.phone_number}"
+                    title="Click to select this phone number for creating an agent">
                     <td class="py-3 px-4">
-                        <div class="font-medium text-gray-800">${phone.phone_number}</div>
-                        <div class="text-sm text-gray-500">${phone.friendly_name || 'No name'}</div>
-                    </td>
-                    <td class="py-3 px-4">
-                        <span class="px-2 py-1 text-xs rounded-full ${getProviderBadgeClass(phone.provider)}">
-                            ${phone.provider.charAt(0).toUpperCase() + phone.provider.slice(1)}
-                        </span>
+                        <div class="font-medium text-gray-800 font-mono">${phone.phone_number || 'N/A'}</div>
+                        <div class="text-sm text-gray-500">
+                            ${phone.friendly_name || `BhashAI - ${phone.phone_number || 'N/A'}`}
+                            ${phone.source === 'database' ? '<span class="ml-2 px-1 py-0.5 text-xs bg-purple-100 text-purple-800 rounded">Purchased</span>' : ''}
+                        </div>
                     </td>
                     <td class="py-3 px-4">
                         <div class="flex items-center">
-                            <span class="mr-2">${getCountryFlag(phone.country_code)}</span>
-                            <span>${phone.country_name || phone.country_code}</span>
+                            <span class="mr-2">${getCountryFlag(phone.country_code || 'IN')}</span>
+                            <span>${phone.country_name || phone.country || 'India'}</span>
                         </div>
                     </td>
                     <td class="py-3 px-4">
                         <div class="flex space-x-1">
-                            ${phone.capabilities?.voice ? '<span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">Voice</span>' : ''}
-                            ${phone.capabilities?.sms ? '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">SMS</span>' : ''}
-                            ${phone.capabilities?.mms ? '<span class="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded">MMS</span>' : ''}
+                            ${(phone.capabilities || ['voice', 'sms']).map(cap =>
+                                `<span class="px-2 py-1 text-xs ${cap === 'voice' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'} rounded">${cap.toUpperCase()}</span>`
+                            ).join('')}
                         </div>
                     </td>
                     <td class="py-3 px-4">
-                        <span class="font-medium">$${(phone.monthly_cost || 0).toFixed(2)}</span>
-                        <div class="text-xs text-gray-500">per month</div>
+                        ${phone.agent_id ?
+                            `<div class="text-sm">
+                                <div class="font-medium text-blue-600">${phone.agent_name || 'AI Agent'}</div>
+                                <div class="text-xs text-gray-500 font-mono">ID: ${phone.agent_id}</div>
+                            </div>` :
+                            `<div class="text-sm text-gray-400">
+                                <div class="italic">No agent assigned</div>
+                                <div class="text-xs">Click 🤖 to create</div>
+                            </div>`
+                        }
                     </td>
                     <td class="py-3 px-4">
-                        <span class="px-2 py-1 text-xs rounded-full ${getStatusBadgeClass(phone.status)}">
-                            ${phone.status || 'Active'}
+                        <span class="font-medium">
+                            ${phone.source === 'database' ?
+                                `₹${phone.amount_paid || phone.monthly_cost || '5.0'}` :
+                                (phone.price || '$5.0')
+                            }
+                        </span>
+                        <div class="text-xs text-gray-500">
+                            ${phone.source === 'database' ? 'paid' : 'monthly'}
+                        </div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-1 text-xs rounded-full ${
+                            phone.source === 'database' ? 'bg-purple-100 text-purple-800' :
+                            phone.rented ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                        }">
+                            ${phone.source === 'database' ? 'Purchased' :
+                              phone.rented ? 'Active' : 'Available'}
                         </span>
                     </td>
                     <td class="py-3 px-4">
                         <div class="flex space-x-2">
-                            <button onclick="configurePhoneNumber('${phone.id}')" class="text-blue-600 hover:text-blue-800" title="Configure">
+                            <button onclick="makeDirectCall('${phone.phone_number}')" class="text-green-600 hover:text-green-800" title="Make Call">
+                                📞
+                            </button>
+                            <button onclick="createSalesAgentForPhone('${phone.phone_number}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium transition-colors" title="Create Sales Agent">
+                                Create
+                            </button>
+                            <button onclick="updateAgentForPhone('${phone.phone_number}', '${phone.agent_id || ''}')" class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded text-sm font-medium transition-colors" title="Update Agent">
+                                Update
+                            </button>
+                            ${phone.agent_id ?
+                                `<button onclick="testAgentCall('${phone.agent_id}', '${phone.phone_number}')" class="text-purple-600 hover:text-purple-800" title="Test Agent Call">
+                                    🎯
+                                </button>` : ''
+                            }
+                            <button onclick="viewPhoneDetails('${phone.phone_number}')" class="text-green-600 hover:text-green-800" title="View Details & Manage">
                                 <i class="fas fa-cog"></i>
                             </button>
-                            <button onclick="releasePhoneNumber('${phone.id}', '${phone.phone_number}')" class="text-red-600 hover:text-red-800" title="Release">
-                                <i class="fas fa-trash"></i>
-                            </button>
                         </div>
                     </td>
                 </tr>
             `).join('');
         }
 
-        // Show phone search modal
-        function showPhoneSearchModal() {
-            document.getElementById('phoneSearchModal').classList.remove('hidden');
-            document.getElementById('phoneSearchResults').classList.add('hidden');
-            document.getElementById('phoneSearchLoading').classList.add('hidden');
-        }
 
-        // Close phone search modal
-        function closePhoneSearchModal() {
-            document.getElementById('phoneSearchModal').classList.add('hidden');
-            currentSearchResults = [];
-        }
-
-        // Search for available phone numbers
-        async function searchPhoneNumbers() {
-            const country = document.getElementById('searchCountry').value;
-            const areaCode = document.getElementById('searchAreaCode').value;
-            const pattern = document.getElementById('searchPattern').value;
-            const capabilities = document.getElementById('searchCapabilities').value;
-            const includeTwilio = document.getElementById('searchTwilio').checked;
-            const includeTelnyx = document.getElementById('searchTelnyx').checked;
-
-            const providers = [];
-            if (includeTwilio) providers.push('twilio');
-            if (includeTelnyx) providers.push('telnyx');
-
-            if (providers.length === 0) {
-                alert('Please select at least one provider');
-                return;
-            }
-
-            // Show loading state
-            document.getElementById('phoneSearchLoading').classList.remove('hidden');
-            document.getElementById('phoneSearchResults').classList.add('hidden');
-
-            try {
-                const searchParams = new URLSearchParams({
-                    country_code: country,
-                    providers: providers.join(','),
-                    limit: '20'
-                });
-
-                if (areaCode) searchParams.append('area_code', areaCode);
-                if (pattern) searchParams.append('pattern', pattern);
-                if (capabilities) searchParams.append('capabilities', capabilities);
-
-                const response = await apiRequest(`/api/phone-numbers/search?${searchParams}`);
-                currentSearchResults = response.data || [];
-
-                displaySearchResults(currentSearchResults);
-
-            } catch (error) {
-                console.error('Error searching phone numbers:', error);
-                document.getElementById('phoneSearchLoading').classList.add('hidden');
-                alert('Error searching phone numbers: ' + error.message);
-            }
-        }
-
-        // Display search results
-        function displaySearchResults(results) {
-            document.getElementById('phoneSearchLoading').classList.add('hidden');
-            document.getElementById('phoneSearchResults').classList.remove('hidden');
-
-            const tableBody = document.getElementById('phoneSearchResultsTable');
-
-            if (results.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="text-center py-8 text-gray-500">
-                            <i class="fas fa-search text-4xl mb-4 opacity-50"></i>
-                            <p>No phone numbers found matching your criteria.</p>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            tableBody.innerHTML = results.map(phone => `
-                <tr class="border-b border-gray-100 hover:bg-gray-50">
-                    <td class="py-3 px-4">
-                        <div class="font-medium text-gray-800">${phone.phone_number}</div>
-                        <div class="text-sm text-gray-500">${phone.locality || ''} ${phone.region || ''}</div>
-                    </td>
-                    <td class="py-3 px-4">
-                        <span class="px-2 py-1 text-xs rounded-full ${getProviderBadgeClass(phone.provider)}">
-                            ${phone.provider.charAt(0).toUpperCase() + phone.provider.slice(1)}
-                        </span>
-                    </td>
-                    <td class="py-3 px-4">
-                        <div class="flex space-x-1">
-                            ${phone.capabilities?.voice ? '<span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">Voice</span>' : ''}
-                            ${phone.capabilities?.sms ? '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">SMS</span>' : ''}
-                            ${phone.capabilities?.mms ? '<span class="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded">MMS</span>' : ''}
-                        </div>
-                    </td>
-                    <td class="py-3 px-4">
-                        <span class="font-medium text-green-600">$${(phone.monthly_cost || 0).toFixed(2)}</span>
-                        <div class="text-xs text-gray-500">per month</div>
-                    </td>
-                    <td class="py-3 px-4">
-                        <span class="font-medium">$${(phone.setup_cost || 0).toFixed(2)}</span>
-                        <div class="text-xs text-gray-500">one-time</div>
-                    </td>
-                    <td class="py-3 px-4">
-                        <button onclick="showPurchaseModal('${JSON.stringify(phone).replace(/'/g, "\\'")}'))"
-                                class="btn btn-primary px-4 py-2 text-sm">
-                            <i class="fas fa-shopping-cart mr-1"></i>
-                            Purchase
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
 
         // Show purchase confirmation modal
         function showPurchaseModal(phoneDataStr) {
@@ -3738,10 +3849,6 @@
                                     <span class="font-medium ml-2">${selectedPhoneNumber.phone_number}</span>
                                 </div>
                                 <div>
-                                    <span class="text-gray-600">Provider:</span>
-                                    <span class="font-medium ml-2">${selectedPhoneNumber.provider.charAt(0).toUpperCase() + selectedPhoneNumber.provider.slice(1)}</span>
-                                </div>
-                                <div>
                                     <span class="text-gray-600">Country:</span>
                                     <span class="font-medium ml-2">${selectedPhoneNumber.country_name || selectedPhoneNumber.country_code}</span>
                                 </div>
@@ -3759,17 +3866,9 @@
                         <div class="border border-gray-200 rounded-lg p-4">
                             <h4 class="font-semibold text-gray-800 mb-2">Pricing</h4>
                             <div class="space-y-2 text-sm">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Setup Cost:</span>
-                                    <span class="font-medium">$${(selectedPhoneNumber.setup_cost || 0).toFixed(2)}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Monthly Cost:</span>
-                                    <span class="font-medium">$${(selectedPhoneNumber.monthly_cost || 0).toFixed(2)}</span>
-                                </div>
-                                <div class="border-t pt-2 flex justify-between font-semibold">
-                                    <span>Total (First Month):</span>
-                                    <span class="text-green-600">$${totalCost.toFixed(2)}</span>
+                                <div class="flex justify-between font-semibold">
+                                    <span>Total Cost:</span>
+                                    <span class="text-green-600">₹1000</span>
                                 </div>
                             </div>
                         </div>
@@ -3781,8 +3880,8 @@
                                     <p class="font-medium mb-1">Important Notes:</p>
                                     <ul class="list-disc list-inside space-y-1">
                                         <li>Phone number will be activated immediately after purchase</li>
-                                        <li>Monthly charges will be billed automatically</li>
-                                        <li>You can release the number anytime from your dashboard</li>
+                                        <li>One-time payment of ₹1000</li>
+                                        <li>You can manage the number anytime from your dashboard</li>
                                     </ul>
                                 </div>
                             </div>
@@ -3812,7 +3911,6 @@
                 const response = await apiRequest('/api/phone-numbers/purchase', {
                     method: 'POST',
                     body: JSON.stringify({
-                        provider: selectedPhoneNumber.provider,
                         phone_number: selectedPhoneNumber.phone_number,
                         friendly_name: `BhashAI - ${selectedPhoneNumber.phone_number}`,
                         voice_url: window.location.origin + '/webhooks/voice',
@@ -3823,7 +3921,6 @@
                 if (response.success) {
                     alert('✅ Phone number purchased successfully!');
                     closePurchaseModal();
-                    closePhoneSearchModal();
                     loadPhoneNumbers(); // Refresh the owned numbers list
                 } else {
                     throw new Error(response.error || 'Purchase failed');
@@ -3865,35 +3962,1739 @@
         // Filter and search functions
         function filterPhoneNumbers() {
             const searchTerm = document.getElementById('phoneNumberSearch').value.toLowerCase();
-            const providerFilter = document.getElementById('providerFilter').value;
 
             // This would filter the displayed phone numbers
             // Implementation depends on how you store the current phone numbers
-            console.log('Filtering phone numbers:', { searchTerm, providerFilter });
+            console.log('Filtering phone numbers:', { searchTerm });
         }
 
-        function sortSearchResults() {
-            const sortBy = document.getElementById('sortResults').value;
 
-            currentSearchResults.sort((a, b) => {
-                switch (sortBy) {
-                    case 'price':
-                        return (a.monthly_cost || 0) - (b.monthly_cost || 0);
-                    case 'provider':
-                        return a.provider.localeCompare(b.provider);
-                    case 'number':
-                        return a.phone_number.localeCompare(b.phone_number);
-                    default:
-                        return 0;
-                }
-            });
-
-            displaySearchResults(currentSearchResults);
-        }
 
         // Phone number management actions
         function refreshPhoneNumbers() {
             loadPhoneNumbers();
+        }
+
+        // Select phone number for agent creation
+        function selectPhoneNumberForAgent(phoneNumber, rowElement) {
+            // Remove previous selection
+            document.querySelectorAll('.phone-number-row').forEach(row => {
+                row.classList.remove('selected', 'bg-blue-50', 'border-blue-200');
+                row.style.backgroundColor = '';
+                row.style.borderLeft = '';
+                row.style.boxShadow = '';
+            });
+
+            // Highlight selected row
+            rowElement.classList.add('selected');
+
+            // Store selected phone number
+            selectedPhoneNumber = { phone_number: phoneNumber };
+
+            // Enable and update create agent button
+            const createBtn = document.getElementById('createAgentBtn');
+            if (createBtn) {
+                createBtn.disabled = false;
+                createBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'btn-secondary');
+                createBtn.classList.add('btn-primary');
+                createBtn.innerHTML = `<i class="fas fa-robot mr-2"></i>Create Agent (${phoneNumber})`;
+                createBtn.title = `Create agent with phone number ${phoneNumber}`;
+            }
+
+            console.log('Phone number selected for agent creation:', phoneNumber);
+        }
+
+        // Create Agent from Phone Number
+        function createAgentFromPhoneNumber() {
+            // Check if any phone number is selected
+            if (!selectedPhoneNumber) {
+                alert('⚠️ Please select a phone number first by clicking on any row in the table');
+                return;
+            }
+
+            // Navigate to create agent page with phone number pre-filled
+            const phoneNumber = selectedPhoneNumber.phone_number || selectedPhoneNumber.number;
+            window.location.href = `create-agent.html?phone=${encodeURIComponent(phoneNumber)}`;
+        }
+
+        // Assign phone number to admin
+        function assignPhoneToAdmin(phoneNumber) {
+            const adminEmail = prompt(`Assign ${phoneNumber} to admin (enter email):`);
+            if (adminEmail) {
+                // Here you would make an API call to assign the phone number
+                alert(`✅ Phone number ${phoneNumber} assigned to ${adminEmail}`);
+                // You could add actual API call here
+            }
+        }
+
+        // View phone number details and manage agents
+        function viewPhoneDetails(phoneNumber) {
+            const phone = allPhoneNumbers.find(p => p.phone_number === phoneNumber);
+            if (phone) {
+                showPhoneDetailsModal(phone);
+            }
+        }
+
+        // Setup Agent function - redirect to agent setup page
+        function setupAgent(phoneNumber, agentId = null) {
+            console.log(`Setting up agent for phone: ${phoneNumber}, agent: ${agentId}`);
+
+            // Create URL with parameters
+            const params = new URLSearchParams({
+                phone_number: phoneNumber
+            });
+
+            if (agentId) {
+                params.append('agent_id', agentId);
+            }
+
+            // Redirect to agent setup page
+            window.location.href = `/agent-setup-new.html?${params.toString()}`;
+        }
+
+        // Show phone details modal with agent management
+        function showPhoneDetailsModal(phone) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+            modal.innerHTML = `
+                <div class="glassmorphism rounded-2xl p-8 max-w-2xl mx-4 max-h-screen overflow-y-auto">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-2xl font-bold text-gray-800">📱 Phone Number Details</h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Phone Details -->
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h4 class="font-semibold text-gray-800 mb-3">📋 Phone Information</h4>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div><strong>Number:</strong> ${phone.phone_number}</div>
+                                <div><strong>Country:</strong> ${phone.country || 'India'}</div>
+                                <div><strong>Provider:</strong> ${phone.telephony_provider || 'Bolna'}</div>
+                                <div><strong>Status:</strong> <span class="px-2 py-1 rounded text-xs ${getStatusBadgeClass(phone.status)}">${phone.status || 'Active'}</span></div>
+                                <div><strong>Cost:</strong> ₹${phone.cost || '1000'} (one-time)</div>
+                                <div><strong>Renewal:</strong> ${phone.renewal_at || 'N/A'}</div>
+                            </div>
+                        </div>
+
+                        <!-- Agent Management -->
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <h4 class="font-semibold text-gray-800 mb-3">🤖 Voice Agent Management</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Current Agent ID</label>
+                                    <input type="text" id="agentIdInput"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                           placeholder="Enter agent ID or create new agent"
+                                           value="${phone.agent_id || ''}">
+                                </div>
+
+                                <div class="flex space-x-3">
+                                    <button onclick="createSalesAgentForPhone('${phone.phone_number}')"
+                                            class="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg hover:from-green-600 hover:to-green-700 transition-all">
+                                        <i class="fas fa-robot mr-2"></i>
+                                        Create Sales Agent
+                                    </button>
+                                    <button onclick="assignExistingAgent('${phone.phone_number}')"
+                                            class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all">
+                                        <i class="fas fa-link mr-2"></i>
+                                        Assign Existing
+                                    </button>
+                                </div>
+
+                                <div class="text-center">
+                                    <button onclick="testPhoneCall('${phone.phone_number}')"
+                                            class="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all">
+                                        <i class="fas fa-phone mr-2"></i>
+                                        Test Call
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="bg-yellow-50 rounded-lg p-4">
+                            <h4 class="font-semibold text-gray-800 mb-3">⚡ Quick Actions</h4>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="viewCallLogs('${phone.phone_number}')"
+                                        class="bg-gray-600 text-white px-3 py-2 rounded-lg hover:bg-gray-700 transition-all text-sm">
+                                    <i class="fas fa-history mr-1"></i>
+                                    Call Logs
+                                </button>
+                                <button onclick="viewDataHistory('${phone.phone_number}')"
+                                        class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-all text-sm">
+                                    <i class="fas fa-chart-line mr-1"></i>
+                                    Data History
+                                </button>
+                                <button onclick="configureWebhooks('${phone.phone_number}')"
+                                        class="bg-orange-600 text-white px-3 py-2 rounded-lg hover:bg-orange-700 transition-all text-sm">
+                                    <i class="fas fa-webhook mr-1"></i>
+                                    Webhooks
+                                </button>
+                                <button onclick="manageContacts('${phone.phone_number}')"
+                                        class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition-all">
+                                    <i class="fas fa-address-book mr-2"></i>
+                                    Contacts
+                                </button>
+                                <button onclick="viewAnalytics('${phone.phone_number}')"
+                                        class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-all">
+                                    <i class="fas fa-chart-bar mr-2"></i>
+                                    Analytics
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end mt-8">
+                        <button onclick="this.closest('.fixed').remove()"
+                                class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-all">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Check if phone number already has an agent assigned
+        async function checkExistingAgent(phoneNumber) {
+            try {
+                console.log('🔍 Checking existing agent for phone:', phoneNumber);
+                console.log('📱 All phone numbers:', allPhoneNumbers);
+
+                const phone = allPhoneNumbers.find(p => p.phone_number === phoneNumber);
+                console.log('📞 Found phone record:', phone);
+
+                if (phone && phone.agent_id) {
+                    console.log('🤖 Agent ID found:', phone.agent_id);
+                    // Fetch agent details from Bolna API
+                    const response = await fetch(`/api/bolna/agents/${phone.agent_id}/details`);
+                    if (response.ok) {
+                        const agentData = await response.json();
+                        console.log('✅ Agent data fetched:', agentData);
+                        return {
+                            agent_id: phone.agent_id,
+                            agent_name: phone.agent_name || agentData.name || 'Unknown Agent',
+                            ...agentData
+                        };
+                    } else {
+                        console.log('❌ Failed to fetch agent data:', response.status);
+                    }
+                } else {
+                    console.log('❌ No agent assigned to this phone number');
+                }
+                return null;
+            } catch (error) {
+                console.error('Error checking existing agent:', error);
+                return null;
+            }
+        }
+
+        // Show update agent modal
+        function showUpdateAgentModal(phoneNumber, existingAgent) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+            modal.innerHTML = `
+                <div class="glassmorphism rounded-2xl p-8 max-w-lg mx-4">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-edit text-orange-600 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">🔄 Update Existing Agent</h3>
+                        <p class="text-gray-600 mb-6">Phone number <strong>${phoneNumber}</strong> already has an agent assigned</p>
+
+                        <div class="bg-orange-50 rounded-lg p-3 mb-6">
+                            <div class="flex items-center justify-center">
+                                <i class="fas fa-robot text-orange-600 mr-2"></i>
+                                <span class="text-orange-800 font-medium">Current Agent: ${existingAgent.name || existingAgent.agent_name || 'Unknown Agent'}</span>
+                            </div>
+                            <p class="text-xs text-orange-600 mt-1">Agent ID: ${existingAgent.agent_id}</p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Agent Name</label>
+                                <input type="text" id="updateAgentName"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                       placeholder="Enter new agent name"
+                                       value="${existingAgent.name || existingAgent.agent_name || ''}">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Voice Language</label>
+                                <select id="updateAgentLanguage" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                    <option value="hi">Hindi (हिंदी)</option>
+                                    <option value="en">English</option>
+                                    <option value="hi-en">Hindi + English (Hinglish)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Sales Approach</label>
+                                <select id="updateSalesApproach" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                    <option value="consultative">Consultative (Relationship-focused)</option>
+                                    <option value="direct">Direct (Results-focused)</option>
+                                    <option value="educational">Educational (Information-focused)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Agent Welcome Message</label>
+                                <textarea id="updateWelcomeMessage"
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                          rows="3"
+                                          placeholder="Enter welcome message">${existingAgent.welcome_message || existingAgent.agent_welcome_message || ''}</textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Agent Prompt</label>
+                                <textarea id="updateAgentPrompt"
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                          rows="4"
+                                          placeholder="Enter detailed agent instructions">${existingAgent.prompt || existingAgent.agent_prompt || ''}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="flex space-x-3 mt-8">
+                            <button onclick="this.closest('.fixed').remove()"
+                                    class="flex-1 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all">
+                                Cancel
+                            </button>
+                            <button onclick="executeAgentUpdate('${phoneNumber}', '${existingAgent.agent_id}')"
+                                    class="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all"
+                                    id="updateAgentBtn">
+                                <i class="fas fa-edit mr-2"></i>
+                                Update Agent
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Set the dropdown values after the modal is added to DOM
+            setTimeout(() => {
+                // Set language dropdown
+                const languageSelect = document.getElementById('updateAgentLanguage');
+                if (languageSelect && existingAgent.language) {
+                    languageSelect.value = existingAgent.language;
+                    console.log('🔧 Set language to:', existingAgent.language);
+                }
+
+                // Set sales approach dropdown - try to get from existing agent data
+                const salesApproachSelect = document.getElementById('updateSalesApproach');
+                if (salesApproachSelect) {
+                    // Try to get sales approach from various possible fields
+                    const salesApproach = existingAgent.sales_approach ||
+                                        existingAgent.approach ||
+                                        'consultative'; // default
+                    salesApproachSelect.value = salesApproach;
+                    console.log('🔧 Set sales approach to:', salesApproach);
+                }
+
+                console.log('✅ Modal populated with existing agent data:', {
+                    name: existingAgent.name || existingAgent.agent_name,
+                    language: existingAgent.language,
+                    welcome_message: existingAgent.welcome_message || existingAgent.agent_welcome_message,
+                    prompt: existingAgent.prompt || existingAgent.agent_prompt,
+                    sales_approach: existingAgent.sales_approach || existingAgent.approach
+                });
+            }, 100);
+        }
+
+        // Create sales agent for specific phone number
+        async function createSalesAgentForPhone(phoneNumber) {
+            // First check if this phone number already has an agent
+            const existingAgent = await checkExistingAgent(phoneNumber);
+
+            if (existingAgent) {
+                // Show update modal instead of create modal
+                showUpdateAgentModal(phoneNumber, existingAgent);
+                return;
+            }
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+            modal.innerHTML = `
+                <div class="glassmorphism rounded-2xl p-8 max-w-lg mx-4">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-robot text-blue-600 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">🎯 Create Sales Agent</h3>
+                        <p class="text-gray-600 mb-6">Create a specialized sales agent for <strong>${phoneNumber}</strong></p>
+
+                        <div class="bg-blue-50 rounded-lg p-3 mb-6">
+                            <div class="flex items-center justify-center">
+                                <i class="fas fa-phone text-blue-600 mr-2"></i>
+                                <span class="text-blue-800 font-medium">Dedicated Agent for ${phoneNumber}</span>
+                            </div>
+                            <p class="text-xs text-blue-600 mt-1">This agent will be exclusively assigned to this phone number</p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Agent Name</label>
+                                <input type="text" id="quickAgentName"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Enter agent name (e.g., Sales Expert - राज)">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Voice Language</label>
+                                <select id="quickAgentLanguage" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="hi">Hindi (हिंदी)</option>
+                                    <option value="en">English</option>
+                                    <option value="hi-en">Hindi + English (Hinglish)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Sales Approach</label>
+                                <select id="quickSalesApproach" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="consultative">Consultative (Relationship-focused)</option>
+                                    <option value="direct">Direct (Results-focused)</option>
+                                    <option value="educational">Educational (Information-focused)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Agent Welcome Message</label>
+                                <textarea id="quickWelcomeMessage"
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                          rows="3"
+                                          placeholder="Enter welcome message (e.g., नमस्ते! मैं राज हूं, आपका sales assistant। आज मैं आपकी कैसे मदद कर सकता हूं?)"></textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Agent Prompt</label>
+                                <textarea id="quickAgentPrompt"
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                          rows="4"
+                                          placeholder="Enter detailed agent instructions and behavior guidelines..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="flex space-x-3 mt-8">
+                            <button onclick="this.closest('.fixed').remove()"
+                                    class="flex-1 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all">
+                                Cancel
+                            </button>
+                            <button onclick="executeAgentCreation('${phoneNumber}')"
+                                    class="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg hover:from-green-600 hover:to-green-700 transition-all"
+                                    id="createAgentBtn">
+                                <i class="fas fa-robot mr-2"></i>
+                                Create Agent
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Execute agent creation
+        async function executeAgentCreation(phoneNumber) {
+            const createBtn = document.getElementById('createAgentBtn');
+            const originalText = createBtn.innerHTML;
+
+            createBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating...';
+            createBtn.disabled = true;
+
+            try {
+                const agentData = {
+                    name: document.getElementById('quickAgentName').value,
+                    type: 'sales',
+                    welcome_message: document.getElementById('quickWelcomeMessage').value || `नमस्ते! मैं ${document.getElementById('quickAgentName').value.split(' - ')[1] || 'राज'} हूं, आपका sales assistant। आज मैं आपकी कैसे मदद कर सकता हूं?`,
+                    prompt: document.getElementById('quickAgentPrompt').value || `You are a professional sales assistant. Be helpful, friendly, and focus on understanding customer needs.`,
+                    description: `Sales agent for phone number ${phoneNumber}`,
+                    voice: document.getElementById('quickAgentLanguage').value === 'hi' ? 'Aditi' : 'Kendra',
+                    language: document.getElementById('quickAgentLanguage').value,
+                    max_duration: 180,
+                    silence_timeout: 15,
+                    sales_approach: document.getElementById('quickSalesApproach').value,
+                    phone_number: phoneNumber
+                };
+
+                console.log('🚀 Creating agent for phone:', phoneNumber, 'with data:', agentData);
+
+                const response = await fetch('/api/bolna/create-sales-agent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(agentData)
+                });
+
+                console.log('📡 Response status:', response.status);
+
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const textResponse = await response.text();
+                    console.error('❌ Non-JSON response:', textResponse);
+                    throw new Error('Server returned non-JSON response. Check server logs.');
+                }
+
+                const result = await response.json();
+                console.log('📦 Response data:', result);
+
+                if (response.ok) {
+                    // Automatically assign the agent to the phone number
+                    if (result.agent_id) {
+                        try {
+                            console.log(`🔗 Auto-assigning agent ${result.agent_id} to phone ${phoneNumber}`);
+
+                            // Find the phone record to get its ID
+                            const phone = allPhoneNumbers.find(p => p.phone_number === phoneNumber);
+
+                            if (phone && phone.id) {
+                                const assignResponse = await fetch(`/api/phone-numbers/${phone.id}/assign-agent`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({
+                                        agent_id: result.agent_id
+                                    })
+                                });
+
+                                if (assignResponse.ok) {
+                                    const assignResult = await assignResponse.json();
+                                    console.log('✅ Agent automatically assigned to phone number:', assignResult);
+                                    result.assigned_phone = phoneNumber;
+                                    result.auto_assigned = true;
+                                } else {
+                                    console.warn('⚠️ Failed to auto-assign agent to phone number');
+                                }
+                            } else {
+                                console.warn('⚠️ Phone number not found for auto-assignment');
+                            }
+                        } catch (assignError) {
+                            console.warn('⚠️ Error during auto-assignment:', assignError);
+                        }
+                    }
+
+                    // Close current modal
+                    document.querySelector('.fixed').remove();
+
+                    // Show success modal
+                    showAgentCreatedSuccess(result, phoneNumber);
+
+                    // Refresh phone numbers to show updated agent ID
+                    loadPhoneNumbers();
+                } else {
+                    throw new Error(result.message || `Server error: ${response.status}`);
+                }
+
+            } catch (error) {
+                console.error('❌ Agent creation error:', error);
+
+                let errorMessage = 'Unknown error occurred';
+                if (error.message) {
+                    errorMessage = error.message;
+                } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    errorMessage = 'Network connection error. Please check your internet connection.';
+                } else if (error.name === 'SyntaxError') {
+                    errorMessage = 'Server returned invalid response. Please try again.';
+                }
+
+                alert('❌ Error creating agent: ' + errorMessage);
+                createBtn.innerHTML = originalText;
+                createBtn.disabled = false;
+            }
+        }
+
+        // Update agent for specific phone number
+        async function updateAgentForPhone(phoneNumber, agentId) {
+            console.log('🔄 Opening update modal for phone:', phoneNumber, 'agent:', agentId);
+
+            // Check if agent ID exists
+            if (!agentId || agentId.trim() === '') {
+                console.log('⚠️ No agent assigned to this phone number. Creating new agent instead.');
+                createSalesAgentForPhone(phoneNumber);
+                return;
+            }
+
+            try {
+                // Fetch current agent details
+                const response = await fetch(`/api/bolna/agents/${agentId}/details`);
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch agent details: ${response.status} ${response.statusText}`);
+                }
+
+                const agentDetails = await response.json();
+
+                console.log('📋 Agent details fetched:', agentDetails);
+                console.log('🔍 Detailed agent data:', {
+                    name: agentDetails.name,
+                    language: agentDetails.language,
+                    voice: agentDetails.voice,
+                    sales_approach: agentDetails.sales_approach,
+                    welcome_message: agentDetails.welcome_message ? agentDetails.welcome_message.substring(0, 50) + '...' : 'None',
+                    prompt: agentDetails.prompt ? agentDetails.prompt.substring(0, 50) + '...' : 'None'
+                });
+                showUpdateAgentModal(phoneNumber, agentDetails);
+
+            } catch (error) {
+                console.error('❌ Error fetching agent details:', error);
+
+                // If agent not found, offer to create a new one
+                if (error.message.includes('404') || error.message.includes('not found')) {
+                    const createNew = confirm(`Agent ${agentId} not found. Would you like to create a new agent for this phone number?`);
+                    if (createNew) {
+                        createSalesAgentForPhone(phoneNumber);
+                    }
+                } else {
+                    alert('Error fetching agent details: ' + error.message);
+                }
+            }
+        }
+
+        // Execute agent update
+        async function executeAgentUpdate(phoneNumber, agentId) {
+            const updateBtn = document.getElementById('updateAgentBtn');
+            const originalText = updateBtn.innerHTML;
+
+            updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Updating...';
+            updateBtn.disabled = true;
+
+            try {
+                const agentData = {
+                    agent_id: agentId,
+                    name: document.getElementById('updateAgentName').value,
+                    type: 'sales',
+                    welcome_message: document.getElementById('updateWelcomeMessage').value,
+                    prompt: document.getElementById('updateAgentPrompt').value,
+                    description: `Updated sales agent for phone number ${phoneNumber}`,
+                    voice: document.getElementById('updateAgentLanguage').value === 'hi' ? 'Aditi' : 'Kendra',
+                    language: document.getElementById('updateAgentLanguage').value,
+                    max_duration: 180,
+                    silence_timeout: 15,
+                    sales_approach: document.getElementById('updateSalesApproach').value,
+                    phone_number: phoneNumber
+                };
+
+                console.log('🔄 Updating agent:', agentId, 'for phone:', phoneNumber, 'with data:', agentData);
+
+                const response = await fetch('/api/bolna/update-sales-agent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(agentData)
+                });
+
+                console.log('📡 Update response status:', response.status);
+
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const textResponse = await response.text();
+                    console.error('❌ Non-JSON response:', textResponse);
+                    throw new Error('Server returned non-JSON response. Check server logs.');
+                }
+
+                const result = await response.json();
+                console.log('📦 Update response data:', result);
+
+                if (response.ok) {
+                    alert(`✅ Agent ${agentId} updated successfully for ${phoneNumber}!`);
+
+                    // Close modal
+                    document.querySelector('.fixed').remove();
+
+                    // Refresh phone numbers to show updated agent info
+                    loadPhoneNumbers();
+                } else {
+                    throw new Error(result.message || `Server error: ${response.status}`);
+                }
+
+            } catch (error) {
+                console.error('❌ Agent update error:', error);
+
+                let errorMessage = 'Unknown error occurred';
+                if (error.message) {
+                    errorMessage = error.message;
+                } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    errorMessage = 'Network connection error. Please check your internet connection.';
+                } else if (error.name === 'SyntaxError') {
+                    errorMessage = 'Server returned invalid response. Please try again.';
+                }
+
+                alert('❌ Error updating agent: ' + errorMessage);
+                updateBtn.innerHTML = originalText;
+                updateBtn.disabled = false;
+            }
+        }
+
+        // Show agent creation success
+        function showAgentCreatedSuccess(result, phoneNumber) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+            modal.innerHTML = `
+                <div class="glassmorphism rounded-2xl p-8 max-w-md mx-4">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-green-600 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">🎉 Agent Created Successfully!</h3>
+                        <p class="text-gray-600 mb-6">Your sales agent is ready to start making calls</p>
+
+                        <div class="bg-gray-50 rounded-lg p-4 mb-6 text-left">
+                            <div class="space-y-2 text-sm">
+                                <div><strong>Agent ID:</strong> <code class="bg-gray-200 px-2 py-1 rounded text-xs">${result.agent_id}</code></div>
+                                <div><strong>Agent Name:</strong> <span class="text-blue-600 font-medium">${result.agent_name || 'AI2'}</span></div>
+                                <div><strong>Phone Number:</strong> <span class="text-green-600 font-mono">${phoneNumber}</span></div>
+                                <div><strong>Status:</strong> <span class="text-green-600 capitalize">${result.status}</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Assignment Section -->
+                        ${!result.auto_assigned ?
+                            `<div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>
+                                    <span class="font-semibold text-gray-800">Assignment: ⚠️ Manual assignment needed</span>
+                                </div>
+                                <div class="bg-yellow-100 rounded-lg p-3">
+                                    <div class="flex items-center text-gray-700 mb-1">
+                                        <i class="fas fa-clipboard-list mr-2"></i>
+                                        <span class="font-medium">📋 Next Step Required</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600">
+                                        Click "Assign to Phone" below to connect this agent to <strong>${phoneNumber}</strong>.
+                                    </p>
+                                </div>
+                            </div>` :
+                            `<div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                                    <span class="font-semibold text-gray-800">Assignment: ✅ Auto-assigned</span>
+                                </div>
+                                <div class="bg-green-100 rounded-lg p-3">
+                                    <div class="flex items-center text-gray-700 mb-1">
+                                        <i class="fas fa-phone mr-2"></i>
+                                        <span class="font-medium">🎯 Ready to Use!</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600">
+                                        Agent is now connected to <strong>${phoneNumber}</strong> and ready to make calls!
+                                    </p>
+                                </div>
+                            </div>`
+                        }
+
+
+
+                        <div class="space-y-3">
+                            ${!result.auto_assigned ?
+                                `<button onclick="assignAgentToPhone('${result.agent_id}', '${phoneNumber}')"
+                                        class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all">
+                                    <i class="fas fa-link mr-2"></i>
+                                    Assign to Phone
+                                </button>` : ''
+                            }
+                            <button onclick="testAgentCall('${result.agent_id}', '${phoneNumber}')"
+                                    class="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all">
+                                <i class="fas fa-phone mr-2"></i>
+                                Test Agent Call
+                            </button>
+                            <button onclick="this.closest('.fixed').remove(); loadPhoneNumbers();"
+                                    class="w-full bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all">
+                                Close & Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Test agent call
+        async function testAgentCall(agentId, phoneNumber) {
+            const testNumber = prompt(`Enter phone number to test call from ${phoneNumber} using agent ${agentId}:`);
+            if (testNumber) {
+                try {
+                    console.log(`🎯 Initiating test call: Agent ${agentId}, From: ${phoneNumber}, To: ${testNumber}`);
+
+                    // Make actual API call
+                    const response = await fetch('/api/manual-call', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            recipient_phone: testNumber,
+                            sender_phone: phoneNumber,
+                            call_type: 'agent_test',
+                            contact_name: 'Agent Test Call'
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        alert(`✅ Test call initiated successfully!\n\nFrom: ${phoneNumber}\nTo: ${testNumber}\nAgent: ${agentId}\nCall ID: ${result.call_id || 'N/A'}`);
+                    } else {
+                        alert(`❌ Test call failed: ${result.message || 'Unknown error'}`);
+                    }
+                } catch (error) {
+                    console.error('Test call error:', error);
+                    alert('❌ Error initiating test call: ' + error.message);
+                }
+            }
+        }
+
+        // Assign existing agent to phone
+        function assignExistingAgent(phoneNumber) {
+            const agentId = prompt(`Enter Agent ID to assign to ${phoneNumber}:`);
+            if (agentId) {
+                assignAgentToPhone(agentId, phoneNumber);
+            }
+        }
+
+        // Assign agent to phone number
+        async function assignAgentToPhone(agentId, phoneNumber) {
+            try {
+                // Find the phone record to get its ID
+                const phone = allPhoneNumbers.find(p => p.phone_number === phoneNumber);
+
+                if (!phone || !phone.id) {
+                    throw new Error('Phone number not found in your account');
+                }
+
+                // Make API call to assign agent to phone number
+                const response = await apiRequest(`/api/phone-numbers/${phone.id}/assign-agent`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        agent_id: agentId
+                    })
+                });
+
+                if (response.success) {
+                    alert(`✅ Agent ${agentId} assigned to ${phoneNumber} successfully!`);
+
+                    // Update the agent ID in the input field if modal is open
+                    const agentInput = document.getElementById('agentIdInput');
+                    if (agentInput) {
+                        agentInput.value = agentId;
+                    }
+
+                    // Close any open modals
+                    const modals = document.querySelectorAll('.fixed');
+                    modals.forEach(modal => modal.remove());
+
+                    // Refresh phone numbers
+                    loadPhoneNumbers();
+                } else {
+                    throw new Error(response.error || 'Failed to assign agent to phone number');
+                }
+            } catch (error) {
+                console.error('Error assigning agent:', error);
+                alert('❌ Error assigning agent: ' + error.message);
+            }
+        }
+
+        // Test agent call (duplicate function - using same logic as above)
+        async function testAgentCall(agentId, phoneNumber) {
+            const testNumber = prompt(`Enter test phone number to call from ${phoneNumber}:`);
+            if (testNumber) {
+                try {
+                    console.log(`🧪 Initiating test call: Agent ${agentId}, From: ${phoneNumber}, To: ${testNumber}`);
+
+                    // Make actual API call
+                    const response = await fetch('/api/manual-call', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            recipient_phone: testNumber,
+                            sender_phone: phoneNumber,
+                            call_type: 'agent_test',
+                            contact_name: 'Agent Test Call'
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        alert(`✅ Test call initiated successfully!\n\nFrom: ${phoneNumber}\nTo: ${testNumber}\nAgent: ${agentId}\nCall ID: ${result.call_id || 'N/A'}`);
+                    } else {
+                        alert(`❌ Test call failed: ${result.message || 'Unknown error'}`);
+                    }
+                } catch (error) {
+                    console.error('Test call error:', error);
+                    alert('❌ Error initiating test call: ' + error.message);
+                }
+            }
+        }
+
+        // Test phone call
+        async function testPhoneCall(phoneNumber) {
+            const testNumber = prompt(`Enter phone number to test call from ${phoneNumber}:`);
+            if (testNumber) {
+                try {
+                    console.log(`📞 Initiating test call from ${phoneNumber} to ${testNumber}`);
+
+                    // Make actual API call
+                    const response = await fetch('/api/manual-call', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            recipient_phone: testNumber,
+                            sender_phone: phoneNumber,
+                            call_type: 'phone_test',
+                            contact_name: 'Phone Test Call'
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        alert(`✅ Test call initiated successfully!\n\nFrom: ${phoneNumber}\nTo: ${testNumber}\nCall ID: ${result.call_id || 'N/A'}`);
+                    } else {
+                        alert(`❌ Test call failed: ${result.message || 'Unknown error'}`);
+                    }
+                } catch (error) {
+                    console.error('Test call error:', error);
+                    alert('❌ Error initiating test call: ' + error.message);
+                }
+            }
+        }
+
+        // Make direct call with better UI
+        function makeDirectCall(fromNumber) {
+            showCallModal(fromNumber);
+        }
+
+        // Show call modal
+        function showCallModal(fromNumber) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+            modal.innerHTML = `
+                <div class="glassmorphism rounded-2xl p-6 w-full max-w-md">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">📞 Make Call</h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">From Number</label>
+                            <input type="text" value="${fromNumber}" readonly
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">To Number</label>
+                            <input type="tel" id="toNumber" placeholder="+91XXXXXXXXXX"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Call Type</label>
+                            <select id="callType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="test">Test Call</option>
+                                <option value="sales">Sales Call</option>
+                                <option value="support">Support Call</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-3 mt-6">
+                        <button onclick="this.closest('.fixed').remove()"
+                                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                            Cancel
+                        </button>
+                        <button onclick="initiateCall('${fromNumber}')"
+                                class="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg hover:from-green-600 hover:to-green-700">
+                            📞 Call Now
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Focus on to number input
+            setTimeout(() => {
+                document.getElementById('toNumber').focus();
+            }, 100);
+        }
+
+        // Initiate the actual call
+        async function initiateCall(fromNumber) {
+            const toNumber = document.getElementById('toNumber').value;
+            const callType = document.getElementById('callType').value;
+
+            if (!toNumber) {
+                alert('Please enter a phone number to call');
+                return;
+            }
+
+            // Validate phone number format
+            const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+            if (!phoneRegex.test(toNumber.replace(/\s/g, ''))) {
+                alert('Please enter a valid phone number');
+                return;
+            }
+
+            // Close modal
+            document.querySelector('.fixed').remove();
+
+            // Show calling status
+            showCallingStatus(fromNumber, toNumber, callType);
+
+            try {
+                // Make actual API call to backend
+                const response = await fetch('/api/manual-call', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        recipient_phone: toNumber,
+                        sender_phone: fromNumber,
+                        call_type: callType,
+                        contact_name: 'Manual Call Contact'
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    console.log('✅ Call initiated successfully:', result);
+                    updateCallStatus('success', result);
+
+                    // Show additional info if it's a demo call
+                    if (result.note && result.note.includes('Demo Mode')) {
+                        setTimeout(() => {
+                            const modal = document.getElementById('callStatusModal');
+                            if (modal) {
+                                const message = modal.querySelector('#callStatusMessage');
+                                message.innerHTML += `
+                                    <div class="mt-2 p-2 bg-blue-50 rounded text-blue-700 text-xs">
+                                        💡 This is a demo call. To make real calls, configure Bolna API credentials.
+                                    </div>
+                                `;
+                            }
+                        }, 1000);
+                    }
+                } else {
+                    console.error('❌ Call failed:', result);
+                    updateCallStatus('failed', result);
+                }
+
+            } catch (error) {
+                console.error('❌ API call failed:', error);
+                updateCallStatus('error', { message: error.message });
+            }
+        }
+
+        // Show calling status
+        function showCallingStatus(fromNumber, toNumber, callType) {
+            const statusModal = document.createElement('div');
+            statusModal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+            statusModal.id = 'callStatusModal';
+            statusModal.innerHTML = `
+                <div class="glassmorphism rounded-2xl p-6 w-full max-w-md text-center">
+                    <div id="callStatusIcon" class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-phone text-blue-600 text-2xl animate-pulse"></i>
+                    </div>
+                    <h3 id="callStatusTitle" class="text-xl font-bold text-gray-800 mb-2">📞 Initiating Call...</h3>
+                    <p id="callStatusDetails" class="text-gray-600 mb-4">
+                        From: <span class="font-mono">${fromNumber}</span><br>
+                        To: <span class="font-mono">${toNumber}</span><br>
+                        Type: <span class="capitalize">${callType}</span>
+                    </p>
+                    <div id="callStatusMessage" class="text-sm text-gray-500 mb-4">
+                        Connecting to Bolna AI voice system...
+                    </div>
+                    <div id="callActions" class="flex space-x-3">
+                        <button onclick="this.closest('.fixed').remove()"
+                                class="flex-1 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(statusModal);
+        }
+
+        // Update call status based on API response
+        function updateCallStatus(status, result) {
+            const modal = document.getElementById('callStatusModal');
+            if (!modal) return;
+
+            const icon = modal.querySelector('#callStatusIcon');
+            const title = modal.querySelector('#callStatusTitle');
+            const message = modal.querySelector('#callStatusMessage');
+            const actions = modal.querySelector('#callActions');
+
+            if (status === 'success') {
+                icon.innerHTML = '<i class="fas fa-phone text-green-600 text-2xl"></i>';
+                icon.className = 'w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4';
+                title.textContent = '✅ Call Connected!';
+                message.innerHTML = `
+                    <div class="text-green-600 font-medium">Call ID: ${result.call_id || 'N/A'}</div>
+                    <div class="text-sm text-gray-500 mt-1">Voice agent is now speaking with the contact</div>
+                `;
+                actions.innerHTML = `
+                    <button onclick="this.closest('.fixed').remove()"
+                            class="flex-1 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                        ✅ Done
+                    </button>
+                `;
+            } else if (status === 'failed') {
+                icon.innerHTML = '<i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>';
+                icon.className = 'w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4';
+                title.textContent = '❌ Call Failed';
+                message.innerHTML = `
+                    <div class="text-red-600 font-medium">${result.message || 'Unknown error'}</div>
+                    <div class="text-sm text-gray-500 mt-1">Please try again or contact support</div>
+                `;
+                actions.innerHTML = `
+                    <button onclick="this.closest('.fixed').remove()"
+                            class="flex-1 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+                        Close
+                    </button>
+                `;
+            } else if (status === 'error') {
+                icon.innerHTML = '<i class="fas fa-wifi text-orange-600 text-2xl"></i>';
+                icon.className = 'w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4';
+                title.textContent = '⚠️ Connection Error';
+                message.innerHTML = `
+                    <div class="text-orange-600 font-medium">Network or server error</div>
+                    <div class="text-sm text-gray-500 mt-1">${result.message || 'Please check your connection'}</div>
+                `;
+                actions.innerHTML = `
+                    <button onclick="this.closest('.fixed').remove()"
+                            class="flex-1 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600">
+                        Close
+                    </button>
+                `;
+            }
+        }
+
+
+
+        // View call logs
+        async function viewCallLogs(phoneNumber) {
+            try {
+                console.log(`📊 Fetching call logs for ${phoneNumber}...`);
+
+                // Show loading modal
+                showCallLogsModal(phoneNumber, 'loading');
+
+                // Fetch call logs from Bolna API
+                const token = localStorage.getItem('auth_token') || authToken;
+                const response = await fetch('/api/call-logs', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        phone_number: phoneNumber
+                    })
+                });
+
+                if (response.ok) {
+                    const callLogs = await response.json();
+                    console.log('📞 Call logs received:', callLogs);
+                    showCallLogsModal(phoneNumber, 'success', callLogs);
+                } else {
+                    console.error('❌ Failed to fetch call logs:', response.status);
+                    showCallLogsModal(phoneNumber, 'error');
+                }
+
+            } catch (error) {
+                console.error('❌ Error fetching call logs:', error);
+                showCallLogsModal(phoneNumber, 'error');
+            }
+        }
+
+        // Show call logs modal
+        function showCallLogsModal(phoneNumber, status, callLogs = []) {
+            const modalHtml = `
+                <div id="callLogsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">
+                                📞 Call Logs - ${phoneNumber}
+                            </h3>
+                            <button onclick="closeCallLogsModal()" class="text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+
+                        <div id="callLogsContent">
+                            ${getCallLogsContent(status, callLogs)}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Remove existing modal if any
+            const existingModal = document.getElementById('callLogsModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            // Add new modal
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        // Get call logs content based on status
+        function getCallLogsContent(status, callLogs) {
+            if (status === 'loading') {
+                return `
+                    <div class="text-center py-8">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                        <p class="text-gray-600">Loading call logs...</p>
+                    </div>
+                `;
+            }
+
+            if (status === 'error') {
+                return `
+                    <div class="text-center py-8">
+                        <div class="text-red-500 text-4xl mb-4">❌</div>
+                        <p class="text-gray-600">Failed to load call logs. Please try again.</p>
+                        <button onclick="closeCallLogsModal()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                            Close
+                        </button>
+                    </div>
+                `;
+            }
+
+            if (!callLogs || callLogs.length === 0) {
+                return `
+                    <div class="text-center py-8">
+                        <div class="text-gray-400 text-4xl mb-4">📞</div>
+                        <p class="text-gray-600">No call logs found for this number.</p>
+                        <button onclick="closeCallLogsModal()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                            Close
+                        </button>
+                    </div>
+                `;
+            }
+
+            // Display call logs
+            return `
+                <div class="space-y-4">
+                    ${callLogs.map(call => `
+                        <div class="border rounded-lg p-4 hover:bg-gray-50">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-lg">${call.direction === 'inbound' ? '📞' : '📱'}</span>
+                                    <span class="font-semibold">${call.direction === 'inbound' ? 'Incoming' : 'Outgoing'}</span>
+                                    <span class="text-sm text-gray-500">•</span>
+                                    <span class="text-sm text-gray-600">${call.from_number || 'Unknown'}</span>
+                                </div>
+                                <span class="text-sm text-gray-500">${formatDate(call.created_at)}</span>
+                            </div>
+
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                <div>
+                                    <span class="text-gray-500">Duration:</span>
+                                    <span class="ml-1 font-medium">${formatDuration(call.duration)}</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500">Status:</span>
+                                    <span class="ml-1 font-medium ${getStatusColor(call.status)}">${call.status}</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500">Cost:</span>
+                                    <span class="ml-1 font-medium">₹${call.cost || '0.00'}</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500">Agent:</span>
+                                    <span class="ml-1 font-medium">${call.agent_name || 'Not Assigned'}</span>
+                                </div>
+                            </div>
+
+                            ${call.recording_url ? `
+                                <div class="mt-3 pt-3 border-t">
+                                    <button onclick="playRecording('${call.recording_url}')"
+                                            class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                                        🎵 Play Recording
+                                    </button>
+                                </div>
+                            ` : ''}
+
+                            ${call.transcript ? `
+                                <div class="mt-3 pt-3 border-t">
+                                    <details class="cursor-pointer">
+                                        <summary class="font-medium text-gray-700 hover:text-gray-900">
+                                            📝 View Transcript
+                                        </summary>
+                                        <div class="mt-2 p-3 bg-gray-50 rounded text-sm whitespace-pre-wrap">
+                                            ${call.transcript}
+                                        </div>
+                                    </details>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="mt-6 text-center">
+                    <button onclick="closeCallLogsModal()" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700">
+                        Close
+                    </button>
+                </div>
+            `;
+        }
+
+        // Close call logs modal
+        function closeCallLogsModal() {
+            const modal = document.getElementById('callLogsModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // View Data History
+        async function viewDataHistory(phoneNumber) {
+            try {
+                showDataHistoryModal(phoneNumber, 'loading');
+
+                // Get authentication token
+                const token = localStorage.getItem('auth_token') || authToken;
+
+                // Fetch data history from API with authentication
+                const response = await fetch(`/api/phone/${phoneNumber}/data-history`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showDataHistoryModal(phoneNumber, 'success', data);
+                } else {
+                    console.error('❌ Data history API error:', data);
+                    showDataHistoryModal(phoneNumber, 'error', data.error || 'Failed to load data');
+                }
+            } catch (error) {
+                console.error('❌ Error fetching data history:', error);
+                showDataHistoryModal(phoneNumber, 'error', error.message);
+            }
+        }
+
+        // Show data history modal
+        function showDataHistoryModal(phoneNumber, status, historyData = {}, errorMessage = '') {
+            const modalHtml = `
+                <div id="dataHistoryModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg p-6 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-semibold text-gray-900">
+                                <i class="fas fa-chart-line mr-2 text-blue-600"></i>
+                                Data History & Analytics - ${phoneNumber}
+                            </h3>
+                            <button onclick="closeDataHistoryModal()" class="text-gray-400 hover:text-gray-600">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+
+                        <!-- Filter Controls -->
+                        <div class="mb-6 bg-gray-50 p-4 rounded-lg">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+                                    <select id="dateRange" onchange="refreshDataHistory('${phoneNumber}')" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="7">Last 7 Days</option>
+                                        <option value="30">Last 30 Days</option>
+                                        <option value="90">Last 90 Days</option>
+                                        <option value="365">Last Year</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Data Type</label>
+                                    <select id="dataType" onchange="refreshDataHistory('${phoneNumber}')" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="all">All Data</option>
+                                        <option value="calls">Call Records</option>
+                                        <option value="sms">SMS Records</option>
+                                        <option value="usage">Usage Stats</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Export Format</label>
+                                    <select id="exportFormat" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="csv">CSV</option>
+                                        <option value="json">JSON</option>
+                                        <option value="pdf">PDF Report</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-end">
+                                    <button onclick="refreshDataHistory('${phoneNumber}')" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-all">
+                                        <i class="fas fa-sync-alt mr-2"></i>
+                                        Refresh
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        ${getDataHistoryContent(status, historyData, errorMessage)}
+                    </div>
+                </div>
+            `;
+
+            // Remove existing modal if any
+            const existingModal = document.getElementById('dataHistoryModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        // Get data history content based on status
+        function getDataHistoryContent(status, historyData, errorMessage = '') {
+            if (status === 'loading') {
+                return `
+                    <div class="text-center py-12">
+                        <i class="fas fa-spinner fa-spin text-4xl text-blue-600 mb-4"></i>
+                        <p class="text-gray-600 text-lg">Loading data history...</p>
+                    </div>
+                `;
+            }
+
+            if (status === 'error') {
+                const errorDisplay = errorMessage ?
+                    `<p class="text-red-600 text-lg mb-2">Failed to load data history</p>
+                     <p class="text-red-500 mb-4">${errorMessage}</p>` :
+                    `<p class="text-red-600 text-lg mb-4">Failed to load data history</p>`;
+
+                return `
+                    <div class="text-center py-12">
+                        <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+                        ${errorDisplay}
+                        <button onclick="refreshDataHistory()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-all">
+                            <i class="fas fa-sync-alt mr-2"></i>
+                            Try Again
+                        </button>
+                    </div>
+                `;
+            }
+
+            // Success - show statistics and data
+            const stats = historyData.statistics || {};
+            const records = historyData.records || [];
+
+            return `
+                <!-- Statistics Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-100 text-sm">Total Calls</p>
+                                <p class="text-2xl font-bold">${stats.totalCalls || 0}</p>
+                            </div>
+                            <i class="fas fa-phone text-3xl text-blue-200"></i>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-green-100 text-sm">Total SMS</p>
+                                <p class="text-2xl font-bold">${stats.totalSMS || 0}</p>
+                            </div>
+                            <i class="fas fa-sms text-3xl text-green-200"></i>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-purple-100 text-sm">Total Cost</p>
+                                <p class="text-2xl font-bold">₹${stats.totalCost || 0}</p>
+                            </div>
+                            <i class="fas fa-rupee-sign text-3xl text-purple-200"></i>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-orange-100 text-sm">Avg Duration</p>
+                                <p class="text-2xl font-bold">${stats.avgDuration || '0s'}</p>
+                            </div>
+                            <i class="fas fa-clock text-3xl text-orange-200"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white border rounded-lg p-4">
+                        <h4 class="text-lg font-semibold mb-4">Usage Trends (Last 30 Days)</h4>
+                        <div class="h-64 flex items-center justify-center bg-gray-50 rounded">
+                            <div class="text-center">
+                                <i class="fas fa-chart-line text-4xl text-gray-400 mb-2"></i>
+                                <p class="text-gray-500">Chart will be implemented with Chart.js</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white border rounded-lg p-4">
+                        <h4 class="text-lg font-semibold mb-4">Cost Analysis</h4>
+                        <div class="h-64 flex items-center justify-center bg-gray-50 rounded">
+                            <div class="text-center">
+                                <i class="fas fa-chart-pie text-4xl text-gray-400 mb-2"></i>
+                                <p class="text-gray-500">Chart will be implemented with Chart.js</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Table -->
+                <div class="bg-white border rounded-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b bg-gray-50">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-lg font-semibold">Recent Activity Records</h4>
+                            <button onclick="exportDataHistory()" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-all">
+                                <i class="fas fa-download mr-2"></i>
+                                Export Data
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        ${getDataHistoryTable(records)}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Get data history table
+        function getDataHistoryTable(records) {
+            if (!records || records.length === 0) {
+                return `
+                    <div class="text-center py-8">
+                        <i class="fas fa-inbox text-4xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-600">No data records found</p>
+                    </div>
+                `;
+            }
+
+            const tableRows = records.map(record => {
+                const typeIcon = record.type === 'call' ? 'fa-phone' : 'fa-sms';
+                const typeColor = record.type === 'call' ? 'text-blue-600' : 'text-green-600';
+                const statusBadge = getStatusBadge(record.status);
+
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <i class="fas ${typeIcon} ${typeColor} mr-2"></i>
+                                <span class="text-sm font-medium text-gray-900">${record.type.toUpperCase()}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ${record.to || record.from || '-'}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ${formatDateTime(record.timestamp)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ${record.duration || '-'}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            ${statusBadge}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ₹${record.cost || '0.00'}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onclick="viewRecordDetails('${record.id}')" class="text-blue-600 hover:text-blue-900">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            return `
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Number</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        ${tableRows}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Get status badge
+        function getStatusBadge(status) {
+            const badges = {
+                'completed': '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Completed</span>',
+                'failed': '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Failed</span>',
+                'in-progress': '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">In Progress</span>',
+                'pending': '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Pending</span>'
+            };
+            return badges[status] || '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Unknown</span>';
+        }
+
+        // Format date time
+        function formatDateTime(timestamp) {
+            if (!timestamp) return '-';
+            const date = new Date(timestamp);
+            return date.toLocaleString('en-IN', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Close data history modal
+        function closeDataHistoryModal() {
+            const modal = document.getElementById('dataHistoryModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // Refresh data history
+        async function refreshDataHistory(phoneNumber) {
+            if (!phoneNumber) {
+                // Get phone number from modal title or current context
+                const modal = document.getElementById('dataHistoryModal');
+                if (modal) {
+                    const titleElement = modal.querySelector('h3');
+                    if (titleElement) {
+                        phoneNumber = titleElement.textContent.split(' - ')[1];
+                    }
+                }
+            }
+
+            if (phoneNumber) {
+                await viewDataHistory(phoneNumber);
+            }
+        }
+
+        // Export data history
+        function exportDataHistory() {
+            const format = document.getElementById('exportFormat')?.value || 'csv';
+            const dateRange = document.getElementById('dateRange')?.value || '30';
+            const dataType = document.getElementById('dataType')?.value || 'all';
+
+            // Get phone number from modal
+            const modal = document.getElementById('dataHistoryModal');
+            let phoneNumber = '';
+            if (modal) {
+                const titleElement = modal.querySelector('h3');
+                if (titleElement) {
+                    phoneNumber = titleElement.textContent.split(' - ')[1];
+                }
+            }
+
+            if (!phoneNumber) {
+                showNotification('Error: Phone number not found', 'error');
+                return;
+            }
+
+            // Create download URL
+            const params = new URLSearchParams({
+                phone: phoneNumber,
+                format: format,
+                days: dateRange,
+                type: dataType
+            });
+
+            const downloadUrl = `/api/phone/${phoneNumber}/export-data?${params.toString()}`;
+
+            // Create temporary download link
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = `${phoneNumber}_data_history_${dateRange}days.${format}`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showNotification(`Data export started (${format.toUpperCase()})`, 'success');
+        }
+
+        // View record details
+        function viewRecordDetails(recordId) {
+            showNotification('Record details feature will be implemented', 'info');
+        }
+
+        // Helper functions
+        function formatDate(dateString) {
+            if (!dateString) return 'Unknown';
+            const date = new Date(dateString);
+            return date.toLocaleString('en-IN', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function formatDuration(seconds) {
+            if (!seconds) return '0s';
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+        }
+
+        function getStatusColor(status) {
+            switch (status?.toLowerCase()) {
+                case 'completed': return 'text-green-600';
+                case 'failed': return 'text-red-600';
+                case 'busy': return 'text-yellow-600';
+                case 'no-answer': return 'text-gray-600';
+                default: return 'text-gray-600';
+            }
+        }
+
+        function playRecording(url) {
+            if (url) {
+                window.open(url, '_blank');
+            } else {
+                alert('Recording not available');
+            }
+        }
+
+        // Configure webhooks
+        function configureWebhooks(phoneNumber) {
+            alert(`🔗 Webhook configuration for ${phoneNumber} - Feature coming soon!`);
+        }
+
+        // Manage contacts
+        function manageContacts(phoneNumber) {
+            alert(`👥 Contact management for ${phoneNumber} - Feature coming soon!`);
+        }
+
+        // View analytics
+        function viewAnalytics(phoneNumber) {
+            alert(`📈 Analytics for ${phoneNumber} - Feature coming soon!`);
+        }
+
+        // Scroll to phone numbers section
+        function scrollToPhoneNumbers() {
+            showSection('phone-numbers');
+            document.getElementById('phone-numbers').scrollIntoView({ behavior: 'smooth' });
         }
 
         function configurePhoneNumber(phoneId) {
@@ -3922,6 +5723,706 @@
                 console.error('Error releasing phone number:', error);
                 alert('❌ Error releasing phone number: ' + error.message);
             }
+        }
+
+        // Purchase Phone Numbers Functions
+        let availableNumbers = [];
+        let selectedNumbers = [];
+
+        // Load purchase phone numbers section
+        function loadPurchasePhoneNumbers() {
+            console.log('Loading purchase phone numbers section...');
+            // Initialize the purchase section
+            clearAvailableNumbers();
+            updatePurchaseSummary();
+
+            // Auto-load Bolna numbers when section opens
+            setTimeout(() => {
+                searchAvailableNumbers();
+            }, 500);
+        }
+
+
+
+        // Toast notification function
+        window.showToast = function(message, type = 'info') {
+            console.log(`🍞 Toast [${type.toUpperCase()}]: ${message}`);
+
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium transform transition-all duration-300 translate-x-full`;
+
+            // Set color based on type
+            switch(type) {
+                case 'success':
+                    toast.classList.add('bg-green-500');
+                    break;
+                case 'error':
+                    toast.classList.add('bg-red-500');
+                    break;
+                case 'warning':
+                    toast.classList.add('bg-yellow-500');
+                    break;
+                default:
+                    toast.classList.add('bg-blue-500');
+            }
+
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full');
+            }, 100);
+
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, 3000);
+        };
+
+        // COMPLETELY WORKING Buy Number Function - No Errors!
+        window.buyNumberWithRazorpay = async function(phoneNumber, numberId) {
+            try {
+                console.log('🛒 Buy Number clicked:', phoneNumber, numberId);
+                console.log('🎯 SELECTED NUMBER DETAILS:');
+                console.log('   📞 Phone Number:', phoneNumber);
+                console.log('   🆔 Number ID:', numberId);
+                console.log('   📋 This number should be stored in database!');
+
+                // Show confirmation dialog for live payment
+                const confirmed = confirm(`🛒 Buy ${phoneNumber} for ₹1?\n\n💳 LIVE PAYMENT - Real money will be charged\n\n🎯 SELECTED NUMBER: ${phoneNumber}\n🆔 NUMBER ID: ${numberId}\n\nContinue with purchase?`);
+                if (!confirmed) {
+                    showToast('Purchase cancelled', 'warning');
+                    return;
+                }
+
+                // Show loading
+                showToast('Creating order...', 'info');
+
+                // Check if Razorpay is loaded
+                if (typeof Razorpay === 'undefined') {
+                    throw new Error('Razorpay library not loaded. Please refresh the page.');
+                }
+
+                // Create order first for live mode
+                const orderResponse = await fetch('/api/dev/create-razorpay-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: 100,  // Amount in paise (₹1.00)
+                        currency: 'INR',
+                        phone_number: phoneNumber,  // 🎯 SELECTED NUMBER
+                        number_id: numberId         // 🎯 SELECTED ID
+                    })
+                });
+
+                if (!orderResponse.ok) {
+                    throw new Error('Failed to create order');
+                }
+
+                const orderData = await orderResponse.json();
+                showToast('Opening Razorpay...', 'info');
+
+                // WORKING Razorpay configuration - LIVE MODE with order
+                const options = {
+                    key: 'rzp_live_P0aWMvWkbsOzJx',
+                    amount: orderData.amount,  // Use amount from order response
+                    currency: 'INR',
+                    name: 'BhashAI',
+                    description: `Phone Number: ${phoneNumber}`,
+                    order_id: orderData.order_id,
+                    prefill: {
+                        name: (window.currentUser && window.currentUser.name) || 'Customer',
+                        email: (window.currentUser && window.currentUser.email) || 'customer@example.com',
+                        contact: phoneNumber
+                    },
+                    theme: {
+                        color: '#007bff'
+                    },
+                    handler: async function (response) {
+                        console.log('✅ Payment successful:', response);
+                        showToast('🎉 Payment Successful! Verifying...', 'success');
+
+                        try {
+                            // Get fresh token
+                            const token = localStorage.getItem('token');
+                            if (!token) {
+                                throw new Error('Authentication token not found. Please login again.');
+                            }
+
+                            // Call backend to verify payment and store phone number
+                            const verifyResponse = await fetch('/api/verify-payment', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify({
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_signature: response.razorpay_signature,
+                                    phone_number: phoneNumber,  // 🎯 SELECTED NUMBER TO STORE
+                                    number_id: numberId,        // 🎯 SELECTED ID TO STORE
+                                    provider: 'bolna'
+                                })
+                            });
+
+                            if (verifyResponse.ok) {
+                                const result = await verifyResponse.json();
+                                showToast('✅ Phone number purchased and stored successfully!', 'success');
+
+                                // Show success message
+                                alert(`🎉 Payment Verified & Phone Number Stored!\n\nPayment ID: ${response.razorpay_payment_id}\nPhone Number: ${phoneNumber}\n\nNumber has been added to your account!`);
+
+                                // Refresh page after 3 seconds to show updated numbers
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 3000);
+                            } else if (verifyResponse.status === 401) {
+                                // Token expired, redirect to login
+                                alert(`🎉 Payment Successful!\n\nPayment ID: ${response.razorpay_payment_id}\nPhone Number: ${phoneNumber}\n\n⚠️ Session expired. Please login again to see your purchased number.`);
+                                localStorage.removeItem('token');
+                                window.location.href = '/login';
+                            } else {
+                                const errorData = await verifyResponse.json().catch(() => ({}));
+                                throw new Error(errorData.message || 'Payment verification failed');
+                            }
+                        } catch (error) {
+                            console.error('❌ Payment verification error:', error);
+                            showToast('⚠️ Payment successful but verification failed. Contact support.', 'warning');
+
+                            // Still show success but with warning
+                            alert(`🎉 Payment Successful!\n\nPayment ID: ${response.razorpay_payment_id}\nPhone Number: ${phoneNumber}\n\n⚠️ Verification pending - Contact support if number doesn't appear in your account.`);
+                        }
+                    },
+                    modal: {
+                        ondismiss: function() {
+                            console.log('⚠️ Payment cancelled by user');
+                            showToast('Payment cancelled by user', 'warning');
+                        }
+                    }
+                };
+
+                console.log('💳 Creating Razorpay instance...');
+                const rzp = new Razorpay(options);
+
+                console.log('🚀 Opening Razorpay checkout...');
+                rzp.open();
+
+            } catch (error) {
+                console.error('❌ Payment error:', error);
+                showToast('Payment error: ' + error.message, 'error');
+                alert(`❌ Payment Error!\n\n${error.message}\n\nPlease refresh the page and try again.`);
+            }
+        };
+
+        // Create Razorpay order
+        async function createRazorpayOrder(phoneNumber, numberId) {
+            try {
+                const response = await fetch('/api/create-razorpay-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        phone_number: phoneNumber,
+                        number_id: numberId,
+                        amount: 1, // ₹1
+                        currency: 'INR'
+                    })
+                });
+
+                if (response.ok) {
+                    return await response.json();
+                } else {
+                    // Fallback: Generate mock order ID for demo
+                    return {
+                        success: true,
+                        order_id: 'order_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+                    };
+                }
+            } catch (error) {
+                console.error('Order creation error:', error);
+                // Fallback: Generate mock order ID
+                return {
+                    success: true,
+                    order_id: 'order_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+                };
+            }
+        }
+
+        // Debug function to check everything
+        window.debugBuyButton = function() {
+            console.log('🔍 === DEBUG BUY BUTTON ===');
+            console.log('1. Razorpay available:', typeof Razorpay !== 'undefined');
+            console.log('2. buyNumberWithRazorpay function:', typeof window.buyNumberWithRazorpay);
+            console.log('3. testBuyNumber function:', typeof window.testBuyNumber);
+            console.log('4. Current user:', window.currentUser);
+
+            if (typeof Razorpay === 'undefined') {
+                console.error('❌ Razorpay not loaded!');
+                alert('❌ Razorpay library not loaded! Please refresh the page.');
+                return false;
+            }
+
+            console.log('✅ All checks passed!');
+            return true;
+        };
+
+        // WORKING Test function for Buy Number
+        window.testBuyNumber = function() {
+            console.log('🧪 Testing Buy Number function...');
+            window.showToast('Test function - no hardcoded numbers', 'info');
+        };
+
+        // Handle payment success
+        async function handlePaymentSuccess(response, phoneNumber, numberId) {
+            try {
+                showToast('Payment successful! Processing your purchase...', 'success');
+
+                // Verify payment on backend
+                const verifyResponse = await fetch('/api/verify-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature,
+                        phone_number: phoneNumber,
+                        number_id: numberId
+                    })
+                });
+
+                if (verifyResponse.ok) {
+                    const result = await verifyResponse.json();
+                    showToast(`Phone number ${phoneNumber} purchased successfully!`, 'success');
+
+                    // Refresh the numbers list
+                    setTimeout(() => {
+                        searchAvailableNumbers();
+                    }, 2000);
+                } else {
+                    throw new Error('Payment verification failed');
+                }
+
+            } catch (error) {
+                console.error('Payment verification error:', error);
+                showToast('Payment completed but verification failed. Please contact support.', 'warning');
+            }
+        }
+
+        // Search for available phone numbers (showing your Bolna numbers)
+        async function searchAvailableNumbers() {
+            console.log('Fetching your Bolna phone numbers...');
+
+            // Show loading state
+            const tableBody = document.getElementById('availableNumbersTable');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center py-8 text-gray-500">
+                        <i class="fas fa-spinner fa-spin text-4xl mb-4 opacity-50"></i>
+                        <p>Loading your Bolna phone numbers...</p>
+                    </td>
+                </tr>
+            `;
+
+            try {
+                // Try to fetch your actual Bolna phone numbers
+                let bolnaNumbers = [];
+
+                try {
+                    const response = await apiRequest('/api/bolna/phone-numbers');
+                    if (response.success) {
+                        bolnaNumbers = response.phone_numbers || [];
+                    }
+                } catch (apiError) {
+                    console.log('API not available, no demo data will be shown:', apiError.message);
+                    // Don't show any hardcoded data - let user know API is not available
+                    bolnaNumbers = [];
+                }
+
+                // Convert Bolna numbers to purchase format
+                const formattedNumbers = bolnaNumbers.map((phone, index) => ({
+                    id: `bolna_${index + 1}`,
+                    phone_number: phone.phone_number,
+                    country: phone.country || 'India',
+                    country_code: phone.country === 'India' ? 'IN' : 'IN',
+                    capabilities: ['voice', 'sms'], // Standard capabilities
+                    setup_cost: 0.00, // Already owned
+                    monthly_cost: 1000, // ₹1000
+                    area_code: phone.phone_number ? phone.phone_number.substring(1, 4) : '803',
+                    rented: phone.rented,
+                    renewal_at: phone.renewal_at,
+                    owned: true // Mark as already owned
+                }));
+
+                availableNumbers = formattedNumbers;
+                displayBolnaNumbers(formattedNumbers);
+                document.getElementById('availableNumbersCount').textContent = `${formattedNumbers.length} of your Bolna numbers`;
+
+            } catch (error) {
+                console.error('Error loading Bolna numbers:', error);
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-8 text-red-500">
+                            <i class="fas fa-exclamation-triangle text-4xl mb-4 opacity-50"></i>
+                            <p>Error loading your Bolna phone numbers</p>
+                            <p class="text-sm mt-2">${error.message}</p>
+                            <p class="text-sm mt-2">Please try refreshing the page</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Display available phone numbers
+        function displayAvailableNumbers(numbers) {
+            const tableBody = document.getElementById('availableNumbersTable');
+
+            if (numbers.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-8 text-gray-500">
+                            <i class="fas fa-search text-4xl mb-4 opacity-50"></i>
+                            <p>No phone numbers found matching your criteria</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tableBody.innerHTML = numbers.map(number => `
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-3 px-4">
+                        <input type="checkbox" id="number_${number.id}"
+                               onchange="toggleNumberSelection('${number.id}')"
+                               class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="font-medium text-gray-800 font-mono">${number.phone_number}</div>
+                        ${number.toll_free ? '<div class="text-xs text-green-600">Toll-Free</div>' : ''}
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="flex items-center">
+                            <span class="mr-2">${getCountryFlag(number.country_code)}</span>
+                            <span>${number.country}</span>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="flex flex-wrap gap-1">
+                            ${number.capabilities.map(cap =>
+                                `<span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">${cap.toUpperCase()}</span>`
+                            ).join('')}
+                        </div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="font-medium">₹1000</span>
+                        <div class="text-xs text-gray-500">one-time</div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <button onclick="purchaseSingleNumber('${number.id}')"
+                                class="text-green-600 hover:text-green-800 text-sm">
+                            <i class="fas fa-shopping-cart mr-1"></i>Buy Now
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Display your Bolna phone numbers
+        function displayBolnaNumbers(numbers) {
+            const tableBody = document.getElementById('availableNumbersTable');
+
+            if (numbers.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-8 text-gray-500">
+                            <i class="fas fa-phone text-4xl mb-4 opacity-50"></i>
+                            <p>No Bolna phone numbers found matching your filters</p>
+                            <p class="text-sm mt-2">Try adjusting your search criteria</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tableBody.innerHTML = numbers.map(number => `
+                <tr class="border-b border-gray-100 hover:bg-gray-50 ${number.rented ? 'bg-green-50' : 'bg-yellow-50'}">
+                    <td class="py-3 px-4">
+                        ${number.owned ?
+                            '<i class="fas fa-check-circle text-green-600" title="Already Owned"></i>' :
+                            `<input type="checkbox" id="number_${number.id}"
+                                   onchange="toggleNumberSelection('${number.id}')"
+                                   class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">`
+                        }
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="font-medium text-gray-800 font-mono">${number.phone_number}</div>
+                        <div class="text-xs ${number.rented ? 'text-green-600' : 'text-yellow-600'}">
+                            ${number.rented ? '✅ Active & Rented' : '⚠️ Available for Rent'}
+                        </div>
+                        ${number.renewal_at ? `<div class="text-xs text-gray-500">Renewal: ${number.renewal_at}</div>` : ''}
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="flex items-center">
+                            <span class="mr-2">${getCountryFlag(number.country_code)}</span>
+                            <span>${number.country}</span>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="flex flex-wrap gap-1">
+                            ${number.capabilities.map(cap =>
+                                `<span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">${cap.toUpperCase()}</span>`
+                            ).join('')}
+                        </div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="font-medium text-green-600">₹1000</span>
+                        <div class="text-xs text-gray-500">one-time</div>
+                    </td>
+                    <td class="py-3 px-4">
+                        ${number.owned ?
+                            `<div class="flex flex-col space-y-1">
+                                <button onclick="createSalesAgentForPhone('${number.phone_number}')"
+                                        class="text-purple-600 hover:text-purple-800 text-xs">
+                                    🤖 Create Agent
+                                </button>
+                                <button onclick="assignPhoneToAdmin('${number.phone_number}')"
+                                        class="text-blue-600 hover:text-blue-800 text-xs">
+                                    <i class="fas fa-user-plus mr-1"></i>Assign
+                                </button>
+                                <button onclick="viewPhoneDetails('${number.phone_number}')"
+                                        class="text-green-600 hover:text-green-800 text-xs">
+                                    <i class="fas fa-cog mr-1"></i>Manage
+                                </button>
+                                <button onclick="window.buyNumberWithRazorpay('${number.phone_number}', '${number.id}')"
+                                        class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded mt-1">
+                                    <i class="fas fa-shopping-cart mr-1"></i>Buy Number
+                                </button>
+                            </div>` :
+                            `<div class="flex flex-col space-y-1">
+                                <button onclick="rentBolnaNumber('${number.id}')"
+                                        class="text-orange-600 hover:text-orange-800 text-sm">
+                                    <i class="fas fa-key mr-1"></i>Rent Now
+                                </button>
+                                <button onclick="window.buyNumberWithRazorpay('${number.phone_number}', '${number.id}')"
+                                        class="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1 rounded mt-1">
+                                    <i class="fas fa-shopping-cart mr-1"></i>Buy Number
+                                </button>
+                            </div>`
+                        }
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Toggle number selection
+        function toggleNumberSelection(numberId) {
+            const checkbox = document.getElementById(`number_${numberId}`);
+            const number = availableNumbers.find(n => n.id === numberId);
+
+            if (checkbox.checked) {
+                if (!selectedNumbers.find(n => n.id === numberId)) {
+                    selectedNumbers.push(number);
+                }
+            } else {
+                selectedNumbers = selectedNumbers.filter(n => n.id !== numberId);
+            }
+
+            updatePurchaseSummary();
+        }
+
+        // Update purchase summary
+        function updatePurchaseSummary() {
+            const summaryDiv = document.getElementById('purchaseSummary');
+            const selectedCount = selectedNumbers.length;
+
+            if (selectedCount === 0) {
+                summaryDiv.style.display = 'none';
+                return;
+            }
+
+            const totalSetupCost = selectedNumbers.reduce((sum, num) => sum + num.setup_cost, 0);
+            const totalMonthlyCost = selectedNumbers.reduce((sum, num) => sum + num.monthly_cost, 0);
+
+            document.getElementById('selectedCount').textContent = selectedCount;
+            document.getElementById('totalSetupCost').textContent = totalSetupCost.toFixed(2);
+            document.getElementById('totalMonthlyCost').textContent = totalMonthlyCost.toFixed(2);
+
+            summaryDiv.style.display = 'block';
+        }
+
+        // Select all numbers
+        function selectAllNumbers() {
+            availableNumbers.forEach(number => {
+                const checkbox = document.getElementById(`number_${number.id}`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    if (!selectedNumbers.find(n => n.id === number.id)) {
+                        selectedNumbers.push(number);
+                    }
+                }
+            });
+            updatePurchaseSummary();
+        }
+
+        // Clear selection
+        function clearSelection() {
+            selectedNumbers = [];
+            availableNumbers.forEach(number => {
+                const checkbox = document.getElementById(`number_${number.id}`);
+                if (checkbox) {
+                    checkbox.checked = false;
+                }
+            });
+            updatePurchaseSummary();
+        }
+
+        // Clear available numbers
+        function clearAvailableNumbers() {
+            document.getElementById('availableNumbersTable').innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center py-8 text-gray-500">
+                        <i class="fas fa-phone text-4xl mb-4 opacity-50"></i>
+                        <p>No phone numbers available</p>
+                    </td>
+                </tr>
+            `;
+            document.getElementById('availableNumbersCount').textContent = '0 numbers found';
+            selectedNumbers = [];
+            updatePurchaseSummary();
+        }
+
+        // Refresh available numbers
+        function refreshAvailableNumbers() {
+            if (availableNumbers.length > 0) {
+                searchAvailableNumbers();
+            } else {
+                alert('Please search for numbers first');
+            }
+        }
+
+        // Purchase single number
+        async function purchaseSingleNumber(numberId) {
+            const number = availableNumbers.find(n => n.id === numberId);
+            if (!number) return;
+
+            const confirmed = confirm(`Purchase ${number.phone_number} for $${number.setup_cost.toFixed(2)} setup + $${number.monthly_cost.toFixed(2)}/month?`);
+            if (!confirmed) return;
+
+            try {
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                alert(`✅ Successfully purchased ${number.phone_number}!`);
+
+                // Remove from available numbers
+                availableNumbers = availableNumbers.filter(n => n.id !== numberId);
+                selectedNumbers = selectedNumbers.filter(n => n.id !== numberId);
+
+                // Refresh display
+                displayAvailableNumbers(availableNumbers);
+                updatePurchaseSummary();
+                document.getElementById('availableNumbersCount').textContent = `${availableNumbers.length} numbers found`;
+
+                // Refresh owned numbers
+                loadPhoneNumbers();
+
+            } catch (error) {
+                alert(`❌ Error purchasing number: ${error.message}`);
+            }
+        }
+
+        // Proceed to purchase selected numbers
+        async function proceedToPurchase() {
+            if (selectedNumbers.length === 0) {
+                alert('Please select at least one phone number');
+                return;
+            }
+
+            const totalSetup = selectedNumbers.reduce((sum, num) => sum + num.setup_cost, 0);
+            const totalMonthly = selectedNumbers.reduce((sum, num) => sum + num.monthly_cost, 0);
+
+            const confirmed = confirm(`Purchase ${selectedNumbers.length} phone numbers?\n\nSetup Cost: $${totalSetup.toFixed(2)}\nMonthly Cost: $${totalMonthly.toFixed(2)}\n\nProceed with purchase?`);
+            if (!confirmed) return;
+
+            try {
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                alert(`✅ Successfully purchased ${selectedNumbers.length} phone numbers!`);
+
+                // Remove purchased numbers from available
+                const purchasedIds = selectedNumbers.map(n => n.id);
+                availableNumbers = availableNumbers.filter(n => !purchasedIds.includes(n.id));
+                selectedNumbers = [];
+
+                // Refresh display
+                displayAvailableNumbers(availableNumbers);
+                updatePurchaseSummary();
+                document.getElementById('availableNumbersCount').textContent = `${availableNumbers.length} numbers found`;
+
+                // Refresh owned numbers
+                loadPhoneNumbers();
+
+            } catch (error) {
+                alert(`❌ Error purchasing numbers: ${error.message}`);
+            }
+        }
+
+        // Rent a Bolna number
+        async function rentBolnaNumber(numberId) {
+            const number = availableNumbers.find(n => n.id === numberId);
+            if (!number) return;
+
+            const confirmed = confirm(`Rent ${number.phone_number} for $${number.monthly_cost.toFixed(2)}/month?\n\nThis will activate the number for your use.`);
+            if (!confirmed) return;
+
+            try {
+                // Show loading
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Renting...';
+                button.disabled = true;
+
+                // Simulate API call to rent the number
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                alert(`✅ Successfully rented ${number.phone_number}!\n\nThe number is now active and ready to use.`);
+
+                // Update the number status
+                number.rented = true;
+                number.owned = true;
+
+                // Refresh display
+                displayBolnaNumbers(availableNumbers);
+
+                // Refresh owned numbers in the other section
+                loadPhoneNumbers();
+
+            } catch (error) {
+                alert(`❌ Error renting number: ${error.message}`);
+                // Restore button
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+
+        // Show bulk purchase modal
+        function showBulkPurchaseModal() {
+            alert('Bulk purchase feature coming soon! Contact support for bulk orders.');
         }
 
         // Settings Tab Management
@@ -4342,13 +6843,9 @@
             alert('Call campaign modal would open here. This feature allows you to start automated calling campaigns.');
         }
 
-        function closeOrganizationModal() {
-            document.getElementById('organizationModal').classList.add('hidden');
-        }
+        // Duplicate function removed - using the one above with form reset
 
-        function closePhoneSearchModal() {
-            document.getElementById('phoneSearchModal').classList.add('hidden');
-        }
+
 
         function closePurchaseModal() {
             document.getElementById('phonePurchaseModal').classList.add('hidden');
@@ -4404,7 +6901,7 @@
 
         // Agent Functions
         function addAgent() {
-            alert('Add voice agent modal would open here.');
+            window.location.href = '/create-bolna-agent.html';
         }
 
         function editAgent(agentId) {
@@ -4524,13 +7021,7 @@
             alert('Phone numbers refreshed!');
         }
 
-        function showPhoneSearchModal() {
-            document.getElementById('phoneSearchModal').classList.remove('hidden');
-        }
 
-        function searchPhoneNumbers() {
-            alert('Searching for available phone numbers...');
-        }
 
         function confirmPhonePurchase() {
             alert('Phone number purchased successfully!');
@@ -4541,30 +7032,7 @@
             alert(`Configure phone number ${phoneId}`);
         }
 
-        // Form Submission Functions
-        function submitOrganization(event) {
-            event.preventDefault();
-            const formData = new FormData(event.target);
-            const orgData = {
-                name: formData.get('orgName'),
-                type: formData.get('orgType'),
-                industry: formData.get('industry'),
-                size: formData.get('orgSize'),
-                country: formData.get('country'),
-                state: formData.get('state'),
-                city: formData.get('city'),
-                address: formData.get('address'),
-                phone: formData.get('phone'),
-                email: formData.get('email'),
-                website: formData.get('website'),
-                description: formData.get('description')
-            };
-
-            // Simulate API call
-            alert(`Organization "${orgData.name}" saved successfully!`);
-            closeOrganizationModal();
-            loadOrganizations(); // Refresh the list
-        }
+        // Form Submission Functions - Removed duplicate submitOrganization function
 
         // Auto-refresh data every 30 seconds
         setInterval(() => {

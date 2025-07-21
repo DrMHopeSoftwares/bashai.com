@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Sales Agent - BhashAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #6b7280;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .config-preview {
+            background: #1f2937;
+            color: #f3f4f6;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #6b7280;
+            font-weight: 600;
+            margin-right: 16px;
+            position: relative;
+        }
+
+        .step.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .step.completed {
+            background: var(--success);
+            color: white;
+        }
+
+        .step::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            width: 60px;
+            height: 2px;
+            background: #e5e7eb;
+            transform: translateY(-50%);
+        }
+
+        .step:last-child::after {
+            display: none;
+        }
+
+        .step.completed::after {
+            background: var(--success);
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen p-6">
+        <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="glassmorphism rounded-2xl p-6 mb-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-800">🎯 Sales Agent Creator</h1>
+                        <p class="text-gray-600 mt-2">Create a powerful Hindi/English sales voice agent</p>
+                    </div>
+                    <button onclick="window.location.href='/static/dashboard.html'" class="btn-secondary">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Dashboard
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step Indicator -->
+            <div class="glassmorphism rounded-2xl p-6 mb-6">
+                <div class="step-indicator">
+                    <div class="step active" id="step1">1</div>
+                    <div class="step" id="step2">2</div>
+                    <div class="step" id="step3">3</div>
+                    <div class="step" id="step4">4</div>
+                </div>
+                <div class="flex justify-between text-sm text-gray-600">
+                    <span>Basic Info</span>
+                    <span>Voice Settings</span>
+                    <span>Sales Config</span>
+                    <span>Create Agent</span>
+                </div>
+            </div>
+
+            <!-- Form Container -->
+            <div class="glassmorphism rounded-2xl p-8">
+                <form id="salesAgentForm">
+                    <!-- Step 1: Basic Information -->
+                    <div id="formStep1" class="form-step">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6">📋 Basic Agent Information</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Agent Name *</label>
+                                <input type="text" id="agentName" class="form-input"
+                                       placeholder="Enter agent name (e.g., Sales Expert - राज)" required>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Agent Type</label>
+                                <select id="agentType" class="form-input">
+                                    <option value="sales">Sales Agent</option>
+                                    <option value="support">Customer Support</option>
+                                    <option value="followup">Follow-up Agent</option>
+                                </select>
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Welcome Message *</label>
+                                <textarea id="welcomeMessage" class="form-input" rows="3" required placeholder="Enter welcome message (e.g., नमस्ते! मैं राज हूं, आपका sales assistant। आज मैं आपकी कैसे मदद कर सकता हूं?)"></textarea>
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Agent Description</label>
+                                <textarea id="agentDescription" class="form-input" rows="2" placeholder="Enter agent description (e.g., Expert Hindi/English sales agent for lead conversion and customer engagement)"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end mt-8">
+                            <button type="button" onclick="nextStep(2)" class="btn-primary">
+                                Next: Voice Settings <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Voice Settings -->
+                    <div id="formStep2" class="form-step" style="display: none;">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6">🎤 Voice & Language Settings</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Voice Provider</label>
+                                <select id="voiceProvider" class="form-input">
+                                    <option value="polly">Amazon Polly (Recommended)</option>
+                                    <option value="elevenlabs">ElevenLabs</option>
+                                    <option value="azure">Azure Speech</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Voice Selection</label>
+                                <select id="voiceSelection" class="form-input">
+                                    <option value="Aditi">Aditi (Hindi Female)</option>
+                                    <option value="Raveena">Raveena (Hindi Female)</option>
+                                    <option value="Kendra">Kendra (English Female)</option>
+                                    <option value="Matthew">Matthew (English Male)</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Primary Language</label>
+                                <select id="primaryLanguage" class="form-input">
+                                    <option value="hi">Hindi (हिंदी)</option>
+                                    <option value="en">English</option>
+                                    <option value="hi-en">Hindi + English (Hinglish)</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Speech Rate</label>
+                                <select id="speechRate" class="form-input">
+                                    <option value="slow">Slow (Clear)</option>
+                                    <option value="medium" selected>Medium (Natural)</option>
+                                    <option value="fast">Fast (Energetic)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between mt-8">
+                            <button type="button" onclick="prevStep(1)" class="btn-secondary">
+                                <i class="fas fa-arrow-left mr-2"></i> Previous
+                            </button>
+                            <button type="button" onclick="nextStep(3)" class="btn-primary">
+                                Next: Sales Config <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Sales Configuration -->
+                    <div id="formStep3" class="form-step" style="display: none;">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6">💼 Sales Configuration</h3>
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Max Call Duration (seconds)</label>
+                                <input type="number" id="maxDuration" class="form-input" value="180" min="60" max="600">
+                                <p class="text-sm text-gray-500 mt-1">Recommended: 180 seconds (3 minutes)</p>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Silence Timeout (seconds)</label>
+                                <input type="number" id="silenceTimeout" class="form-input" value="15" min="5" max="30">
+                                <p class="text-sm text-gray-500 mt-1">Hang up after this many seconds of silence</p>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Sales Approach</label>
+                                <select id="salesApproach" class="form-input">
+                                    <option value="consultative">Consultative (Relationship-focused)</option>
+                                    <option value="direct">Direct (Results-focused)</option>
+                                    <option value="educational">Educational (Information-focused)</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Enable Objection Handling</label>
+                                <div class="flex items-center space-x-4">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="priceObjections" checked class="mr-2">
+                                        Price Objections
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="competitorObjections" checked class="mr-2">
+                                        Competitor Comparisons
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="interestObjections" checked class="mr-2">
+                                        Not Interested
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between mt-8">
+                            <button type="button" onclick="prevStep(2)" class="btn-secondary">
+                                <i class="fas fa-arrow-left mr-2"></i> Previous
+                            </button>
+                            <button type="button" onclick="nextStep(4)" class="btn-primary">
+                                Review & Create <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Review & Create -->
+                    <div id="formStep4" class="form-step" style="display: none;">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6">🔍 Review & Create Agent</h3>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-semibold text-gray-800 mb-4">Agent Summary</h4>
+                                <div id="agentSummary" class="space-y-3">
+                                    <!-- Summary will be populated by JavaScript -->
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 class="font-semibold text-gray-800 mb-4">Configuration Preview</h4>
+                                <div id="configPreview" class="config-preview">
+                                    <!-- Config preview will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between mt-8">
+                            <button type="button" onclick="prevStep(3)" class="btn-secondary">
+                                <i class="fas fa-arrow-left mr-2"></i> Previous
+                            </button>
+                            <button type="button" onclick="createAgent()" class="btn-primary" id="createBtn">
+                                <i class="fas fa-robot mr-2"></i> Create Sales Agent
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Success Modal -->
+            <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+                <div class="glassmorphism rounded-2xl p-8 max-w-md mx-4">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-green-600 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">🎉 Agent Created Successfully!</h3>
+                        <p class="text-gray-600 mb-4">Your sales agent is ready to start making calls.</p>
+                        <div id="agentDetails" class="bg-gray-50 rounded-lg p-4 mb-6 text-left">
+                            <!-- Agent details will be populated -->
+                        </div>
+
+                        <!-- Assignment Section -->
+                        <div id="assignmentSection" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>
+                                <span class="font-semibold text-gray-800">Assignment: ⚠️ Manual assignment needed</span>
+                            </div>
+                            <div class="bg-yellow-100 rounded-lg p-3 mb-3">
+                                <div class="flex items-center text-gray-700">
+                                    <i class="fas fa-clipboard-list mr-2"></i>
+                                    <span class="font-medium">Next Step Required</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-1" id="assignmentText">
+                                    Click "Assign to Phone" below to connect this agent to phone number.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex space-x-3">
+                            <button onclick="window.location.href='/static/dashboard.html'" class="btn-secondary flex-1">
+                                Go to Dashboard
+                            </button>
+                            <button onclick="assignToPhoneNumber()" class="btn-primary flex-1">
+                                Assign to Phone
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let createdAgentId = null;
+
+        function nextStep(step) {
+            // Hide current step
+            document.getElementById(`formStep${currentStep}`).style.display = 'none';
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            document.getElementById(`step${currentStep}`).classList.add('completed');
+            
+            // Show next step
+            currentStep = step;
+            document.getElementById(`formStep${currentStep}`).style.display = 'block';
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            
+            if (step === 4) {
+                generatePreview();
+            }
+        }
+
+        function prevStep(step) {
+            // Hide current step
+            document.getElementById(`formStep${currentStep}`).style.display = 'none';
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            
+            // Show previous step
+            document.getElementById(`step${currentStep}`).classList.remove('completed');
+            currentStep = step;
+            document.getElementById(`formStep${currentStep}`).style.display = 'block';
+            document.getElementById(`step${currentStep}`).classList.add('active');
+        }
+
+        function generatePreview() {
+            // Generate agent summary
+            const summary = `
+                <div class="space-y-2 text-sm">
+                    <div><strong>Name:</strong> ${document.getElementById('agentName').value}</div>
+                    <div><strong>Type:</strong> ${document.getElementById('agentType').value}</div>
+                    <div><strong>Voice:</strong> ${document.getElementById('voiceSelection').value}</div>
+                    <div><strong>Language:</strong> ${document.getElementById('primaryLanguage').value}</div>
+                    <div><strong>Max Duration:</strong> ${document.getElementById('maxDuration').value}s</div>
+                    <div><strong>Silence Timeout:</strong> ${document.getElementById('silenceTimeout').value}s</div>
+                </div>
+            `;
+            document.getElementById('agentSummary').innerHTML = summary;
+            
+            // Generate config preview
+            const config = {
+                agent_name: document.getElementById('agentName').value,
+                agent_type: document.getElementById('agentType').value,
+                voice: document.getElementById('voiceSelection').value,
+                language: document.getElementById('primaryLanguage').value,
+                max_duration: parseInt(document.getElementById('maxDuration').value),
+                silence_timeout: parseInt(document.getElementById('silenceTimeout').value)
+            };
+            
+            document.getElementById('configPreview').textContent = JSON.stringify(config, null, 2);
+        }
+
+        async function createAgent() {
+            const createBtn = document.getElementById('createBtn');
+            createBtn.innerHTML = '<div class="loading-spinner inline-block mr-2"></div> Creating Agent...';
+            createBtn.disabled = true;
+            
+            try {
+                const agentData = {
+                    name: document.getElementById('agentName').value,
+                    type: document.getElementById('agentType').value,
+                    welcome_message: document.getElementById('welcomeMessage').value,
+                    description: document.getElementById('agentDescription').value,
+                    voice: document.getElementById('voiceSelection').value,
+                    language: document.getElementById('primaryLanguage').value,
+                    max_duration: parseInt(document.getElementById('maxDuration').value),
+                    silence_timeout: parseInt(document.getElementById('silenceTimeout').value),
+                    sales_approach: document.getElementById('salesApproach').value
+                };
+                
+                const response = await fetch('/api/bolna/create-sales-agent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(agentData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    createdAgentId = result.agent_id;
+                    showSuccessModal(result);
+                } else {
+                    throw new Error(result.message || 'Failed to create agent');
+                }
+                
+            } catch (error) {
+                alert('Error creating agent: ' + error.message);
+                createBtn.innerHTML = '<i class="fas fa-robot mr-2"></i> Create Sales Agent';
+                createBtn.disabled = false;
+            }
+        }
+
+        function showSuccessModal(result) {
+            const phoneNumber = result.phone_number || '+918035315390';
+            const agentName = result.agent_name || 'AI2';
+
+            const details = `
+                <div class="space-y-2 text-sm">
+                    <div><strong>Agent ID:</strong> <code class="bg-gray-200 px-2 py-1 rounded text-xs">${result.agent_id}</code></div>
+                    <div><strong>Agent Name:</strong> <span class="text-blue-600 font-medium">${agentName}</span></div>
+                    <div><strong>Phone Number:</strong> <span class="text-green-600 font-mono">${phoneNumber}</span></div>
+                    <div><strong>Status:</strong> <span class="text-green-600 capitalize">${result.status}</span></div>
+                    <div><strong>Created:</strong> ${new Date().toLocaleString()}</div>
+                </div>
+            `;
+
+            document.getElementById('agentDetails').innerHTML = details;
+
+            // Update assignment text with phone number
+            const assignmentText = document.getElementById('assignmentText');
+            if (assignmentText) {
+                assignmentText.innerHTML = `Click "Assign to Phone" below to connect this agent to <strong>${phoneNumber}</strong>.`;
+            }
+
+            document.getElementById('successModal').classList.remove('hidden');
+        }
+
+        function assignToPhoneNumber() {
+            // Redirect to phone numbers page with agent ID
+            window.location.href = `/static/dashboard.html#phone-numbers?agent_id=${createdAgentId}`;
+        }
+    </script>
+</body>
+</html>

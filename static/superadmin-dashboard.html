@@ -136,7 +136,7 @@
                     <div class="flex items-center space-x-4">
                         <span id="userEmail" class="text-gray-700"></span>
                         <span id="userName" class="text-gray-600 text-sm"></span>
-                        <button id="signOutBtn" onclick="logout()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                        <button id="signOutBtn" onclick="handleSignOut()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors cursor-pointer">
                             Sign Out
                         </button>
                     </div>
@@ -445,22 +445,7 @@
         let currentUser = null;
         let enterprises = [];
 
-        // Simple logout function
-        function logout() {
-            console.log('🚪 Logout button clicked!');
-            try {
-                // Clear token
-                localStorage.removeItem('auth_token');
-                console.log('🗑️ Token cleared');
 
-                // Redirect to login
-                console.log('🔄 Redirecting to login...');
-                window.location.href = '/login';
-            } catch (error) {
-                console.error('❌ Logout error:', error);
-                window.location.href = '/login';
-            }
-        }
 
         window.addEventListener('load', async () => {
             try {
@@ -1149,9 +1134,11 @@
             }
         }
 
-        async function handleSignOut() {
+        // Make handleSignOut globally available
+        window.handleSignOut = async function() {
             try {
-                console.log('🚪 Sign out button clicked!');
+                console.log('🔓 Starting logout process...');
+                alert('Super Admin logout button clicked!'); // Debug alert
 
                 // Call logout API
                 const token = localStorage.getItem('auth_token');
@@ -1166,20 +1153,30 @@
                             'Content-Type': 'application/json'
                         }
                     });
-                    console.log('📊 Logout API response:', response.status);
+                    console.log('📡 Logout API response:', response.status);
                 }
 
                 // Clear local storage
+                console.log('🧹 Clearing local storage...');
                 localStorage.removeItem('auth_token');
-                console.log('🗑️ Token cleared from localStorage');
+                localStorage.clear(); // Clear all local storage
 
+                // Clear session storage as well
+                sessionStorage.clear();
+
+                console.log('🔄 Redirecting to login page...');
                 // Redirect to login
-                console.log('🔄 Redirecting to login...');
                 window.location.href = '/login';
+
             } catch (error) {
                 console.error('❌ Error signing out:', error);
                 // Still redirect even if logout API fails
+                console.log('🧹 Clearing storage due to error...');
                 localStorage.removeItem('auth_token');
+                localStorage.clear();
+                sessionStorage.clear();
+
+                console.log('🔄 Force redirecting to login...');
                 window.location.href = '/login';
             }
         }

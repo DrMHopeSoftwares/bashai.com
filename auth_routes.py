@@ -33,9 +33,12 @@ def login():
         if user_data['role'] == 'superadmin':
             redirect_url = '/superadmin-dashboard.html'
         elif user_data['role'] == 'admin':
-            redirect_url = '/admin-dashboard.html'
+            redirect_url = '/dashboard.html'  # Admin users go to regular dashboard
         elif user_data['role'] == 'manager':
-            redirect_url = '/dashboard.html'  # Managers use regular dashboard
+            redirect_url = '/dashboard.html'  # Managers use regular dashboard with admin features
+        elif user_data['role'] == 'user':
+            redirect_url = '/dashboard.html'  # Regular users go to user dashboard
+
 
         # Create response
         response = make_response(jsonify({
@@ -313,22 +316,22 @@ def update_user_status(user_id):
     try:
         data = request.get_json()
         new_status = data.get('status')
-        
+
         if new_status not in ['active', 'inactive', 'pending']:
             return jsonify({'error': 'Invalid status'}), 400
-        
+
         import sqlite3
         conn = sqlite3.connect(auth_manager.db_path)
         cursor = conn.cursor()
-        
+
         # Check if user exists and get current data
         cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,))
         user = cursor.fetchone()
-        
+
         if not user:
             conn.close()
             return jsonify({'error': 'User not found'}), 404
-        
+
         # Managers can only update users in their organization
         if request.current_user['role'] == 'manager':
             cursor.execute('SELECT organization FROM users WHERE id = ?', (user_id,))
@@ -336,20 +339,83 @@ def update_user_status(user_id):
             if user_org != request.current_user.get('organization'):
                 conn.close()
                 return jsonify({'error': 'Cannot update user from different organization'}), 403
-        
+
         # Update status
-        cursor.execute('UPDATE users SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', 
+        cursor.execute('UPDATE users SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
                       (new_status, user_id))
         conn.commit()
         conn.close()
-        
+
         return jsonify({
             'success': True,
             'message': f'User status updated to {new_status}'
         })
-        
+
     except Exception as e:
         return jsonify({'error': 'Failed to update status', 'details': str(e)}), 500
+
+@auth_bp.route('/api/auth/users/<user_id>/phone-settings', methods=['PUT'])
+@role_required('admin', 'manager')
+def update_user_phone_settings(user_id):
+    """Update user phone settings for Bolna integration (admin/manager only)"""
+    try:
+        data = request.get_json()
+        sender_phone = data.get('sender_phone')
+        bolna_agent_id = data.get('bolna_agent_id')
+
+        # Validate phone number format
+        if sender_phone and not sender_phone.startswith('+'):
+            return jsonify({'error': 'Phone number must be in E.164 format (start with +)'}), 400
+
+        import sqlite3
+        conn = sqlite3.connect(auth_manager.db_path)
+        cursor = conn.cursor()
+
+        # Check if user exists
+        cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,))
+        user = cursor.fetchone()
+
+        if not user:
+            conn.close()
+            return jsonify({'error': 'User not found'}), 404
+
+        # Managers can only update users in their organization
+        if request.current_user['role'] == 'manager':
+            cursor.execute('SELECT organization FROM users WHERE id = ?', (user_id,))
+            user_org = cursor.fetchone()[0]
+            if user_org != request.current_user.get('organization'):
+                conn.close()
+                return jsonify({'error': 'Cannot update user from different organization'}), 403
+
+        # Update phone settings
+        update_fields = []
+        update_values = []
+
+        if sender_phone is not None:
+            update_fields.append('sender_phone = ?')
+            update_values.append(sender_phone)
+
+        if bolna_agent_id is not None:
+            update_fields.append('bolna_agent_id = ?')
+            update_values.append(bolna_agent_id)
+
+        if update_fields:
+            update_fields.append('updated_at = CURRENT_TIMESTAMP')
+            update_values.append(user_id)
+
+            query = f"UPDATE users SET {', '.join(update_fields)} WHERE id = ?"
+            cursor.execute(query, update_values)
+            conn.commit()
+
+        conn.close()
+
+        return jsonify({
+            'success': True,
+            'message': 'Phone settings updated successfully'
+        })
+
+    except Exception as e:
+        return jsonify({'error': 'Failed to update phone settings', 'details': str(e)}), 500
 
 @auth_bp.route('/login')
 def login_page():

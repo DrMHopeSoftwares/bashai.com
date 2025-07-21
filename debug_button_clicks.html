@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Button Clicks</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .number-card { border: 1px solid #ccc; margin: 10px; padding: 15px; border-radius: 8px; }
+        .buy-btn { background: #007bff; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; }
+        .buy-btn:hover { background: #0056b3; }
+        .log { background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 4px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Button Clicks - Dynamic Number Selection</h1>
+    
+    <div id="logs" class="log">
+        <strong>Click Logs:</strong><br>
+    </div>
+    
+    <div id="numbers-container">
+        <!-- Numbers will be loaded here -->
+    </div>
+
+    <script>
+        // Mock numbers data (similar to what API returns)
+        const mockNumbers = [
+            {
+                id: "6da78527-af2e-4687-8d55-7e8a08b5d07e",
+                phone_number: "+918035743222",
+                price: "$5.0",
+                telephony_provider: "plivo"
+            },
+            {
+                id: "dd911f43-3613-4c40-899d-e0e4e2de2778", 
+                phone_number: "+918035315328",
+                price: "$5.0",
+                telephony_provider: "plivo"
+            },
+            {
+                id: "d2c503c4-f311-4cdf-bca5-40a9b6b58ecd",
+                phone_number: "+918035315390", 
+                price: "$5.0",
+                telephony_provider: "plivo"
+            }
+        ];
+
+        function logMessage(message) {
+            const logsDiv = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            logsDiv.innerHTML += `<br>[${timestamp}] ${message}`;
+            console.log(message);
+        }
+
+        // Debug buy function
+        window.debugBuyNumber = function(phoneNumber, numberId) {
+            logMessage(`🛒 BUY CLICKED: Phone=${phoneNumber}, ID=${numberId}`);
+            
+            // Show which exact number was clicked
+            alert(`🎯 CLICKED NUMBER:\n\nPhone: ${phoneNumber}\nID: ${numberId}\n\nThis number should be stored in database!`);
+            
+            // Simulate what would happen
+            logMessage(`✅ Would store: ${phoneNumber} with ID: ${numberId}`);
+        };
+
+        // Load numbers and create buttons
+        function loadNumbers() {
+            const container = document.getElementById('numbers-container');
+            
+            mockNumbers.forEach((number, index) => {
+                const card = document.createElement('div');
+                card.className = 'number-card';
+                
+                card.innerHTML = `
+                    <h3>Number ${index + 1}</h3>
+                    <p><strong>Phone:</strong> ${number.phone_number}</p>
+                    <p><strong>ID:</strong> ${number.id}</p>
+                    <p><strong>Price:</strong> ${number.price}</p>
+                    <p><strong>Provider:</strong> ${number.telephony_provider}</p>
+                    
+                    <button class="buy-btn" 
+                            onclick="window.debugBuyNumber('${number.phone_number}', '${number.id}')">
+                        🛒 Buy This Number
+                    </button>
+                `;
+                
+                container.appendChild(card);
+            });
+            
+            logMessage(`📱 Loaded ${mockNumbers.length} numbers with dynamic buttons`);
+        }
+
+        // Load numbers when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            logMessage('🚀 Page loaded, creating dynamic buttons...');
+            loadNumbers();
+        });
+    </script>
+</body>
+</html>

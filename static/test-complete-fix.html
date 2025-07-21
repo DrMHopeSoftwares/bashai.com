@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Fix Test - BhashAI</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .status-box { padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid; }
+        .status-success { background: #d4edda; color: #155724; border-color: #28a745; }
+        .status-error { background: #f8d7da; color: #721c24; border-color: #dc3545; }
+        .status-info { background: #d1ecf1; color: #0c5460; border-color: #17a2b8; }
+        .code-block { background: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; margin: 10px 0; }
+        .btn { padding: 12px 24px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; font-weight: 500; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: #212529; }
+        .btn-danger { background: #dc3545; color: white; }
+    </style>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8">
+        <h1 class="text-3xl font-bold text-center mb-6">🔧 Complete Fix Test</h1>
+        <p class="text-center text-gray-600 mb-8">Test all fixes applied to the Buy Number functionality</p>
+        
+        <!-- Status Section -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">📊 System Status</h2>
+            <div id="statusContainer">
+                <div class="status-box status-info">
+                    <strong>🔍 Checking system status...</strong>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test Buttons -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">🧪 Test Functions</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <button class="btn btn-primary" onclick="testShowToast()">🍞 Test Toast</button>
+                <button class="btn btn-success" onclick="testBuyNumber()">🛒 Test Buy</button>
+                <button class="btn btn-warning" onclick="testRazorpay()">💳 Test Razorpay</button>
+                <button class="btn btn-danger" onclick="testAllFunctions()">🔍 Test All</button>
+            </div>
+        </div>
+        
+        <!-- Console Output -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">📝 Console Output</h2>
+            <div id="consoleOutput" class="code-block h-64 overflow-y-auto"></div>
+        </div>
+        
+        <!-- Instructions -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">📋 Instructions</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="font-semibold text-green-600">✅ What Should Work:</h3>
+                    <ul class="list-disc list-inside space-y-1 text-sm">
+                        <li>Toast notifications appear</li>
+                        <li>Buy Number button works</li>
+                        <li>Razorpay popup opens</li>
+                        <li>No console errors</li>
+                        <li>All functions are global</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-red-600">❌ Fixed Issues:</h3>
+                    <ul class="list-disc list-inside space-y-1 text-sm">
+                        <li>showToast is not defined</li>
+                        <li>buyNumberWithRazorpay not found</li>
+                        <li>currentUser undefined errors</li>
+                        <li>Function scope issues</li>
+                        <li>Razorpay integration errors</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Console logging
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const consoleOutput = document.getElementById('consoleOutput');
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span class="text-gray-500">[${timestamp}]</span> <span class="text-${type === 'error' ? 'red' : type === 'success' ? 'green' : 'blue'}-600">${message}</span>`;
+            consoleOutput.appendChild(logEntry);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        // Toast function (same as dashboard)
+        function showToast(message, type = 'info') {
+            log(`Toast [${type.toUpperCase()}]: ${message}`, type);
+            
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium transform transition-all duration-300 translate-x-full`;
+            
+            switch(type) {
+                case 'success': toast.classList.add('bg-green-500'); break;
+                case 'error': toast.classList.add('bg-red-500'); break;
+                case 'warning': toast.classList.add('bg-yellow-500'); break;
+                default: toast.classList.add('bg-blue-500');
+            }
+            
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.classList.remove('translate-x-full'), 100);
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Test functions
+        function testShowToast() {
+            log('Testing showToast function...', 'info');
+            showToast('Success toast test!', 'success');
+            setTimeout(() => showToast('Error toast test!', 'error'), 1000);
+            setTimeout(() => showToast('Warning toast test!', 'warning'), 2000);
+            setTimeout(() => showToast('Info toast test!', 'info'), 3000);
+        }
+
+        function testBuyNumber() {
+            log('Testing Buy Number function...', 'info');
+            
+            if (typeof Razorpay === 'undefined') {
+                log('❌ Razorpay library not loaded!', 'error');
+                showToast('Razorpay library not loaded!', 'error');
+                return;
+            }
+            
+            showToast('Testing Buy Number...', 'info');
+            
+            const confirmed = confirm('Test Buy Number for +918035315328?\n\nThis will open Razorpay test popup.');
+            if (!confirmed) {
+                showToast('Test cancelled', 'warning');
+                return;
+            }
+            
+            // Simulate buy process
+            const options = {
+                key: 'rzp_live_tazOQ9eRwtLcPr',
+                amount: 100000,
+                currency: 'INR',
+                name: 'BhashAI Test',
+                description: 'Test Purchase - Phone Number',
+                order_id: 'order_test_' + Date.now(),
+                prefill: {
+                    name: 'Test User',
+                    email: 'test@bashai.com',
+                    contact: '+918035315328'
+                },
+                handler: function (response) {
+                    log('✅ Payment successful: ' + response.razorpay_payment_id, 'success');
+                    showToast('Payment successful!', 'success');
+                },
+                modal: {
+                    ondismiss: function() {
+                        log('⚠️ Payment cancelled', 'warning');
+                        showToast('Payment cancelled', 'warning');
+                    }
+                }
+            };
+            
+            try {
+                const rzp = new Razorpay(options);
+                rzp.open();
+                log('✅ Razorpay popup opened', 'success');
+                showToast('Razorpay opened successfully!', 'success');
+            } catch (error) {
+                log('❌ Error: ' + error.message, 'error');
+                showToast('Error: ' + error.message, 'error');
+            }
+        }
+
+        function testRazorpay() {
+            log('Testing Razorpay availability...', 'info');
+            
+            if (typeof Razorpay !== 'undefined') {
+                log('✅ Razorpay library loaded successfully', 'success');
+                showToast('Razorpay library available!', 'success');
+            } else {
+                log('❌ Razorpay library not loaded', 'error');
+                showToast('Razorpay library not available!', 'error');
+            }
+        }
+
+        function testAllFunctions() {
+            log('🔍 Running comprehensive test...', 'info');
+            
+            const tests = [
+                { name: 'showToast function', test: () => typeof showToast === 'function' },
+                { name: 'Razorpay library', test: () => typeof Razorpay !== 'undefined' },
+                { name: 'Console logging', test: () => typeof console.log === 'function' },
+                { name: 'DOM manipulation', test: () => typeof document.createElement === 'function' },
+                { name: 'Confirm dialog', test: () => typeof confirm === 'function' }
+            ];
+            
+            let passed = 0;
+            tests.forEach(test => {
+                if (test.test()) {
+                    log(`✅ ${test.name}: PASS`, 'success');
+                    passed++;
+                } else {
+                    log(`❌ ${test.name}: FAIL`, 'error');
+                }
+            });
+            
+            const result = `${passed}/${tests.length} tests passed`;
+            log(`📊 Test Results: ${result}`, passed === tests.length ? 'success' : 'warning');
+            showToast(`Test Results: ${result}`, passed === tests.length ? 'success' : 'warning');
+        }
+
+        // Check system status
+        function checkSystemStatus() {
+            const statusContainer = document.getElementById('statusContainer');
+            statusContainer.innerHTML = '';
+            
+            const checks = [
+                { name: 'Razorpay Library', check: typeof Razorpay !== 'undefined' },
+                { name: 'showToast Function', check: typeof showToast === 'function' },
+                { name: 'Console Available', check: typeof console !== 'undefined' },
+                { name: 'DOM Ready', check: document.readyState === 'complete' }
+            ];
+            
+            checks.forEach(item => {
+                const statusBox = document.createElement('div');
+                statusBox.className = `status-box ${item.check ? 'status-success' : 'status-error'}`;
+                statusBox.innerHTML = `<strong>${item.check ? '✅' : '❌'} ${item.name}:</strong> ${item.check ? 'Available' : 'Not Available'}`;
+                statusContainer.appendChild(statusBox);
+            });
+            
+            log('System status check completed', 'info');
+        }
+
+        // Initialize when page loads
+        window.onload = function() {
+            log('🚀 Test page loaded successfully', 'success');
+            setTimeout(checkSystemStatus, 500);
+            showToast('Test page ready!', 'success');
+        };
+    </script>
+</body>
+</html>

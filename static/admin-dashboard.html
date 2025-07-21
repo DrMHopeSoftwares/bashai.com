@@ -112,6 +112,32 @@
             box-shadow: var(--shadow-lg);
             transform: translateY(-2px);
         }
+
+        .main-content {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        /* Navigation Menu Styles */
+        .nav-item {
+            color: var(--gray-600);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            color: var(--primary);
+            background-color: var(--gray-100);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            background-color: var(--gray-100);
+            font-weight: 600;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -123,22 +149,32 @@
         </div>
     </div>
 
+
+
     <!-- Main Dashboard -->
     <div id="dashboardContent" class="hidden">
         <!-- Header -->
-        <header class="bg-white shadow-sm border-b">
+        <header class="bg-white shadow-sm border-b main-content">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
                     <div class="flex items-center">
-                        <h1 class="text-2xl font-bold text-gray-900">SuperAdmin Dashboard</h1>
+                        <h1 class="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
                         <span class="ml-3 px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">ADMIN</span>
                     </div>
+
+                    <!-- Navigation Menu -->
+                    <nav class="flex items-center space-x-6">
+                        <a href="#dashboard" class="nav-item active" data-section="dashboard">Dashboard</a>
+                        <a href="#enterprises" class="nav-item" data-section="enterprises">Enterprises</a>
+                        <a href="#users" class="nav-item" data-section="users">Users</a>
+                        <a href="#analytics" class="nav-item" data-section="analytics">Analytics</a>
+                        <a href="#settings" class="nav-item" data-section="settings">Settings</a>
+                    </nav>
+
                     <div class="flex items-center space-x-4">
+                        <a href="/dashboard.html" class="text-blue-600 hover:text-blue-800">User Dashboard</a>
                         <span id="userEmail" class="text-gray-700"></span>
-                        <button onclick="window.location.href='/dashboard.html'" class="text-blue-600 hover:text-blue-700 px-3 py-1 rounded border border-blue-200 hover:bg-blue-50">
-                            User Dashboard
-                        </button>
-                        <button id="signOutBtn" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                        <button id="signOutBtn" onclick="handleSignOut()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors cursor-pointer">
                             Sign Out
                         </button>
                     </div>
@@ -147,23 +183,25 @@
         </header>
 
         <!-- Main Content -->
-        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <main class="main-content max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
             <div class="px-4 py-6 sm:px-0">
-                
-                <!-- Admin Welcome Section -->
-                <div class="admin-header mb-8">
-                    <div class="relative z-10">
-                        <div class="flex items-center mb-4">
-                            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mr-4">
-                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                                </svg>
+
+                <!-- Dashboard Section -->
+                <div id="dashboardSection">
+                    <!-- Admin Welcome Section -->
+                    <div class="admin-header mb-8">
+                        <div class="relative z-10">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mr-4">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                    </svg>
+                                </div>
+                                <h2 class="text-3xl font-bold">Dashboard Overview</h2>
                             </div>
-                            <h2 class="text-3xl font-bold">Enterprise Management</h2>
+                            <p class="text-white/90 text-lg font-medium">Welcome to the admin dashboard. Manage enterprises, users, and system settings.</p>
                         </div>
-                        <p class="text-white/90 text-lg font-medium">Create and manage enterprises. Each enterprise contains multiple organizations with their own channels and voice agents.</p>
                     </div>
-                </div>
 
                 <!-- Stats Overview -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -223,32 +261,204 @@
                         </div>
                     </div>
                 </div>
+                </div>
 
-                <!-- Enterprise Management Section -->
-                <div class="card mb-8" style="padding: 32px;">
-                    <div class="flex items-center justify-between mb-8">
-                        <div class="flex items-center">
-                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                                </svg>
+                <!-- Enterprises Section -->
+                <div id="enterprisesSection" style="display: none;">
+                    <div class="admin-header mb-8">
+                        <div class="relative z-10">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mr-4">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                    </svg>
+                                </div>
+                                <h2 class="text-3xl font-bold">Enterprise Management</h2>
                             </div>
-                            <div>
-                                <h2 class="text-2xl font-bold">Enterprise Management</h2>
-                                <p class="text-gray-600 font-medium">Create and manage top-level enterprises. Each enterprise can contain multiple organizations.</p>
-                            </div>
+                            <p class="text-white/90 text-lg font-medium">Create and manage top-level enterprises. Each enterprise can contain multiple organizations.</p>
                         </div>
-                        <button id="createEnterpriseBtn" class="btn btn-primary" style="padding: 12px 24px; font-size: 15px;">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            Create Enterprise
-                        </button>
                     </div>
 
-                    <!-- Enterprises List -->
-                    <div id="enterprisesList" class="space-y-4">
-                        <!-- Enterprises will be loaded here -->
+                    <!-- Enterprise Management Section -->
+                    <div class="card mb-8" style="padding: 32px;">
+                        <div class="flex items-center justify-between mb-8">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-2xl font-bold">Enterprise Management</h2>
+                                    <p class="text-gray-600 font-medium">Create and manage top-level enterprises. Each enterprise can contain multiple organizations.</p>
+                                </div>
+                            </div>
+                            <button id="createEnterpriseBtn" class="btn btn-primary" style="padding: 12px 24px; font-size: 15px;">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Create Enterprise
+                            </button>
+                        </div>
+
+                        <!-- Enterprises List -->
+                        <div id="enterprisesList" class="space-y-4">
+                            <!-- Enterprises will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Section -->
+                <div id="usersSection" style="display: none;">
+                    <div class="admin-header mb-8">
+                        <div class="relative z-10">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mr-4">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                                    </svg>
+                                </div>
+                                <h2 class="text-3xl font-bold">User Management</h2>
+                            </div>
+                            <p class="text-white/90 text-lg font-medium">Manage all users across all enterprises and organizations.</p>
+                        </div>
+                    </div>
+
+                    <!-- Users Management Section -->
+                    <div class="card mb-8" style="padding: 32px;">
+                        <div class="flex items-center justify-between mb-8">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-2xl font-bold">All Users</h2>
+                                    <p class="text-gray-600 font-medium">View and manage all users in the system</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Users List -->
+                        <div id="usersList" class="space-y-4">
+                            <!-- Users will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Section -->
+                <div id="analyticsSection" style="display: none;">
+                    <div class="admin-header mb-8">
+                        <div class="relative z-10">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mr-4">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    </svg>
+                                </div>
+                                <h2 class="text-3xl font-bold">Analytics & Reports</h2>
+                            </div>
+                            <p class="text-white/90 text-lg font-medium">View system analytics and generate comprehensive reports.</p>
+                        </div>
+                    </div>
+
+                    <div class="card mb-8" style="padding: 32px;">
+                        <div class="flex items-center justify-between mb-8">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
+                                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-2xl font-bold">Analytics Dashboard</h2>
+                                    <p class="text-gray-600 font-medium">View system analytics and generate reports</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h4 class="font-semibold text-blue-900 mb-2">Enterprise Growth</h4>
+                                <p class="text-blue-700">Track enterprise registration trends over time</p>
+                                <div class="mt-4 h-32 bg-blue-100 rounded flex items-center justify-center">
+                                    <span class="text-blue-600">Chart will be implemented</span>
+                                </div>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <h4 class="font-semibold text-green-900 mb-2">User Activity</h4>
+                                <p class="text-green-700">Monitor user engagement and activity patterns</p>
+                                <div class="mt-4 h-32 bg-green-100 rounded flex items-center justify-center">
+                                    <span class="text-green-600">Chart will be implemented</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Section -->
+                <div id="settingsSection" style="display: none;">
+                    <div class="admin-header mb-8">
+                        <div class="relative z-10">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mr-4">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                </div>
+                                <h2 class="text-3xl font-bold">System Settings</h2>
+                            </div>
+                            <p class="text-white/90 text-lg font-medium">Configure system-wide settings and preferences.</p>
+                        </div>
+                    </div>
+
+                    <div class="card mb-8" style="padding: 32px;">
+                        <div class="flex items-center justify-between mb-8">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mr-4">
+                                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-2xl font-bold">System Configuration</h2>
+                                    <p class="text-gray-600 font-medium">Manage system-wide settings and configurations</p>
+                                </div>
+                            </div>
+                            <button onclick="openModal('systemSettingsModal')" class="btn btn-primary">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                                Edit Settings
+                            </button>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-3 border rounded-lg">
+                                <div>
+                                    <p class="font-medium">Trial Period Duration</p>
+                                    <p class="text-sm text-gray-600">Default trial period for new enterprises</p>
+                                </div>
+                                <span class="text-gray-900 font-medium">14 days</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 border rounded-lg">
+                                <div>
+                                    <p class="font-medium">Auto-approve Enterprises</p>
+                                    <p class="text-sm text-gray-600">Automatically approve new enterprise registrations</p>
+                                </div>
+                                <span class="text-green-600 font-medium">Enabled</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 border rounded-lg">
+                                <div>
+                                    <p class="font-medium">System Maintenance Mode</p>
+                                    <p class="text-sm text-gray-600">Enable maintenance mode for system updates</p>
+                                </div>
+                                <span class="text-red-600 font-medium">Disabled</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -348,7 +558,14 @@
         </div>
     </div>
 
-    <!-- JWT Authentication - No external scripts needed -->
+    <!-- Clerk Script -->
+    <script
+        async
+        crossorigin="anonymous"
+        data-clerk-publishable-key="pk_live_Y2xlcmsuYmhhc2hhaS5jb20k"
+        src="https://unpkg.com/@clerk/clerk-js@latest/dist/clerk.browser.js"
+        onload="window.Clerk?.load()"
+    ></script>
 
     <script>
         let currentUser = null;
@@ -1025,29 +1242,49 @@
             }
         }
 
-        async function handleSignOut() {
+        // Make handleSignOut globally available
+        window.handleSignOut = async function() {
             try {
+                console.log('🔓 Starting logout process...');
+                alert('Logout button clicked!'); // Debug alert
+
                 // Call logout API
                 const token = localStorage.getItem('auth_token');
+                console.log('🔑 Token found:', token ? 'Yes' : 'No');
+
                 if (token) {
-                    await fetch('/api/auth/logout', {
+                    console.log('📡 Calling logout API...');
+                    const response = await fetch('/api/auth/logout', {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${token}`,
                             'Content-Type': 'application/json'
                         }
                     });
+                    console.log('📡 Logout API response:', response.status);
                 }
 
                 // Clear local storage
+                console.log('🧹 Clearing local storage...');
                 localStorage.removeItem('auth_token');
+                localStorage.clear(); // Clear all local storage
 
+                // Clear session storage as well
+                sessionStorage.clear();
+
+                console.log('🔄 Redirecting to login page...');
                 // Redirect to login
                 window.location.href = '/login';
+
             } catch (error) {
-                console.error('Error signing out:', error);
+                console.error('❌ Error signing out:', error);
                 // Still redirect even if logout API fails
+                console.log('🧹 Clearing storage due to error...');
                 localStorage.removeItem('auth_token');
+                localStorage.clear();
+                sessionStorage.clear();
+
+                console.log('🔄 Force redirecting to login...');
                 window.location.href = '/login';
             }
         }
@@ -1090,14 +1327,9 @@
                         errorMessage = errorText;
                     }
                     
-                    // Specific handling for JWT token errors
-                    if (errorText.includes('Invalid token') || errorText.includes('Authentication required')) {
-                        errorMessage = `Authentication Error: ${errorMessage}\n\nYour session has expired. Please login again.`;
-                        // Redirect to login on auth errors
-                        setTimeout(() => {
-                            localStorage.removeItem('auth_token');
-                            window.location.href = '/login';
-                        }, 2000);
+                    // Specific handling for Clerk token errors
+                    if (errorText.includes('Invalid token') || errorText.includes('authorized party')) {
+                        errorMessage = `Authentication Error: ${errorMessage}\n\nThis appears to be a Clerk configuration issue. Please check:\n1. Domain is added to Clerk allowed origins\n2. Correct publishable key is being used\n3. Production vs test environment settings`;
                     }
                     
                     throw new Error(errorMessage);
@@ -1111,6 +1343,97 @@
                 throw error;
             }
         }
+
+        // Navigation functionality
+        function initializeNavigation() {
+            const navItems = document.querySelectorAll('.nav-item[data-section]');
+
+            // Navigation items
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+
+                    // Remove active class from all items
+                    navItems.forEach(navItem => {
+                        navItem.classList.remove('active');
+                    });
+
+                    // Add active class to clicked item
+                    item.classList.add('active');
+
+                    // Get section name
+                    const section = item.getAttribute('data-section');
+
+                    // Handle section switching
+                    switchSection(section);
+                });
+            });
+        }
+
+        function switchSection(section) {
+            console.log(`Switching to section: ${section}`);
+
+            // Hide all sections first
+            const sections = ['dashboard', 'enterprises', 'users', 'analytics', 'settings'];
+            sections.forEach(s => {
+                const element = document.getElementById(`${s}Section`);
+                if (element) {
+                    element.style.display = 'none';
+                }
+            });
+
+            // Show the selected section
+            const targetSection = document.getElementById(`${section}Section`);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+            } else {
+                // If section doesn't exist, show dashboard
+                const dashboardSection = document.getElementById('dashboardSection');
+                if (dashboardSection) {
+                    dashboardSection.style.display = 'block';
+                }
+            }
+
+            // Load section-specific data
+            switch(section) {
+                case 'dashboard':
+                    loadDashboardData();
+                    break;
+                case 'enterprises':
+                    loadEnterprises();
+                    break;
+                case 'users':
+                    loadAllUsers();
+                    break;
+                case 'analytics':
+                    loadAnalytics();
+                    break;
+                case 'settings':
+                    loadSettings();
+                    break;
+            }
+        }
+
+        function loadAnalytics() {
+            console.log('Loading analytics...');
+            // Placeholder for analytics functionality
+        }
+
+        function loadSettings() {
+            console.log('Loading settings...');
+            // Placeholder for settings functionality
+        }
+
+        function loadDashboardData() {
+            // Load all dashboard data
+            loadEnterprises();
+            loadAllUsers();
+        }
+
+        // Initialize navigation when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeNavigation();
+        });
     </script>
 </body>
 </html>

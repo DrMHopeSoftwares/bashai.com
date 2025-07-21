@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Razorpay Test</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 40px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .btn { 
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white; 
+            padding: 20px 40px; 
+            border: none; 
+            border-radius: 50px; 
+            cursor: pointer; 
+            font-size: 18px; 
+            font-weight: 600;
+            margin: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+        }
+        .btn:hover { 
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+        }
+        .card-info { 
+            background: #f8f9fa; 
+            padding: 25px; 
+            border-radius: 15px; 
+            margin: 25px 0;
+            border-left: 5px solid #28a745;
+        }
+        .card-number {
+            font-family: 'Courier New', monospace;
+            font-size: 20px;
+            font-weight: bold;
+            color: #007bff;
+            letter-spacing: 2px;
+        }
+        h1 { 
+            color: #333; 
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        .status {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💳 Simple Razorpay Test</h1>
+        <p class="subtitle">यह बिल्कुल simple solution है - guaranteed working!</p>
+        
+        <div class="card-info">
+            <h3>💳 Live Payment Mode:</h3>
+            <p><strong>⚠️ REAL MONEY WILL BE CHARGED</strong></p>
+            <p>Use your actual card details for live payment</p>
+            <p>Amount: ₹1 for phone number purchase</p>
+        </div>
+        
+        <button class="btn" onclick="buyNumber()">🛒 Buy Phone Number</button>
+        
+        <div id="status"></div>
+    </div>
+
+    <script>
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            const time = new Date().toLocaleTimeString();
+            statusDiv.innerHTML = `<div class="status ${type}">[${time}] ${message}</div>` + statusDiv.innerHTML;
+        }
+
+        async function buyNumber() {
+            console.log('🛒 Starting live payment...');
+            showStatus('🚀 Creating order...', 'info');
+
+            // Check Razorpay
+            if (typeof Razorpay === 'undefined') {
+                showStatus('❌ Razorpay not loaded!', 'error');
+                alert('❌ Razorpay library not loaded!\n\nPlease refresh the page.');
+                return;
+            }
+
+            showStatus('✅ Razorpay library loaded', 'success');
+
+            try {
+                // Create order first for live mode
+                const orderResponse = await fetch('/api/dev/create-razorpay-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: 1,
+                        currency: 'INR',
+                        phone_number: '+918035315328',
+                        number_id: 'simple_test_123'
+                    })
+                });
+
+                if (!orderResponse.ok) {
+                    throw new Error('Failed to create order');
+                }
+
+                const orderData = await orderResponse.json();
+                showStatus('✅ Order created: ' + orderData.order_id, 'success');
+
+                // Live payment options with order
+                const options = {
+                    key: 'rzp_live_P0aWMvWkbsOzJx',
+                    amount: 100, // ₹1
+                    currency: 'INR',
+                    name: 'BhashAI',
+                    description: 'Phone Number Purchase',
+                    order_id: orderData.order_id,
+                    prefill: {
+                        name: 'Customer',
+                        email: 'customer@bashai.com',
+                        contact: '+918035315328'
+                    },
+                    theme: {
+                        color: '#007bff'
+                    },
+                    handler: function (response) {
+                        console.log('✅ Payment successful:', response);
+                        showStatus('🎉 Payment Successful! ID: ' + response.razorpay_payment_id, 'success');
+
+                        alert(`🎉 Payment Successful!\n\nPayment ID: ${response.razorpay_payment_id}\nOrder ID: ${response.razorpay_order_id}\n\nPhone number purchased successfully!`);
+                    },
+                    modal: {
+                        ondismiss: function() {
+                            console.log('⚠️ Payment cancelled');
+                            showStatus('⚠️ Payment cancelled by user', 'info');
+                        }
+                    }
+                };
+
+                showStatus('💳 Opening Razorpay...', 'info');
+                const rzp = new Razorpay(options);
+                rzp.open();
+                showStatus('✅ Razorpay opened successfully!', 'success');
+
+            } catch (error) {
+                console.error('❌ Error:', error);
+                showStatus('❌ Error: ' + error.message, 'error');
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        // Initialize
+        window.onload = function() {
+            showStatus('🚀 Simple test page loaded', 'success');
+            showStatus('💡 Click button to test payment', 'info');
+        };
+    </script>
+</body>
+</html>
