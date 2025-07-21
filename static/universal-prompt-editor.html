@@ -44,10 +44,7 @@
                     <label for="Organization" class="block font-medium mb-1">Enterprise</label>
                     <select id="Organization" onchange="loadOrganizationAgents()" class="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary">
                         <option value="">Select Organization</option>
-                        <option value="org_hope">Hope Hospital</option>
-                        <option value="org_city_clinic">City Clinic</option>
-                        <option value="org_wellness">Wellness Center</option>
-                        <option value="org_medicare">Medicare Solutions</option>
+                        <!-- Options will be populated dynamically -->
                     </select>
                 </div>
                 <div>
@@ -140,25 +137,42 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ...existing code...
+  // Initialize Supabase client
+  const SUPABASE_URL = 'https://ymvfueudlippmfeqdqro.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdmZ1ZXVkbGlwcG1mZXFkcXJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIyMzUwMjcsImV4cCI6MjA2NzgxMTAyN30.tXWFK6xPhZzRF0v5AQxeKqmTS-piaIL6aT4s0o-b5aY';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-function showAgentDetails() {
-    document.getElementById('promptModal').classList.remove('hidden');
-}
+  async function loadOrganizations() {
+    const dropdown = document.getElementById('Organization');
+    // Prevent reloading if already loaded
+    if (dropdown.options.length > 1) return;
 
-function closePromptModal() {
-    document.getElementById('promptModal').classList.add('hidden');
-}
+    const { data, error } = await supabase
+      .from('organizations')
+      .select('id, name')
+      .order('name', { ascending: true });
 
-// Optional: Handle form submission
-document.getElementById('promptForm').onsubmit = function(e) {
-    e.preventDefault();
-    // You can add logic here to save the welcome message and prompt field
-    closePromptModal();
-};
+    if (error) {
+      alert('Failed to load organizations');
+      return;
+    }
+
+    // Remove existing options except the first
+    dropdown.length = 1;
+
+    data.forEach(org => {
+      const option = document.createElement('option');
+      option.value = org.id;
+      option.textContent = org.name;
+      dropdown.appendChild(option);
+    });
+  }
+
+  // Load organizations when the dropdown is clicked
+  document.getElementById('Organization').addEventListener('click', loadOrganizations);
 </script>
-<!-- ...existing code... -->
 
 
 </body>
