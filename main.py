@@ -4054,6 +4054,22 @@ def serve_voice_technology_selector():
     """Serve Voice Technology Selector page"""
     return send_from_directory(app.static_folder, 'voice_technology_selector.html')
 
+@app.route('/voice-samples.html')
+def serve_voice_samples():
+    """Serve Voice Samples page"""
+    return send_from_directory(app.static_folder, 'voice-samples.html')
+
+@app.route('/features.html')
+def serve_features():
+    """Serve Features page"""
+    return send_from_directory(app.static_folder, 'features.html')
+
+@app.route('/coming-soon.html')
+@app.route('/mobile-app.html')
+def serve_mobile_app():
+    """Serve Mobile App Coming Soon page"""
+    return send_from_directory(app.static_folder, 'coming-soon.html')
+
 # OpenAI Realtime Phone Call API Endpoints
 @app.route('/api/realtime/make-call', methods=['POST'])
 @login_required

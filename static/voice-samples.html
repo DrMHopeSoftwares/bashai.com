@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Voice Samples - BhashAI | Listen to Multilingual AI Conversations</title>
+    <meta name="description" content="Listen to BhashAI's AI voice agents in action. Experience natural conversations in Hindi, English, Tamil, Telugu, Bengali, and 20+ Indian languages.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+        
+        .voice-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .voice-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .play-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .play-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .waveform {
+            height: 60px;
+            background: linear-gradient(90deg, #4f46e5, #7c3aed, #4f46e5);
+            background-size: 200% 100%;
+            animation: waveAnimation 2s ease-in-out infinite;
+            border-radius: 30px;
+            opacity: 0.3;
+        }
+        
+        @keyframes waveAnimation {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .playing .waveform {
+            opacity: 1;
+            animation-duration: 0.5s;
+        }
+        
+        .language-flag {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .demo-scenarios {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+        
+        .scenario-btn {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+        }
+        
+        .scenario-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+        }
+        
+        .scenario-btn.active {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-indigo-600">BhashAI</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-gray-600 hover:text-indigo-600">Home</a>
+                    <a href="/dashboard.html" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-indigo-600 to-purple-700 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-5xl font-bold mb-6">🎙️ AI Voice Samples</h1>
+            <p class="text-xl mb-8 max-w-3xl mx-auto">
+                Experience the power of BhashAI's multilingual voice agents. Listen to natural conversations 
+                in Hindi, English, and 20+ Indian languages across different business scenarios.
+            </p>
+            <div class="flex justify-center items-center space-x-4 text-lg">
+                <span>🌟 Natural Conversations</span>
+                <span>•</span>
+                <span>🗣️ 20+ Languages</span>
+                <span>•</span>
+                <span>⚡ Real-time AI</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Scenarios -->
+    <section class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="demo-scenarios">
+                <h2 class="text-3xl font-bold text-center mb-8">🎯 Choose a Demo Scenario</h2>
+                <div class="text-center">
+                    <button class="scenario-btn active" onclick="selectScenario('customer-support')">
+                        📞 Customer Support
+                    </button>
+                    <button class="scenario-btn" onclick="selectScenario('sales-inquiry')">
+                        💼 Sales Inquiry
+                    </button>
+                    <button class="scenario-btn" onclick="selectScenario('appointment-booking')">
+                        📅 Appointment Booking
+                    </button>
+                    <button class="scenario-btn" onclick="selectScenario('order-tracking')">
+                        📦 Order Tracking
+                    </button>
+                    <button class="scenario-btn" onclick="selectScenario('payment-assistance')">
+                        💳 Payment Assistance
+                    </button>
+                </div>
+                <div id="scenario-description" class="mt-6 p-4 bg-gray-50 rounded-lg">
+                    <p class="text-gray-700">
+                        <strong>Customer Support Scenario:</strong> Listen to how our AI handles customer queries, 
+                        provides solutions, and maintains a helpful, professional tone across different languages.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Voice Samples Grid -->
+    <section class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center mb-12">🌍 Multilingual Voice Samples</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="voice-samples-grid">
+                <!-- Voice samples will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Features -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center mb-12">🚀 Voice Technology Features</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="text-center p-6">
+                    <div class="text-4xl mb-4">🎯</div>
+                    <h3 class="text-xl font-semibold mb-2">Natural Conversations</h3>
+                    <p class="text-gray-600">Human-like interactions with context awareness and emotional intelligence</p>
+                </div>
+                
+                <div class="text-center p-6">
+                    <div class="text-4xl mb-4">⚡</div>
+                    <h3 class="text-xl font-semibold mb-2">Real-time Processing</h3>
+                    <p class="text-gray-600">Ultra-low latency responses for seamless conversation flow</p>
+                </div>
+                
+                <div class="text-center p-6">
+                    <div class="text-4xl mb-4">🌐</div>
+                    <h3 class="text-xl font-semibold mb-2">Multilingual Support</h3>
+                    <p class="text-gray-600">20+ Indian languages with accent and dialect recognition</p>
+                </div>
+                
+                <div class="text-center p-6">
+                    <div class="text-4xl mb-4">🔧</div>
+                    <h3 class="text-xl font-semibold mb-2">Easy Integration</h3>
+                    <p class="text-gray-600">Simple APIs for WhatsApp, CRM, and call center systems</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 bg-gradient-to-br from-indigo-600 to-purple-700 text-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl font-bold mb-6">Ready to Experience BhashAI?</h2>
+            <p class="text-xl mb-8">
+                Start your free trial today and see how AI voice agents can transform your business operations.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/dashboard.html" class="bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                    🚀 Start Free Trial
+                </a>
+                <a href="/book-demo.html" class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-indigo-600 transition-colors">
+                    📞 Book a Demo
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">BhashAI</h3>
+                    <p class="text-gray-400">India's first regional language AI voice agent platform</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Platform</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="/dashboard.html" class="hover:text-white">Dashboard</a></li>
+                        <li><a href="/voice-samples.html" class="hover:text-white">Voice Samples</a></li>
+                        <li><a href="/book-demo.html" class="hover:text-white">Book Demo</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">Documentation</a></li>
+                        <li><a href="#" class="hover:text-white">API Reference</a></li>
+                        <li><a href="#" class="hover:text-white">Contact Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Connect</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">Twitter</a></li>
+                        <li><a href="#" class="hover:text-white">LinkedIn</a></li>
+                        <li><a href="#" class="hover:text-white">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 BhashAI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Voice samples data
+        const voiceSamples = {
+            'customer-support': [
+                {
+                    language: 'Hindi',
+                    flag: '🇮🇳',
+                    nativeName: 'हिंदी',
+                    sample: 'Namaste! Main aapki customer support assistant hun. Aap kaise madad kar sakti hun?',
+                    translation: 'Hello! I am your customer support assistant. How can I help you?',
+                    audioUrl: '/audio/hindi-customer-support.mp3'
+                },
+                {
+                    language: 'English',
+                    flag: '🇬🇧',
+                    nativeName: 'English',
+                    sample: 'Hello! I\'m your AI customer support assistant. How can I help you today?',
+                    translation: '',
+                    audioUrl: '/audio/english-customer-support.mp3'
+                },
+                {
+                    language: 'Tamil',
+                    flag: '🇮🇳',
+                    nativeName: 'தமிழ்',
+                    sample: 'Vanakkam! Naan ungal customer support assistant. Eppadiyaavadhu ungalukku uthavi seiya mudiyum?',
+                    translation: 'Hello! I am your customer support assistant. How can I help you?',
+                    audioUrl: '/audio/tamil-customer-support.mp3'
+                },
+                {
+                    language: 'Telugu',
+                    flag: '🇮🇳',
+                    nativeName: 'తెలుగు',
+                    sample: 'Namaskaram! Nenu mee customer support assistant. Meeku ela sahayam cheyagalanu?',
+                    translation: 'Hello! I am your customer support assistant. How can I help you?',
+                    audioUrl: '/audio/telugu-customer-support.mp3'
+                },
+                {
+                    language: 'Bengali',
+                    flag: '🇮🇳',
+                    nativeName: 'বাংলা',
+                    sample: 'Namaskar! Ami apnar customer support assistant. Apnake kivabe sahajyo korte pari?',
+                    translation: 'Hello! I am your customer support assistant. How can I help you?',
+                    audioUrl: '/audio/bengali-customer-support.mp3'
+                },
+                {
+                    language: 'Marathi',
+                    flag: '🇮🇳',
+                    nativeName: 'मराठी',
+                    sample: 'Namaskar! Mi tumchi customer support assistant aahe. Tumhala kashi madad karu shakto?',
+                    translation: 'Hello! I am your customer support assistant. How can I help you?',
+                    audioUrl: '/audio/marathi-customer-support.mp3'
+                }
+            ]
+        };
+
+        let currentScenario = 'customer-support';
+        let currentlyPlaying = null;
+
+        function selectScenario(scenario) {
+            currentScenario = scenario;
+            
+            // Update active button
+            document.querySelectorAll('.scenario-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update description
+            const descriptions = {
+                'customer-support': 'Customer Support Scenario: Listen to how our AI handles customer queries, provides solutions, and maintains a helpful, professional tone across different languages.',
+                'sales-inquiry': 'Sales Inquiry Scenario: Experience how our AI engages with potential customers, answers product questions, and guides them through the sales process.',
+                'appointment-booking': 'Appointment Booking Scenario: See how our AI efficiently schedules appointments, manages calendars, and confirms bookings with customers.',
+                'order-tracking': 'Order Tracking Scenario: Listen to how our AI helps customers track their orders, provides shipping updates, and resolves delivery concerns.',
+                'payment-assistance': 'Payment Assistance Scenario: Experience how our AI guides customers through payment processes, resolves billing issues, and ensures secure transactions.'
+            };
+            
+            document.getElementById('scenario-description').innerHTML = `
+                <p class="text-gray-700"><strong>${descriptions[scenario]}</strong></p>
+            `;
+            
+            // Refresh voice samples
+            renderVoiceSamples();
+        }
+
+        function renderVoiceSamples() {
+            const grid = document.getElementById('voice-samples-grid');
+            const samples = voiceSamples[currentScenario] || voiceSamples['customer-support'];
+            
+            grid.innerHTML = samples.map((sample, index) => `
+                <div class="voice-card bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                    <div class="text-center mb-4">
+                        <div class="language-flag">${sample.flag}</div>
+                        <h3 class="text-xl font-semibold text-gray-800">${sample.language}</h3>
+                        <p class="text-sm text-gray-500">${sample.nativeName}</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="waveform mb-3" id="waveform-${index}"></div>
+                        <p class="text-gray-700 font-medium mb-2">"${sample.sample}"</p>
+                        ${sample.translation ? `<p class="text-sm text-gray-500 italic">${sample.translation}</p>` : ''}
+                    </div>
+                    
+                    <div class="text-center">
+                        <button class="play-btn bg-indigo-600 text-white px-6 py-3 rounded-full hover:bg-indigo-700 transition-colors flex items-center justify-center mx-auto" onclick="playVoiceSample(${index})">
+                            <i class="fas fa-play mr-2" id="play-icon-${index}"></i>
+                            <span id="play-text-${index}">Play Sample</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function playVoiceSample(index) {
+            const playIcon = document.getElementById(`play-icon-${index}`);
+            const playText = document.getElementById(`play-text-${index}`);
+            const waveform = document.getElementById(`waveform-${index}`);
+            const card = waveform.closest('.voice-card');
+            
+            // Stop any currently playing sample
+            if (currentlyPlaying !== null && currentlyPlaying !== index) {
+                stopVoiceSample(currentlyPlaying);
+            }
+            
+            if (currentlyPlaying === index) {
+                // Stop current sample
+                stopVoiceSample(index);
+                return;
+            }
+            
+            // Start playing
+            currentlyPlaying = index;
+            playIcon.className = 'fas fa-pause mr-2';
+            playText.textContent = 'Playing...';
+            card.classList.add('playing');
+            
+            // Simulate audio playback (replace with actual audio implementation)
+            setTimeout(() => {
+                stopVoiceSample(index);
+            }, 3000); // 3 second demo
+            
+            // Show notification
+            showNotification(`Playing ${voiceSamples[currentScenario][index].language} voice sample`);
+        }
+
+        function stopVoiceSample(index) {
+            const playIcon = document.getElementById(`play-icon-${index}`);
+            const playText = document.getElementById(`play-text-${index}`);
+            const waveform = document.getElementById(`waveform-${index}`);
+            const card = waveform.closest('.voice-card');
+            
+            currentlyPlaying = null;
+            playIcon.className = 'fas fa-play mr-2';
+            playText.textContent = 'Play Sample';
+            card.classList.remove('playing');
+        }
+
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Hide notification
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            renderVoiceSamples();
+            showNotification('Welcome to BhashAI Voice Samples!');
+        });
+    </script>
+</body>
+</html>
