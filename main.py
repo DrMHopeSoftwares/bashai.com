@@ -4070,6 +4070,26 @@ def serve_mobile_app():
     """Serve Mobile App Coming Soon page"""
     return send_from_directory(app.static_folder, 'coming-soon.html')
 
+@app.route('/ai-voice.html')
+def serve_ai_voice():
+    """Serve AI Voice page"""
+    return send_from_directory(app.static_folder, 'ai-voice.html')
+
+@app.route('/cloud-tech.html')
+def serve_cloud_tech():
+    """Serve Cloud Tech page"""
+    return send_from_directory(app.static_folder, 'cloud-tech.html')
+
+@app.route('/enterprise-suite.html')
+def serve_enterprise_suite():
+    """Serve Enterprise Suite page"""
+    return send_from_directory(app.static_folder, 'enterprise-suite.html')
+
+@app.route('/business-hub.html')
+def serve_business_hub():
+    """Serve Business Hub page"""
+    return send_from_directory(app.static_folder, 'business-hub.html')
+
 # OpenAI Realtime Phone Call API Endpoints
 @app.route('/api/realtime/make-call', methods=['POST'])
 @login_required
