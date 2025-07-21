@@ -24,7 +24,7 @@
 
 2. **Import Project:**
    - Click "New Project"
-   - Import your GitHub repository: `DrMHopeSoftwares/bhashai.com`
+   - Import your GitHub repository: `DrMHopeSoftwares/bashai.com`
    - Select the repository
 
 3. **Configure Build Settings:**

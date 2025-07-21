@@ -9,7 +9,7 @@ import sqlite3
 import os
 from datetime import datetime, timedelta
 from functools import wraps
-from flask import request, jsonify, session, current_app, g
+from flask import request, jsonify, session, current_app
 import secrets
 from dotenv import load_dotenv
 
@@ -298,10 +298,7 @@ def login_required(f):
         if user_data['status'] != 'active':
             return jsonify({'error': f'Account is {user_data["status"]}'}), 403
         
-        # Set user data in both request and g objects for compatibility
         request.current_user = user_data
-        g.user_id = user_data['user_id']
-        g.current_user = user_data
         return f(*args, **kwargs)
     
     return decorated_function

@@ -28,20 +28,26 @@ def get_enterprises():
         print(f"Get enterprises error: {e}")
         return jsonify({'message': 'Failed to get enterprises'}), 500
 
-@app.route('/api/organizations', methods=['GET'])
+@app.route('/api/enterprises/<enterprise_id>/organizations', methods=['GET'])
 @require_auth
-def get_all_organizations():
-    """Get all organizations (for super_admin or audit purposes)"""
+def get_organizations(enterprise_id):
+    """Get organizations for an enterprise"""
     try:
-        # For now, fetch all organizations. Consider adding role-based access control if this should be restricted.
-        organizations = supabase_request('GET', 'organizations?order=name.asc')
-        print(f"Organizations fetched from Supabase (all): {organizations}") # Debug log
+        user_id = g.user_id
+        
+        # Verify user has access to this enterprise
+        user = supabase_request('GET', f'users?id=eq.{user_id}&enterprise_id=eq.{enterprise_id}')
+        if not user or len(user) == 0:
+            return jsonify({'message': 'Access denied'}), 403
+        
+        # Get organizations for the enterprise
+        organizations = supabase_request('GET', f'organizations?enterprise_id=eq.{enterprise_id}&order=created_at.desc')
         
         return jsonify({'organizations': organizations}), 200
         
     except Exception as e:
-        print(f"Get all organizations error: {e}")
-        return jsonify({'message': 'Failed to get all organizations'}), 500
+        print(f"Get organizations error: {e}")
+        return jsonify({'message': 'Failed to get organizations'}), 500
 
 @app.route('/api/organizations', methods=['POST'])
 @require_auth
@@ -72,11 +78,9 @@ def create_organization():
             'description': data.get('description', ''),
             'type': data.get('type', 'general'),
             'status': 'active',
-            'enterprise_id': enterprise_id,
-            'user_id': user_id
+            'enterprise_id': enterprise_id
         }
         
-        print(f"Organization data being sent to Supabase: {org_data}") # Debug log
         organization = supabase_request('POST', 'organizations', data=org_data)
         
         if organization and len(organization) > 0:

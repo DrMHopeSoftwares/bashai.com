@@ -89,7 +89,7 @@ def manual_sql_instructions():
     print("   python populate_database_rest.py")
     print()
     print("📁 The SQL files are located in your project directory:")
-    print(f"   /Users/murali/bhashai.com for git push/bhashai.com/")
+    print(f"   /Users/murali/bhashai.com for git push/bashai.com/")
     print()
     print("=" * 60)
 
