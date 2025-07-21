@@ -4090,6 +4090,26 @@ def serve_business_hub():
     """Serve Business Hub page"""
     return send_from_directory(app.static_folder, 'business-hub.html')
 
+@app.route('/privacy-policy.html')
+def serve_privacy_policy():
+    """Serve Privacy Policy page"""
+    return send_from_directory(app.static_folder, 'privacy-policy.html')
+
+@app.route('/terms-conditions.html')
+def serve_terms_conditions():
+    """Serve Terms and Conditions page"""
+    return send_from_directory(app.static_folder, 'terms-conditions.html')
+
+@app.route('/cancellation-refund.html')
+def serve_cancellation_refund():
+    """Serve Cancellation and Refund Policy page"""
+    return send_from_directory(app.static_folder, 'cancellation-refund.html')
+
+@app.route('/shipping-delivery.html')
+def serve_shipping_delivery():
+    """Serve Shipping and Delivery Policy page"""
+    return send_from_directory(app.static_folder, 'shipping-delivery.html')
+
 # OpenAI Realtime Phone Call API Endpoints
 @app.route('/api/realtime/make-call', methods=['POST'])
 @login_required
