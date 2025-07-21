@@ -470,6 +470,10 @@
             <div class="mb-8">
                 <h2 class="text-xl font-bold text-gray-800 mb-4">Quick Actions</h2>
                 <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <button class="quick-action" onclick="window.location.href='/voice_technology_selector.html'">
+                        <i class="fas fa-microphone mr-2"></i>
+                        Choose Voice Technology
+                    </button>
                     <button class="quick-action" onclick="window.location.href='/agent-setup.html'">
                         <i class="fas fa-robot mr-2"></i>
                         Setup Voice Agent
@@ -695,10 +699,23 @@
                         <h2 class="text-2xl font-bold text-gray-800">Voice Agents Management</h2>
                         <p class="text-gray-600 mt-2">Manage AI voice assistants for this channel</p>
                     </div>
-                    <button onclick="addAgent()" class="btn btn-primary px-6 py-3">
-                        <i class="fas fa-plus mr-2"></i>
-                        Add Voice Agent
-                    </button>
+                    <div class="flex items-center space-x-3">
+                        <select id="voiceTechFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="filterAgentsByTechnology()">
+                            <option value="">All Technologies</option>
+                            <option value="elevenlabs">ElevenLabs</option>
+                            <option value="bolna">Bolna.com</option>
+                            <option value="relevanceai">RelevanceAI</option>
+                            <option value="openai">OpenAI Speech</option>
+                        </select>
+                        <button onclick="window.location.href='/voice_technology_selector.html'" class="btn btn-secondary px-4 py-2">
+                            <i class="fas fa-microphone mr-2"></i>
+                            Choose Technology
+                        </button>
+                        <button onclick="addAgent()" class="btn btn-primary px-6 py-3">
+                            <i class="fas fa-plus mr-2"></i>
+                            Add Voice Agent
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -2056,6 +2073,7 @@
                             <tr class="border-b border-gray-200">
                                 <th class="text-left py-3 px-4 font-semibold text-gray-700">Phone Number</th>
                                 <th class="text-left py-3 px-4 font-semibold text-gray-700">Provider</th>
+                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Voice Technology</th>
                                 <th class="text-left py-3 px-4 font-semibold text-gray-700">Country</th>
                                 <th class="text-left py-3 px-4 font-semibold text-gray-700">Capabilities</th>
                                 <th class="text-left py-3 px-4 font-semibold text-gray-700">Monthly Cost</th>
@@ -5028,7 +5046,31 @@
 
         // Agent Functions
         function addAgent() {
-            alert('Add voice agent modal would open here.');
+            // Check if user has selected a voice technology
+            const selectedTech = localStorage.getItem('selectedVoiceTechnology');
+            if (!selectedTech) {
+                if (confirm('You need to choose a voice technology first. Would you like to select one now?')) {
+                    window.location.href = '/voice_technology_selector.html';
+                    return;
+                }
+            }
+
+            // Redirect to appropriate agent creation page based on technology
+            const techUrls = {
+                'elevenlabs': '/create-agent-enhanced.html?provider=elevenlabs',
+                'bolna': '/agent-setup.html?provider=bolna',
+                'relevanceai': '/create-agent.html?provider=relevanceai',
+                'openai': '/realtime-voice-interface.html?provider=openai'
+            };
+
+            window.location.href = techUrls[selectedTech] || '/voice_technology_selector.html';
+        }
+
+        function filterAgentsByTechnology() {
+            const selectedTech = document.getElementById('voiceTechFilter').value;
+            console.log('Filtering agents by technology:', selectedTech);
+            // Implementation would filter the displayed agents
+            // This would be connected to your agent management system
         }
 
         function editAgent(agentId) {

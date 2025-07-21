@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Voice Technology - BhashAI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .tech-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .tech-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .tech-card.selected {
+            border-color: #6366f1;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen">
+    <div class="container mx-auto px-6 py-12">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">Choose Your AI Voice Technology</h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Select the best AI voice technology for your use case. Each provider offers unique capabilities and pricing.
+            </p>
+        </div>
+
+        <!-- Technology Selection Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            
+            <!-- 1. ElevenLabs -->
+            <div class="tech-card bg-white rounded-2xl p-8 border-2 border-gray-200" onclick="selectTechnology('elevenlabs')">
+                <div class="flex items-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mr-4">
+                        <i class="fas fa-microphone text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">ElevenLabs</h3>
+                        <p class="text-purple-600 font-medium">Premium Voice Synthesis</p>
+                    </div>
+                </div>
+                
+                <div class="space-y-4 mb-6">
+                    <div class="flex items-center text-gray-700">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>22+ Professional Voices (Rachel, Adam, etc.)</span>
+                    </div>
+                    <div class="flex items-center text-gray-700">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Natural Voice Cloning & Synthesis</span>
+                    </div>
+                    <div class="flex items-center text-gray-700">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Multi-language Support (Hindi, English)</span>
+                    </div>
+                    <div class="flex items-center text-gray-700">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Real-time Conversation Capabilities</span>
+                    </div>
+                </div>
+                
+                <div class="border-t pt-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-gray-600">Best For:</span>
+                        <span class="text-sm bg-purple-100 text-purple-800 px-3 py-1 rounded-full">Premium Quality</span>
+                    </div>
+                    <p class="text-sm text-gray-600">Customer service, marketing calls, professional demos</p>
+                </div>
+            </div>
+
+            <!-- 2. Bolna.com -->
+            <div class="tech-card bg-white rounded-2xl p-8 border-2 border-gray-200" onclick="selectTechnology('bolna')">
+                <div class="flex items-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mr-4">
+                        <i class="fas fa-phone text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">Bolna.com</h3>
+                        <p class="text-orange-600 font-medium">Phone Call Automation</p>
+                    </div>
+                </div>
+                
+                <div class="space-y-4 mb-6">
+                    <div class="flex items-center text-gray-700">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Phone Number Management & Purchasing</span>
+                    </div>
+                    <div class="flex items-center text-gray-700">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Bulk Calling & Campaign Management</span>
+                    </div>
+                    <div class="flex items-center text-gray-700">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Call Analytics & Logging</span>
+                    </div>
+                    <div class="flex items-center text-gray-700">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Indian Phone Numbers & Local Rates</span>
+                    </div>
+                </div>
+                
+                <div class="border-t pt-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-gray-600">Best For:</span>
+                        <span class="text-sm bg-orange-100 text-orange-800 px-3 py-1 rounded-full">Scale & Automation</span>
+                    </div>
+                    <p class="text-sm text-gray-600">Mass calling, lead generation, appointment reminders</p>
+                </div>
+            </div>
+
+            <!-- 3. RelevanceAI -->
+            <div class="tech-card bg-white rounded-2xl p-8 border-2 border-gray-200" onclick="selectTechnology('relevanceai')">
+                <div class="flex items-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4">
+                        <i class="fas fa-robot text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">RelevanceAI</h3>
+                        <p class="text-blue-600 font-medium">Advanced AI Agents</p>
+                    </div>
+                </div>
+                
+                <div class="space-y-4 mb-6">
+                    <div class="flex items-center text-gray-700">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Custom AI Agent Creation & Management</span>
+                    </div>
+                    <div class="flex items-center text-gray-700">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Complex Conversation Flows</span>
+                    </div>
+                    <div class="flex items-center text-gray-700">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Business Logic Integration</span>
+                    </div>
+                    <div class="flex items-center text-gray-700">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Multi-turn Conversations & Context</span>
+                    </div>
+                </div>
+                
+                <div class="border-t pt-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-gray-600">Best For:</span>
+                        <span class="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full">Complex Logic</span>
+                    </div>
+                    <p class="text-sm text-gray-600">Support agents, sales qualification, complex workflows</p>
+                </div>
+            </div>
+
+            <!-- 4. OpenAI Speech-to-Speech -->
+            <div class="tech-card bg-white rounded-2xl p-8 border-2 border-gray-200" onclick="selectTechnology('openai')">
+                <div class="flex items-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center mr-4">
+                        <i class="fas fa-comments text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">OpenAI</h3>
+                        <p class="text-green-600 font-medium">Real-time Speech-to-Speech</p>
+                    </div>
+                </div>
+                
+                <div class="space-y-4 mb-6">
+                    <div class="flex items-center text-gray-700">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Real-time Speech-to-Speech Conversion</span>
+                    </div>
+                    <div class="flex items-center text-gray-700">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>GPT-4 Powered Intelligent Responses</span>
+                    </div>
+                    <div class="flex items-center text-gray-700">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Low-latency Voice Interactions</span>
+                    </div>
+                    <div class="flex items-center text-gray-700">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Advanced Language Understanding</span>
+                    </div>
+                </div>
+                
+                <div class="border-t pt-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-gray-600">Best For:</span>
+                        <span class="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full">Intelligence</span>
+                    </div>
+                    <p class="text-sm text-gray-600">Natural conversations, Q&A, intelligent assistance</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="mt-16 max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold text-gray-800 text-center mb-8">Technology Comparison</h2>
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-4 text-left font-semibold text-gray-800">Feature</th>
+                            <th class="px-6 py-4 text-center font-semibold text-purple-600">ElevenLabs</th>
+                            <th class="px-6 py-4 text-center font-semibold text-orange-600">Bolna</th>
+                            <th class="px-6 py-4 text-center font-semibold text-blue-600">RelevanceAI</th>
+                            <th class="px-6 py-4 text-center font-semibold text-green-600">OpenAI</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-6 py-4 font-medium text-gray-800">Voice Quality</td>
+                            <td class="px-6 py-4 text-center"><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i></td>
+                            <td class="px-6 py-4 text-center"><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="far fa-star text-gray-300"></i><i class="far fa-star text-gray-300"></i></td>
+                            <td class="px-6 py-4 text-center"><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="far fa-star text-gray-300"></i></td>
+                            <td class="px-6 py-4 text-center"><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="far fa-star text-gray-300"></i></td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="px-6 py-4 font-medium text-gray-800">Conversation Intelligence</td>
+                            <td class="px-6 py-4 text-center"><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="far fa-star text-gray-300"></i></td>
+                            <td class="px-6 py-4 text-center"><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="far fa-star text-gray-300"></i><i class="far fa-star text-gray-300"></i><i class="far fa-star text-gray-300"></i></td>
+                            <td class="px-6 py-4 text-center"><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i></td>
+                            <td class="px-6 py-4 text-center"><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i></td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 font-medium text-gray-800">Scalability</td>
+                            <td class="px-6 py-4 text-center"><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="far fa-star text-gray-300"></i></td>
+                            <td class="px-6 py-4 text-center"><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i></td>
+                            <td class="px-6 py-4 text-center"><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="far fa-star text-gray-300"></i></td>
+                            <td class="px-6 py-4 text-center"><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="far fa-star text-gray-300"></i><i class="far fa-star text-gray-300"></i></td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="px-6 py-4 font-medium text-gray-800">Cost Effectiveness</td>
+                            <td class="px-6 py-4 text-center"><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="far fa-star text-gray-300"></i><i class="far fa-star text-gray-300"></i></td>
+                            <td class="px-6 py-4 text-center"><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i></td>
+                            <td class="px-6 py-4 text-center"><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="far fa-star text-gray-300"></i></td>
+                            <td class="px-6 py-4 text-center"><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="fas fa-star text-yellow-500"></i><i class="far fa-star text-gray-300"></i><i class="far fa-star text-gray-300"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="text-center mt-12">
+            <button id="continueBtn" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                Continue with Selected Technology
+            </button>
+            <p class="text-gray-600 mt-4">Select a technology above to continue</p>
+        </div>
+    </div>
+
+    <script>
+        let selectedTech = null;
+
+        function selectTechnology(tech) {
+            // Remove previous selection
+            document.querySelectorAll('.tech-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Add selection to clicked card
+            event.currentTarget.classList.add('selected');
+            selectedTech = tech;
+
+            // Enable continue button
+            const continueBtn = document.getElementById('continueBtn');
+            continueBtn.disabled = false;
+            continueBtn.onclick = () => proceedWithTechnology(tech);
+
+            // Update button text
+            const techNames = {
+                'elevenlabs': 'ElevenLabs',
+                'bolna': 'Bolna.com',
+                'relevanceai': 'RelevanceAI',
+                'openai': 'OpenAI Speech-to-Speech'
+            };
+            continueBtn.textContent = `Continue with ${techNames[tech]}`;
+        }
+
+        function proceedWithTechnology(tech) {
+            // Store selection and redirect to appropriate setup page
+            localStorage.setItem('selectedVoiceTechnology', tech);
+            
+            const redirectUrls = {
+                'elevenlabs': '/create-agent-enhanced.html?provider=elevenlabs',
+                'bolna': '/agent-setup.html?provider=bolna',
+                'relevanceai': '/create-agent.html?provider=relevanceai',
+                'openai': '/realtime-voice-interface.html?provider=openai'
+            };
+
+            window.location.href = redirectUrls[tech];
+        }
+
+        // Auto-select if coming from a specific provider
+        const urlParams = new URLSearchParams(window.location.search);
+        const preselected = urlParams.get('provider');
+        if (preselected) {
+            setTimeout(() => {
+                const card = document.querySelector(`[onclick="selectTechnology('${preselected}')"]`);
+                if (card) {
+                    card.click();
+                }
+            }, 500);
+        }
+    </script>
+</body>
+</html>
