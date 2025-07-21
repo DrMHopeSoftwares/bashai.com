@@ -73,7 +73,7 @@
             </div>
             <div class="flex flex-wrap gap-2 mt-2">
                 <button class="btn btn-primary px-4 py-2" onclick="loadAgents()">🔄 Refresh Agents</button>
-                <button class="btn bg-info text-white px-4 py-2" onclick="showAgentDetails()">📊 Show Agent Details</button>
+                <button class="btn bg-info text-white px-4 py-2" onclick="showAgentDetails()">📊 Add/Edit Prompt</button>
             </div>
         </div>
         <div id="agentInfo" class="bg-blue-50 border-l-4 border-primary rounded-lg p-4 mb-6 hidden">
@@ -119,9 +119,48 @@
             </ul>
         </div>
     </div>
-    <script>
-// ... existing code ...
-    </script>
+
+
+
+
+<!-- Modal Popup for Add/Edit Prompt -->
+<div id="promptModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
+        <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">📊 Add/Edit Prompt</h3>
+        <form id="promptForm">
+            <label class="block font-medium mb-1" for="welcomeMessage">Welcome Message</label>
+            <textarea id="welcomeMessage" class="w-full rounded-lg border-gray-300 p-3 mb-4" rows="3" placeholder="Enter welcome message..."></textarea>
+            <label class="block font-medium mb-1" for="promptField">Prompt Field</label>
+            <textarea id="promptField" class="w-full rounded-lg border-gray-300 p-3 mb-4" rows="5" placeholder="Enter prompt..."></textarea>
+            <div class="flex justify-end gap-2 mt-4">
+                <button type="button" class="btn bg-danger text-white px-4 py-2" onclick="closePromptModal()">Cancel</button>
+                <button type="submit" class="btn bg-accent text-white px-4 py-2">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// ...existing code...
+
+function showAgentDetails() {
+    document.getElementById('promptModal').classList.remove('hidden');
+}
+
+function closePromptModal() {
+    document.getElementById('promptModal').classList.add('hidden');
+}
+
+// Optional: Handle form submission
+document.getElementById('promptForm').onsubmit = function(e) {
+    e.preventDefault();
+    // You can add logic here to save the welcome message and prompt field
+    closePromptModal();
+};
+</script>
+<!-- ...existing code... -->
+
+
 </body>
 </html>
-// ... existing code ...
+
