@@ -13,11 +13,6 @@
     }
   ],
   "env": {
-    "PYTHONPATH": "."
-  },
-  "functions": {
-    "main.py": {
-      "maxDuration": 30
-    }
+    "FLASK_ENV": "production"
   }
 }

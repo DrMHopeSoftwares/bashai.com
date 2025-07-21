@@ -425,19 +425,19 @@
                 <div class="space-y-3">
                     <div class="flex justify-between text-gray-700">
                         <span>Active Numbers:</span>
-                        <span class="font-bold text-gray-800">3</span>
+                        <span class="font-bold text-gray-800" id="sidebar-active-numbers">3</span>
                     </div>
                     <div class="flex justify-between text-gray-700">
                         <span>Total Calls:</span>
-                        <span class="font-bold text-green-600">1,247</span>
+                        <span class="font-bold text-green-600" id="sidebar-total-calls">1,247</span>
                     </div>
                     <div class="flex justify-between text-gray-700">
                         <span>Monthly Cost:</span>
-                        <span class="font-bold text-yellow-600">₹2,850</span>
+                        <span class="font-bold text-yellow-600" id="sidebar-monthly-cost">₹2,850</span>
                     </div>
                     <div class="flex justify-between text-gray-700">
                         <span>Avg Duration:</span>
-                        <span class="font-bold text-blue-600">3.2 min</span>
+                        <span class="font-bold text-blue-600" id="sidebar-avg-duration">3.2 min</span>
                     </div>
                 </div>
                 
@@ -493,22 +493,22 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div class="stats-card floating">
                     <div class="text-3xl mb-2">📱</div>
-                    <div class="text-2xl font-bold text-gray-800">3</div>
+                    <div class="text-2xl font-bold text-gray-800" id="main-active-numbers">3</div>
                     <div class="text-gray-600">Active Numbers</div>
                 </div>
                 <div class="stats-card floating" style="animation-delay: 0.2s;">
                     <div class="text-3xl mb-2">📞</div>
-                    <div class="text-2xl font-bold text-blue-600">1,247</div>
+                    <div class="text-2xl font-bold text-blue-600" id="main-total-calls">1,247</div>
                     <div class="text-gray-600">Total Calls</div>
                 </div>
                 <div class="stats-card floating" style="animation-delay: 0.4s;">
                     <div class="text-3xl mb-2">⏱️</div>
-                    <div class="text-2xl font-bold text-green-600">3.2 min</div>
+                    <div class="text-2xl font-bold text-green-600" id="main-avg-duration">3.2 min</div>
                     <div class="text-gray-600">Avg Duration</div>
                 </div>
                 <div class="stats-card floating" style="animation-delay: 0.6s;">
                     <div class="text-3xl mb-2">💰</div>
-                    <div class="text-2xl font-bold text-purple-600">₹2,850</div>
+                    <div class="text-2xl font-bold text-purple-600" id="main-monthly-cost">₹2,850</div>
                     <div class="text-gray-600">Monthly Cost</div>
                 </div>
             </div>
@@ -871,9 +871,295 @@
 
     <script>
         // Initialize the page
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Phone Numbers Management page loaded successfully!');
-        });
+        // Global variables for phone number data
+        let phoneNumberStats = {};
+        let detailedPhoneNumbers = [];
+
+        // Authentication and API functions
+        async function getAuthToken() {
+            try {
+                // Check for auth token in localStorage or cookies
+                const authToken = localStorage.getItem('auth_token') || getCookie('auth_token');
+                
+                if (!authToken) {
+                    console.log('❌ No auth token found, redirecting to login');
+                    window.location.href = '/login';
+                    return null;
+                }
+
+                // Verify token with server
+                const response = await fetch('/api/auth/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const userData = await response.json();
+                    console.log('✅ User authenticated:', userData.user?.email);
+                    return userData;
+                } else {
+                    console.log('❌ Authentication failed, redirecting to login');
+                    window.location.href = '/login';
+                    return null;
+                }
+            } catch (error) {
+                console.error('Auth error:', error);
+                window.location.href = '/login';
+                return null;
+            }
+        }
+
+        // Cookie helper function
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        async function apiRequest(url, options = {}) {
+            try {
+                // Get auth token for API requests
+                const authToken = localStorage.getItem('auth_token') || getCookie('auth_token');
+                
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': authToken ? `Bearer ${authToken}` : '',
+                        ...options.headers
+                    }
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        console.log('❌ Unauthorized, redirecting to login');
+                        window.location.href = '/login';
+                        return null;
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error('API request failed:', error);
+                throw error;
+            }
+        }
+
+        // Load phone number statistics
+        async function loadPhoneStats() {
+            try {
+                const response = await apiRequest('/api/phone-numbers/stats');
+                if (response.success) {
+                    phoneNumberStats = response.stats;
+                    updateStatistics();
+                }
+            } catch (error) {
+                console.error('Failed to load phone stats:', error);
+                // Use default values if API fails
+                phoneNumberStats = {
+                    active_numbers: 0,
+                    total_calls: 0,
+                    monthly_cost: 0,
+                    avg_duration_minutes: 0,
+                    current_month_calls: 0
+                };
+                updateStatistics();
+            }
+        }
+
+        // Load detailed phone numbers
+        async function loadDetailedPhoneNumbers() {
+            try {
+                const response = await apiRequest('/api/phone-numbers/detailed');
+                if (response.success) {
+                    detailedPhoneNumbers = response.data;
+                    updatePhoneNumbersList();
+                }
+            } catch (error) {
+                console.error('Failed to load detailed phone numbers:', error);
+                detailedPhoneNumbers = [];
+                updatePhoneNumbersList();
+            }
+        }
+
+        // Update statistics display
+        function updateStatistics() {
+            // Update main stats cards
+            updateElementsByDataAttribute('active-numbers', phoneNumberStats.active_numbers);
+            updateElementsByDataAttribute('total-calls', phoneNumberStats.total_calls.toLocaleString());
+            updateElementsByDataAttribute('avg-duration', phoneNumberStats.avg_duration_minutes + ' min');
+            updateElementsByDataAttribute('monthly-cost', '₹' + phoneNumberStats.monthly_cost.toLocaleString());
+
+            // Update hardcoded values in the sidebar and main stats
+            updateHardcodedStats();
+        }
+
+        function updateElementsByDataAttribute(attribute, value) {
+            const elements = document.querySelectorAll(`[data-stat="${attribute}"]`);
+            elements.forEach(el => el.textContent = value);
+        }
+
+        function updateHardcodedStats() {
+            // Update main stats cards using specific IDs
+            const mainActiveNumbers = document.getElementById('main-active-numbers');
+            if (mainActiveNumbers) {
+                mainActiveNumbers.textContent = phoneNumberStats.active_numbers;
+            }
+
+            const mainTotalCalls = document.getElementById('main-total-calls');
+            if (mainTotalCalls) {
+                mainTotalCalls.textContent = phoneNumberStats.total_calls.toLocaleString();
+            }
+
+            const mainAvgDuration = document.getElementById('main-avg-duration');
+            if (mainAvgDuration) {
+                mainAvgDuration.textContent = phoneNumberStats.avg_duration_minutes + ' min';
+            }
+
+            const mainMonthlyCost = document.getElementById('main-monthly-cost');
+            if (mainMonthlyCost) {
+                mainMonthlyCost.textContent = '₹' + phoneNumberStats.monthly_cost.toLocaleString();
+            }
+
+            // Update sidebar stats using specific IDs
+            const sidebarActiveNumbers = document.getElementById('sidebar-active-numbers');
+            if (sidebarActiveNumbers) {
+                sidebarActiveNumbers.textContent = phoneNumberStats.active_numbers;
+            }
+
+            const sidebarTotalCalls = document.getElementById('sidebar-total-calls');
+            if (sidebarTotalCalls) {
+                sidebarTotalCalls.textContent = phoneNumberStats.total_calls.toLocaleString();
+            }
+
+            const sidebarMonthlyCost = document.getElementById('sidebar-monthly-cost');
+            if (sidebarMonthlyCost) {
+                sidebarMonthlyCost.textContent = '₹' + phoneNumberStats.monthly_cost.toLocaleString();
+            }
+
+            const sidebarAvgDuration = document.getElementById('sidebar-avg-duration');
+            if (sidebarAvgDuration) {
+                sidebarAvgDuration.textContent = phoneNumberStats.avg_duration_minutes + ' min';
+            }
+        }
+
+        // Update phone numbers list
+        function updatePhoneNumbersList() {
+            const phoneNumbersContainer = document.querySelector('.space-y-6');
+            if (!phoneNumbersContainer) return;
+
+            // Clear existing hardcoded numbers
+            phoneNumbersContainer.innerHTML = '';
+
+            if (detailedPhoneNumbers.length === 0) {
+                phoneNumbersContainer.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="text-6xl mb-4">📱</div>
+                        <h3 class="text-xl font-semibold text-gray-600 mb-2">No Phone Numbers</h3>
+                        <p class="text-gray-500 mb-6">You haven't purchased any phone numbers yet.</p>
+                        <button onclick="purchaseNumber()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+                            Purchase Your First Number
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            // Generate phone number cards using existing styles
+            detailedPhoneNumbers.forEach(phone => {
+                const phoneCard = createPhoneNumberCard(phone);
+                phoneNumbersContainer.appendChild(phoneCard);
+            });
+        }
+
+        // Create phone number card element
+        function createPhoneNumberCard(phone) {
+            const card = document.createElement('div');
+            card.className = 'phone-card';
+            
+            const statusBadge = phone.status === 'active' ? 
+                '<span class="status-badge active">Active</span>' : 
+                '<span class="status-badge inactive">Inactive</span>';
+
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="phone-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div>
+                            <div class="number-display">${phone.phone_number}</div>
+                            <div class="text-sm text-gray-600">${phone.friendly_name}</div>
+                        </div>
+                    </div>
+                    ${statusBadge}
+                </div>
+
+                <div class="grid grid-cols-4 gap-4 mb-4">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-blue-600">${phone.usage_stats.current_month_calls}</div>
+                        <div class="text-sm text-gray-600">Calls This Month</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-green-600">${phone.usage_stats.success_rate}%</div>
+                        <div class="text-sm text-gray-600">Success Rate</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-purple-600">₹${phone.monthly_cost}</div>
+                        <div class="text-sm text-gray-600">Monthly Cost</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-orange-600">${phone.usage_stats.avg_duration_minutes} min</div>
+                        <div class="text-sm text-gray-600">Avg Duration</div>
+                    </div>
+                </div>
+
+                <div class="capabilities-badges mb-4">
+                    ${phone.capabilities && phone.capabilities.voice ? '<span class="capability-badge">📞 Inbound/Outbound</span>' : ''}
+                    ${phone.capabilities && phone.capabilities.sms ? '<span class="capability-badge">📧 SMS Support</span>' : ''}
+                    <span class="capability-badge">🔐 End-to-End Encryption</span>
+                    <span class="capability-badge">📊 Advanced Analytics</span>
+                </div>
+
+                <div class="flex space-x-3">
+                    <button class="action-button success" onclick="configureNumber('${phone.phone_number}')">
+                        <i class="fas fa-cog mr-2"></i>Configure
+                    </button>
+                    <button class="action-button" onclick="viewCallLogs('${phone.phone_number}')">
+                        <i class="fas fa-list mr-2"></i>Call Logs
+                    </button>
+                    <button class="action-button" onclick="testNumber('${phone.phone_number}')">
+                        <i class="fas fa-phone mr-2"></i>Test Call
+                    </button>
+                    <button class="action-button danger" onclick="releaseNumber('${phone.phone_number}')">
+                        <i class="fas fa-trash mr-2"></i>Release
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Initialize page
+        async function initializePage() {
+            console.log('Initializing phone numbers page...');
+            
+            // Check authentication
+            const user = await getAuthToken();
+            if (!user) return;
+
+            // Load data
+            await loadPhoneStats();
+            await loadDetailedPhoneNumbers();
+            
+            console.log('Phone numbers page initialized successfully');
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
 
         // Number management functions
         function configureNumber(number) {

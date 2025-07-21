@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Features - BhashAI | Comprehensive AI Voice Agent Platform</title>
+    <meta name="description" content="Explore BhashAI's comprehensive features: multilingual voice agents, real-time analytics, CRM integration, and advanced AI capabilities for Indian businesses.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+        
+        .feature-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+        
+        .feature-icon {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .category-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .demo-video {
+            background: linear-gradient(135deg, #1f2937, #374151);
+            border-radius: 16px;
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .demo-video::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="%234f46e5" stop-opacity="0.1"/><stop offset="100%" stop-color="%234f46e5" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/></svg>');
+        }
+        
+        .play-button {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .play-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+        
+        .comparison-table {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        .table-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+        }
+        
+        .check-icon {
+            color: #10b981;
+            font-size: 1.2rem;
+        }
+        
+        .cross-icon {
+            color: #ef4444;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-indigo-600">BhashAI</a>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="/" class="text-gray-600 hover:text-indigo-600">Home</a>
+                    <a href="/voice-samples.html" class="text-gray-600 hover:text-indigo-600">Voice Samples</a>
+                    <a href="/book-demo.html" class="text-gray-600 hover:text-indigo-600">Book Demo</a>
+                    <a href="/dashboard.html" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-indigo-600 to-purple-700 text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-5xl font-bold mb-6">🚀 Comprehensive Features</h1>
+            <p class="text-xl mb-8 max-w-3xl mx-auto">
+                Discover all the powerful features that make BhashAI the leading AI voice agent platform for Indian businesses
+            </p>
+            <div class="flex justify-center items-center space-x-6 text-lg">
+                <span>🎯 20+ Languages</span>
+                <span>•</span>
+                <span>⚡ Real-time AI</span>
+                <span>•</span>
+                <span>🔧 Easy Integration</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Features -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold category-header mb-4">🎙️ Core Voice AI Features</h2>
+                <p class="text-xl text-gray-600">Advanced AI capabilities that power natural conversations</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-lg">
+                    <div class="feature-icon">
+                        <i class="fas fa-language"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-4">Multilingual Support</h3>
+                    <p class="text-gray-600 mb-4">Native support for 20+ Indian languages including Hindi, Tamil, Telugu, Bengali, Marathi, and more with accent recognition.</p>
+                    <ul class="text-sm text-gray-500 space-y-1">
+                        <li>• Regional dialect understanding</li>
+                        <li>• Code-switching (Hinglish) support</li>
+                        <li>• Cultural context awareness</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-lg">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-4">Advanced AI Processing</h3>
+                    <p class="text-gray-600 mb-4">State-of-the-art natural language processing with context awareness and emotional intelligence.</p>
+                    <ul class="text-sm text-gray-500 space-y-1">
+                        <li>• Intent recognition</li>
+                        <li>• Sentiment analysis</li>
+                        <li>• Context retention</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-lg">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-4">Real-time Processing</h3>
+                    <p class="text-gray-600 mb-4">Ultra-low latency voice processing for natural, uninterrupted conversations with sub-second response times.</p>
+                    <ul class="text-sm text-gray-500 space-y-1">
+                        <li>• <200ms response time</li>
+                        <li>• Streaming audio processing</li>
+                        <li>• Edge computing optimization</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-lg">
+                    <div class="feature-icon">
+                        <i class="fas fa-microphone-alt"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-4">Voice Synthesis</h3>
+                    <p class="text-gray-600 mb-4">High-quality, natural-sounding voice synthesis with multiple voice options and customizable speech patterns.</p>
+                    <ul class="text-sm text-gray-500 space-y-1">
+                        <li>• 50+ voice options</li>
+                        <li>• Custom voice training</li>
+                        <li>• Emotion-aware speech</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-lg">
+                    <div class="feature-icon">
+                        <i class="fas fa-ear-listen"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-4">Speech Recognition</h3>
+                    <p class="text-gray-600 mb-4">Accurate speech-to-text conversion with noise cancellation and speaker identification capabilities.</p>
+                    <ul class="text-sm text-gray-500 space-y-1">
+                        <li>• 95%+ accuracy rate</li>
+                        <li>• Background noise filtering</li>
+                        <li>• Multiple speaker detection</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-lg">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-4">Conversation Management</h3>
+                    <p class="text-gray-600 mb-4">Intelligent conversation flow management with context switching and multi-turn dialogue support.</p>
+                    <ul class="text-sm text-gray-500 space-y-1">
+                        <li>• Dynamic conversation trees</li>
+                        <li>• Context preservation</li>
+                        <li>• Fallback handling</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Integration Features -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold category-header mb-4">🔗 Integration & Connectivity</h2>
+                <p class="text-xl text-gray-600">Seamlessly connect with your existing business systems</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="feature-card bg-gray-50 p-6 rounded-xl text-center">
+                    <div class="text-4xl mb-4">📱</div>
+                    <h3 class="text-lg font-semibold mb-2">WhatsApp Integration</h3>
+                    <p class="text-gray-600 text-sm">Direct integration with WhatsApp Business API for voice messages and calls</p>
+                </div>
+                
+                <div class="feature-card bg-gray-50 p-6 rounded-xl text-center">
+                    <div class="text-4xl mb-4">🏢</div>
+                    <h3 class="text-lg font-semibold mb-2">CRM Systems</h3>
+                    <p class="text-gray-600 text-sm">Connect with Salesforce, HubSpot, Zoho, and other popular CRM platforms</p>
+                </div>
+                
+                <div class="feature-card bg-gray-50 p-6 rounded-xl text-center">
+                    <div class="text-4xl mb-4">☎️</div>
+                    <h3 class="text-lg font-semibold mb-2">Call Centers</h3>
+                    <p class="text-gray-600 text-sm">Integration with Twilio, Plivo, and traditional telephony systems</p>
+                </div>
+                
+                <div class="feature-card bg-gray-50 p-6 rounded-xl text-center">
+                    <div class="text-4xl mb-4">🔌</div>
+                    <h3 class="text-lg font-semibold mb-2">REST APIs</h3>
+                    <p class="text-gray-600 text-sm">Comprehensive APIs for custom integrations and third-party applications</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Video Section -->
+    <section class="py-20">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold category-header mb-4">🎬 See Features in Action</h2>
+                <p class="text-xl text-gray-600">Watch how BhashAI's features work together to create amazing voice experiences</p>
+            </div>
+            
+            <div class="demo-video" onclick="playDemo()">
+                <div class="play-button">
+                    <i class="fas fa-play"></i>
+                </div>
+                <div class="absolute bottom-4 left-4 text-white">
+                    <h3 class="text-xl font-semibold">BhashAI Platform Demo</h3>
+                    <p class="text-sm opacity-80">5:30 minutes • Multilingual Voice AI in Action</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Comparison -->
+    <section class="py-20 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold category-header mb-4">📊 Feature Comparison</h2>
+                <p class="text-xl text-gray-600">See how BhashAI compares to other voice AI platforms</p>
+            </div>
+            
+            <div class="comparison-table">
+                <div class="table-header p-4">
+                    <div class="grid grid-cols-4 gap-4 font-semibold">
+                        <div>Feature</div>
+                        <div class="text-center">BhashAI</div>
+                        <div class="text-center">Competitor A</div>
+                        <div class="text-center">Competitor B</div>
+                    </div>
+                </div>
+                <div class="p-4 space-y-4">
+                    <div class="grid grid-cols-4 gap-4 py-3 border-b border-gray-100">
+                        <div class="font-medium">Indian Language Support</div>
+                        <div class="text-center"><i class="fas fa-check check-icon"></i> 20+ Languages</div>
+                        <div class="text-center"><i class="fas fa-times cross-icon"></i> Limited</div>
+                        <div class="text-center"><i class="fas fa-check check-icon"></i> 5 Languages</div>
+                    </div>
+                    <div class="grid grid-cols-4 gap-4 py-3 border-b border-gray-100">
+                        <div class="font-medium">Real-time Processing</div>
+                        <div class="text-center"><i class="fas fa-check check-icon"></i> <200ms</div>
+                        <div class="text-center"><i class="fas fa-check check-icon"></i> ~500ms</div>
+                        <div class="text-center"><i class="fas fa-check check-icon"></i> ~300ms</div>
+                    </div>
+                    <div class="grid grid-cols-4 gap-4 py-3 border-b border-gray-100">
+                        <div class="font-medium">WhatsApp Integration</div>
+                        <div class="text-center"><i class="fas fa-check check-icon"></i> Native</div>
+                        <div class="text-center"><i class="fas fa-times cross-icon"></i> No</div>
+                        <div class="text-center"><i class="fas fa-check check-icon"></i> Third-party</div>
+                    </div>
+                    <div class="grid grid-cols-4 gap-4 py-3 border-b border-gray-100">
+                        <div class="font-medium">Custom Voice Training</div>
+                        <div class="text-center"><i class="fas fa-check check-icon"></i> Yes</div>
+                        <div class="text-center"><i class="fas fa-times cross-icon"></i> No</div>
+                        <div class="text-center"><i class="fas fa-check check-icon"></i> Premium Only</div>
+                    </div>
+                    <div class="grid grid-cols-4 gap-4 py-3">
+                        <div class="font-medium">Pricing (per month)</div>
+                        <div class="text-center text-green-600 font-semibold">₹999+</div>
+                        <div class="text-center">$99+</div>
+                        <div class="text-center">$149+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gradient-to-br from-indigo-600 to-purple-700 text-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl font-bold mb-6">Ready to Experience These Features?</h2>
+            <p class="text-xl mb-8">
+                Start your free trial today and explore all the powerful features BhashAI has to offer
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/dashboard.html" class="bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                    🚀 Start Free Trial
+                </a>
+                <a href="/book-demo.html" class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-indigo-600 transition-colors">
+                    📞 Book a Demo
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">BhashAI</h3>
+                    <p class="text-gray-400">India's first regional language AI voice agent platform</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Features</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">Voice AI</a></li>
+                        <li><a href="#" class="hover:text-white">Multilingual Support</a></li>
+                        <li><a href="#" class="hover:text-white">Integrations</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Platform</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="/dashboard.html" class="hover:text-white">Dashboard</a></li>
+                        <li><a href="/voice-samples.html" class="hover:text-white">Voice Samples</a></li>
+                        <li><a href="/book-demo.html" class="hover:text-white">Book Demo</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Connect</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">Twitter</a></li>
+                        <li><a href="#" class="hover:text-white">LinkedIn</a></li>
+                        <li><a href="#" class="hover:text-white">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 BhashAI. All rights reserved.</p>
+                <div class="mt-4 space-x-6">
+                    <a href="/privacy-policy.html" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="/terms-conditions.html" class="text-gray-400 hover:text-white transition-colors">Terms & Conditions</a>
+                    <a href="/cancellation-refund.html" class="text-gray-400 hover:text-white transition-colors">Cancellation & Refund</a>
+                    <a href="/shipping-delivery.html" class="text-gray-400 hover:text-white transition-colors">Shipping & Delivery</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function playDemo() {
+            // Create modal for demo video
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-4xl w-full mx-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-2xl font-bold">BhashAI Platform Demo</h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                    </div>
+                    <div class="aspect-video bg-gray-900 rounded-lg flex items-center justify-center text-white">
+                        <div class="text-center">
+                            <i class="fas fa-play text-4xl mb-4"></i>
+                            <p class="text-xl">Demo video would play here</p>
+                            <p class="text-sm opacity-75 mt-2">Showcasing multilingual voice AI capabilities</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Close on background click
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+        
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            showNotification('Explore BhashAI\'s comprehensive features!');
+        });
+    </script>
+</body>
+</html>

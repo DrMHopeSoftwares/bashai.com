@@ -35,8 +35,8 @@ def auto_git_push(task_description, detailed_changes=None):
     
     # Get current working directory
     cwd = os.getcwd()
-    if not cwd.endswith('bashai.com'):
-        cwd = os.path.join(cwd, 'bashai.com')
+    if not cwd.endswith('bhashai.com'):
+        cwd = os.path.join(cwd, 'bhashai.com')
     
     print(f"🔄 Auto Git Push: {task_description}")
     

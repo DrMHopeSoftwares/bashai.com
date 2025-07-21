@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Voice Agent - BhashAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            color: #1f2937; /* Ensure dark text on light background */
+        }
+
+        .glassmorphism * {
+            color: inherit; /* Inherit the dark color from parent */
+        }
+
+        .glassmorphism h1, .glassmorphism h2, .glassmorphism h3, .glassmorphism h4, .glassmorphism h5, .glassmorphism h6 {
+            color: #1f2937 !important;
+        }
+
+        .glassmorphism p, .glassmorphism span:not(.text-white):not(.bg-blue-500):not(.bg-green-500):not(.bg-purple-500):not(.bg-orange-500), .glassmorphism div:not(.bg-gradient-to-r) {
+            color: #374151 !important;
+        }
+
+        .glassmorphism .text-white {
+            color: white !important; /* Keep intentionally white text white */
+        }
+
+        /* Fix for step indicators and progress text */
+        .glassmorphism .step-indicator {
+            color: white !important; /* Step numbers should be white on colored background */
+        }
+
+        .glassmorphism .text-gray-800,
+        .glassmorphism .text-gray-700,
+        .glassmorphism .text-gray-600,
+        .glassmorphism .text-gray-500 {
+            color: #374151 !important;
+        }
+
+        /* Ensure progress step labels are visible */
+        .glassmorphism .space-y-4 span {
+            color: #374151 !important;
+        }
+
+        /* Fix for any content that might have inherited white color */
+        .glassmorphism *:not(.text-white):not(.step-indicator):not(.bg-gradient-to-r *):not(.bg-blue-500 *):not(.bg-green-500 *):not(.bg-purple-500 *):not(.bg-orange-500 *) {
+            color: #374151 !important;
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            margin: 4px 0;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid #fff;
+        }
+
+        .provider-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .provider-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .provider-card:hover::before {
+            left: 100%;
+        }
+
+        .provider-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.25);
+            transform: translateY(-8px);
+        }
+
+        .provider-card.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .provider-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .bolna-icon { 
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .relevance-icon { 
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+
+        .openai-icon {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+        }
+
+        .elevenlabs-icon {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .use-case-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            padding: 2.5rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .use-case-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.25);
+            transform: translateY(-8px);
+        }
+
+        .use-case-card.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .step-indicator {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            position: relative;
+        }
+
+        .step-indicator.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .step-indicator.completed {
+            background: linear-gradient(135deg, var(--success), #059669);
+            border-color: var(--success);
+        }
+
+        .step-line {
+            height: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            flex: 1;
+            margin: 0 1rem;
+        }
+
+        .step-line.active {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .quick-action {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .quick-action:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 16px 20px;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .feature-badge {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 2px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .relevance-config {
+            background: rgba(139, 92, 246, 0.05);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .elevenlabs-config {
+            background: rgba(245, 158, 11, 0.05);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .provider-comparison {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: rgba(99, 102, 241, 0.1);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="fixed left-0 top-0 h-full w-72 sidebar z-50">
+        <div class="p-6">
+            <div class="flex items-center mb-8">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center mr-3">
+                    <i class="fas fa-microphone-alt text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-white text-xl font-bold">BhashAI</h1>
+                    <p class="text-white/70 text-sm">Create AI Agent</p>
+                </div>
+            </div>
+
+            <nav class="space-y-2 mb-8">
+                <a href="/dashboard.html" class="nav-item flex items-center p-3 text-white/80">
+                    <i class="fas fa-chart-pie mr-3"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item active flex items-center p-3 text-white">
+                    <i class="fas fa-plus mr-3"></i>
+                    <span>Create Agent</span>
+                </a>
+                <a href="/agent-setup.html" class="nav-item flex items-center p-3 text-white/80">
+                    <i class="fas fa-robot mr-3"></i>
+                    <span>AI Agents</span>
+                </a>
+                <a href="/contact-management.html" class="nav-item flex items-center p-3 text-white/80">
+                    <i class="fas fa-address-book mr-3"></i>
+                    <span>Contacts</span>
+                </a>
+            </nav>
+
+            <!-- Progress Indicator -->
+            <div class="glassmorphism rounded-xl p-4">
+                <h3 class="text-gray-800 font-semibold mb-4">Creation Progress</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        <div class="step-indicator active">1</div>
+                        <div class="step-line active"></div>
+                        <span class="text-gray-800 text-sm">AI Provider</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="step-indicator" id="step2">2</div>
+                        <div class="step-line" id="line2"></div>
+                        <span class="text-gray-600 text-sm">Use Case</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="step-indicator" id="step3">3</div>
+                        <div class="step-line" id="line3"></div>
+                        <span class="text-gray-600 text-sm">Configure</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="step-indicator" id="step4">4</div>
+                        <span class="text-gray-600 text-sm ml-4">Deploy</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="ml-72 min-h-screen">
+        <!-- Header -->
+        <header class="glassmorphism border-b border-white/20 p-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">🚀 Create New AI Agent</h1>
+                    <p class="text-gray-600">Build your intelligent assistant with multiple AI providers</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="quick-action" onclick="saveAndContinueLater()">
+                        <i class="fas fa-save mr-2"></i>
+                        Save Draft
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Step 1: Provider Selection -->
+        <div id="step1" class="step-content p-8">
+            <div class="glassmorphism rounded-2xl p-8 mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Step 1: Choose Your AI Provider</h2>
+                <p class="text-gray-600 mb-8">Select the AI platform that best fits your needs. Each provider offers unique capabilities.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="provider-card slide-in" onclick="selectProvider('bolna')" id="bolna-card">
+                        <div class="provider-icon bolna-icon">
+                            <i class="fas fa-phone-volume"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Bolna AI</h3>
+                        <p class="text-gray-600 mb-4">Specialized for voice calls with native Hindi/Hinglish support.</p>
+                        <div class="space-y-2">
+                            <div class="feature-badge">🎯 Voice Optimized</div>
+                            <div class="feature-badge">🇮🇳 Hindi Native</div>
+                            <div class="feature-badge">📞 Call Handling</div>
+                            <div class="feature-badge">⚡ Fast Response</div>
+                        </div>
+                        <div class="mt-4 text-sm text-gray-600">
+                            <strong>Best for:</strong> Voice calls, appointments, reminders
+                        </div>
+                    </div>
+
+                    <div class="provider-card slide-in" onclick="selectProvider('relevance')" id="relevance-card" style="animation-delay: 0.1s;">
+                        <div class="provider-icon relevance-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Relevance AI</h3>
+                        <p class="text-gray-600 mb-4">Multi-agent AI workforce with advanced automation capabilities.</p>
+                        <div class="space-y-2">
+                            <div class="feature-badge">🤖 Multi-Agent</div>
+                            <div class="feature-badge">🔧 Custom Tools</div>
+                            <div class="feature-badge">📊 Analytics</div>
+                            <div class="feature-badge">🔗 Integrations</div>
+                        </div>
+                        <div class="mt-4 text-sm text-gray-600">
+                            <strong>Best for:</strong> Complex workflows, data processing, integrations
+                        </div>
+                    </div>
+
+                    <div class="provider-card slide-in" onclick="selectProvider('openai')" id="openai-card" style="animation-delay: 0.2s;">
+                        <div class="provider-icon openai-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">OpenAI Realtime</h3>
+                        <p class="text-gray-600 mb-4">Advanced conversational AI with GPT-4 powered real-time responses.</p>
+                        <div class="space-y-2">
+                            <div class="feature-badge">🧠 GPT-4 Powered</div>
+                            <div class="feature-badge">💬 Natural Chat</div>
+                            <div class="feature-badge">🌐 Multilingual</div>
+                            <div class="feature-badge">🔄 Context Aware</div>
+                        </div>
+                        <div class="mt-4 text-sm text-gray-600">
+                            <strong>Best for:</strong> Complex conversations, support, analysis
+                        </div>
+                    </div>
+
+                    <div class="provider-card slide-in" onclick="selectProvider('elevenlabs')" id="elevenlabs-card" style="animation-delay: 0.3s;">
+                        <div class="provider-icon elevenlabs-icon">
+                            <i class="fas fa-microphone-alt"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">ElevenLabs</h3>
+                        <p class="text-gray-600 mb-4">Premium conversational AI with natural voice synthesis and phone integration.</p>
+                        <div class="space-y-2">
+                            <div class="feature-badge">📞 Phone Calls</div>
+                            <div class="feature-badge">🎙️ Voice Cloning</div>
+                            <div class="feature-badge">🔗 Webhook Ready</div>
+                            <div class="feature-badge">🌍 Multilingual</div>
+                        </div>
+                        <div class="mt-4 text-sm text-gray-600">
+                            <strong>Best for:</strong> Phone calls, custom voices, professional branding
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Provider Comparison Table -->
+                <div class="provider-comparison">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Provider Comparison</h3>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Bolna AI</th>
+                                <th>Relevance AI</th>
+                                <th>OpenAI Realtime</th>
+                                <th>ElevenLabs</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Voice Calls</td>
+                                <td>✅ Excellent</td>
+                                <td>⚠️ Limited</td>
+                                <td>✅ Good</td>
+                                <td>✅ Excellent</td>
+                            </tr>
+                            <tr>
+                                <td>Hindi Support</td>
+                                <td>✅ Native</td>
+                                <td>✅ Supported</td>
+                                <td>✅ Supported</td>
+                                <td>✅ Supported</td>
+                            </tr>
+                            <tr>
+                                <td>Voice Cloning</td>
+                                <td>❌ No</td>
+                                <td>❌ No</td>
+                                <td>❌ No</td>
+                                <td>✅ Yes</td>
+                            </tr>
+                            <tr>
+                                <td>Phone Integration</td>
+                                <td>✅ Native</td>
+                                <td>⚠️ Limited</td>
+                                <td>⚠️ Limited</td>
+                                <td>✅ Native</td>
+                            </tr>
+                            <tr>
+                                <td>Webhook Support</td>
+                                <td>✅ Yes</td>
+                                <td>✅ Yes</td>
+                                <td>⚠️ Limited</td>
+                                <td>✅ Advanced</td>
+                            </tr>
+                            <tr>
+                                <td>Cost</td>
+                                <td>💰 Low</td>
+                                <td>💰💰 Medium</td>
+                                <td>💰💰💰 High</td>
+                                <td>💰💰 Medium</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <button class="quick-action" id="continueBtn1" onclick="goToStep2()" disabled>
+                        <i class="fas fa-arrow-right mr-2"></i>
+                        Continue to Use Case
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Use Case Selection -->
+        <div id="step2" class="step-content p-8" style="display: none;">
+            <div class="glassmorphism rounded-2xl p-8 mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Step 2: Define Your Use Case</h2>
+                <p class="text-gray-600 mb-8">What will your AI agent do? Select the primary function.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="useCaseContainer">
+                    <!-- Use cases will be dynamically loaded based on provider -->
+                </div>
+
+                <div class="mt-8 flex justify-between">
+                    <button class="quick-action" onclick="goToStep1()">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Provider
+                    </button>
+                    <button class="quick-action" id="continueBtn2" onclick="goToStep3()" disabled>
+                        <i class="fas fa-arrow-right mr-2"></i>
+                        Continue to Configuration
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Configuration -->
+        <div id="step3" class="step-content p-8" style="display: none;">
+            <div class="glassmorphism rounded-2xl p-8 mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Step 3: Configure Your Agent</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Agent Name *</label>
+                            <input type="text" id="agentName" class="form-input" placeholder="e.g., Customer Support Assistant" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                            <textarea id="agentDescription" class="form-input" rows="3" placeholder="Describe what this agent does..."></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Department/Organization</label>
+                            <select id="agentOrganization" class="form-input">
+                                <option>Main Organization</option>
+                                <option>Customer Support</option>
+                                <option>Sales Team</option>
+                                <option>Technical Support</option>
+                                <option>Marketing</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-4">Languages</label>
+                            <div class="space-y-3">
+                                <label class="flex items-center">
+                                    <input type="checkbox" checked class="mr-3 w-4 h-4 text-blue-600 rounded">
+                                    <span>🇮🇳 Hindi (हिंदी)</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" checked class="mr-3 w-4 h-4 text-blue-600 rounded">
+                                    <span>🇬🇧 English</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" checked class="mr-3 w-4 h-4 text-blue-600 rounded">
+                                    <span>🔄 Hinglish (Mixed)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Provider-specific configuration -->
+                        <div id="providerConfig">
+                            <!-- This will be dynamically populated based on selected provider -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-between">
+                    <button class="quick-action" onclick="goToStep2()">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Use Case
+                    </button>
+                    <button class="quick-action" onclick="goToStep4()">
+                        <i class="fas fa-arrow-right mr-2"></i>
+                        Continue to Deploy
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Deploy -->
+        <div id="step4" class="step-content p-8" style="display: none;">
+            <div class="glassmorphism rounded-2xl p-8 mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Step 4: Review & Deploy</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">📋 Agent Summary</h3>
+                        <div class="space-y-4" id="agentSummary">
+                            <div class="flex justify-between py-2 border-b border-gray-200">
+                                <span class="text-gray-600">Name:</span>
+                                <span class="font-medium" id="summaryName">-</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-gray-200">
+                                <span class="text-gray-600">Provider:</span>
+                                <span class="font-medium" id="summaryProvider">-</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-gray-200">
+                                <span class="text-gray-600">Use Case:</span>
+                                <span class="font-medium" id="summaryUseCase">-</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-gray-200">
+                                <span class="text-gray-600">Languages:</span>
+                                <span class="font-medium">Hindi, English, Hinglish</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <h4 class="font-semibold text-gray-800 mb-3">🚀 Deployment Options</h4>
+                            <div class="space-y-3">
+                                <label class="flex items-center">
+                                    <input type="radio" name="deployment" value="test" checked class="mr-3">
+                                    <span>Test Mode (Free trial)</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="deployment" value="live" class="mr-3">
+                                    <span>Live Deployment</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">🔑 API Configuration</h3>
+                        <div class="glassmorphism rounded-xl p-6">
+                            <div id="apiKeyStatus" class="text-center py-8">
+                                <i class="fas fa-key text-4xl text-gray-400 mb-4"></i>
+                                <p class="text-gray-600">API key configuration will be shown here</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 space-y-3">
+                            <button class="quick-action w-full" onclick="testAgent()" id="testBtn">
+                                <i class="fas fa-play mr-2"></i>
+                                Test Agent
+                            </button>
+                            <button class="quick-action w-full" onclick="deployAgent()" id="deployBtn">
+                                <i class="fas fa-rocket mr-2"></i>
+                                Deploy Agent
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-between">
+                    <button class="quick-action" onclick="goToStep3()">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Configuration
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let selectedProvider = null;
+        let selectedUseCase = null;
+        let agentConfig = {};
+
+        // Provider configurations
+        const providerConfigs = {
+            bolna: {
+                useCases: [
+                    {
+                        id: 'appointment',
+                        name: 'Appointment Booking',
+                        description: 'Handle appointment scheduling via voice calls',
+                        icon: '📅'
+                    },
+                    {
+                        id: 'reminder',
+                        name: 'Call Reminders',
+                        description: 'Automated reminder calls for appointments, medications',
+                        icon: '⏰'
+                    },
+                    {
+                        id: 'support',
+                        name: 'Voice Support',
+                        description: 'Handle customer support calls in Hindi/English',
+                        icon: '🎧'
+                    }
+                ],
+                configFields: `
+                    <div class="space-y-4">
+                        <h4 class="font-semibold text-gray-800">Bolna Voice Configuration</h4>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Voice Type</label>
+                            <select class="form-input">
+                                <option>Female - Professional Hindi</option>
+                                <option>Male - Professional Hindi</option>
+                                <option>Female - Friendly Hindi</option>
+                                <option>Male - Friendly Hindi</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Call Flow Type</label>
+                            <select class="form-input">
+                                <option>Interactive (Two-way conversation)</option>
+                                <option>Announcement (One-way message)</option>
+                                <option>Survey (Question-based)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Response Speed</label>
+                            <select class="form-input">
+                                <option>Quick & Efficient</option>
+                                <option>Natural & Conversational</option>
+                                <option>Detailed & Thorough</option>
+                            </select>
+                        </div>
+                    </div>
+                `
+            },
+            relevance: {
+                useCases: [
+                    {
+                        id: 'workflow',
+                        name: 'Workflow Automation',
+                        description: 'Multi-agent system for complex business workflows',
+                        icon: '🔄'
+                    },
+                    {
+                        id: 'dataprocess',
+                        name: 'Data Processing',
+                        description: 'Intelligent data extraction and analysis',
+                        icon: '📊'
+                    },
+                    {
+                        id: 'integration',
+                        name: 'System Integration',
+                        description: 'Connect multiple systems with AI agents',
+                        icon: '🔗'
+                    }
+                ],
+                configFields: `
+                    <div class="relevance-config space-y-4">
+                        <h4 class="font-semibold text-gray-800">
+                            <i class="fas fa-brain mr-2 text-purple-600"></i>
+                            Relevance AI Configuration
+                        </h4>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Agent Type</label>
+                            <select id="relevanceAgentType" class="form-input" onchange="updateRelevanceConfig()">
+                                <option value="single">Single Agent</option>
+                                <option value="multi">Multi-Agent Team</option>
+                            </select>
+                        </div>
+                        <div id="agentTeamConfig" style="display: none;">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Team Size</label>
+                            <input type="number" class="form-input" min="2" max="10" value="3" placeholder="Number of agents">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Tools & Integrations</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="mr-2">
+                                    <span>Slack Integration</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="mr-2">
+                                    <span>Google Sheets</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="mr-2">
+                                    <span>Email Automation</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="mr-2">
+                                    <span>Database Access</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Relevance API Key</label>
+                            <input type="password" id="relevanceApiKey" class="form-input" placeholder="Enter your Relevance AI API key">
+                            <p class="text-sm text-gray-600 mt-1">Get your API key from relevanceai.com</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Region</label>
+                            <select id="relevanceRegion" class="form-input">
+                                <option value="us-east">US East</option>
+                                <option value="eu-west">EU West</option>
+                                <option value="ap-south">Asia Pacific</option>
+                            </select>
+                        </div>
+                    </div>
+                `
+            },
+            openai: {
+                useCases: [
+                    {
+                        id: 'assistant',
+                        name: 'Smart Assistant',
+                        description: 'GPT-4 powered conversational assistant',
+                        icon: '🤖'
+                    },
+                    {
+                        id: 'analysis',
+                        name: 'Content Analysis',
+                        description: 'Analyze and process complex information',
+                        icon: '🔍'
+                    },
+                    {
+                        id: 'creative',
+                        name: 'Creative Content',
+                        description: 'Generate creative content and responses',
+                        icon: '✨'
+                    }
+                ],
+                configFields: `
+                    <div class="space-y-4">
+                        <h4 class="font-semibold text-gray-800">OpenAI Realtime Configuration</h4>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Model</label>
+                            <select class="form-input">
+                                <option>GPT-4 (Most capable)</option>
+                                <option>GPT-3.5 Turbo (Faster)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Temperature</label>
+                            <input type="range" class="w-full" min="0" max="2" step="0.1" value="0.7">
+                            <p class="text-sm text-gray-600">Controls randomness in responses</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">System Prompt</label>
+                            <textarea class="form-input" rows="3" placeholder="Define the agent's behavior and personality..."></textarea>
+                        </div>
+                    </div>
+                `
+            },
+            elevenlabs: {
+                useCases: [
+                    {
+                        id: 'phone_support',
+                        name: 'Phone Support',
+                        description: 'Professional phone-based customer support with natural voices',
+                        icon: '📞'
+                    },
+                    {
+                        id: 'voice_branding',
+                        name: 'Voice Branding',
+                        description: 'Custom branded voice experiences with voice cloning',
+                        icon: '🎭'
+                    },
+                    {
+                        id: 'multilingual_calls',
+                        name: 'Multilingual Calls',
+                        description: 'International phone support in multiple languages',
+                        icon: '🌍'
+                    },
+                    {
+                        id: 'appointment_calls',
+                        name: 'Appointment Calls',
+                        description: 'Automated appointment booking and confirmation calls',
+                        icon: '📅'
+                    }
+                ],
+                configFields: `
+                    <div class="elevenlabs-config space-y-4">
+                        <h4 class="font-semibold text-gray-800">
+                            <i class="fas fa-microphone-alt mr-2 text-orange-600"></i>
+                            ElevenLabs Configuration
+                        </h4>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">API Key</label>
+                            <input type="password" id="elevenlabsApiKey" class="form-input" placeholder="Enter your ElevenLabs API key">
+                            <p class="text-sm text-gray-600 mt-1">Get your API key from ElevenLabs dashboard</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Voice Selection</label>
+                            <select id="elevenlabsVoice" class="form-input" onchange="updateVoicePreview()">
+                                <option value="pNInz6obpgDQGcFmaJgB">Adam - Deep, authoritative male voice</option>
+                                <option value="21m00Tcm4TlvDq8ikWAM">Rachel - Calm, professional female voice</option>
+                                <option value="AZnzlk1XvdvUeBnXmlld">Domi - Strong, confident female voice</option>
+                                <option value="EXAVITQu4vr4xnSDxMaL">Bella - Friendly, warm female voice</option>
+                                <option value="ErXwobaYiN019PkySvjV">Antoni - Smooth, articulate male voice</option>
+                                <option value="custom">Custom Voice (Voice Cloning)</option>
+                            </select>
+                        </div>
+                        <div id="customVoiceConfig" style="display: none;">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Custom Voice ID</label>
+                            <input type="text" class="form-input" placeholder="Enter your custom voice ID">
+                            <p class="text-sm text-gray-600 mt-1">Upload and train your custom voice in ElevenLabs dashboard</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Voice Settings</label>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">Stability</label>
+                                    <input type="range" class="w-full" min="0" max="1" step="0.1" value="0.75" id="stabilitySlider">
+                                    <span class="text-xs text-gray-500">0.75</span>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">Similarity Boost</label>
+                                    <input type="range" class="w-full" min="0" max="1" step="0.1" value="0.75" id="similaritySlider">
+                                    <span class="text-xs text-gray-500">0.75</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Phone Integration</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="mr-2" checked>
+                                    <span class="text-sm">Enable phone call webhooks</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="mr-2" checked>
+                                    <span class="text-sm">Auto-generate conversation summaries</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="mr-2">
+                                    <span class="text-sm">Enable call recording</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Webhook URL</label>
+                            <input type="url" class="form-input" placeholder="https://your-domain.com/webhook/elevenlabs" readonly>
+                            <p class="text-sm text-gray-600 mt-1">This will be auto-generated after agent creation</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        // Provider selection
+        function selectProvider(provider) {
+            selectedProvider = provider;
+            
+            // Remove selection from all cards
+            document.querySelectorAll('.provider-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selection to clicked card
+            document.getElementById(provider + '-card').classList.add('selected');
+            
+            // Enable continue button
+            document.getElementById('continueBtn1').disabled = false;
+            
+            // Store provider in config
+            agentConfig.provider = provider;
+        }
+
+        // Use case selection
+        function selectUseCase(useCase) {
+            selectedUseCase = useCase;
+            
+            // Remove selection from all cards
+            document.querySelectorAll('.use-case-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selection to clicked card
+            document.getElementById(useCase + '-card').classList.add('selected');
+            
+            // Enable continue button
+            document.getElementById('continueBtn2').disabled = false;
+            
+            // Store use case in config
+            agentConfig.useCase = useCase;
+        }
+
+        // Load use cases based on provider
+        function loadUseCases() {
+            const container = document.getElementById('useCaseContainer');
+            const useCases = providerConfigs[selectedProvider].useCases;
+            
+            container.innerHTML = useCases.map(useCase => `
+                <div class="use-case-card slide-in" onclick="selectUseCase('${useCase.id}')" id="${useCase.id}-card">
+                    <div class="text-4xl mb-4">${useCase.icon}</div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">${useCase.name}</h3>
+                    <p class="text-gray-600 text-sm">${useCase.description}</p>
+                </div>
+            `).join('');
+        }
+
+        // Load provider-specific configuration
+        function loadProviderConfig() {
+            const configContainer = document.getElementById('providerConfig');
+            configContainer.innerHTML = providerConfigs[selectedProvider].configFields;
+
+            // Initialize provider-specific features
+            if (selectedProvider === 'elevenlabs') {
+                setTimeout(initializeElevenLabsSliders, 100);
+            }
+        }
+
+        // Update Relevance AI specific configuration
+        function updateRelevanceConfig() {
+            const agentType = document.getElementById('relevanceAgentType').value;
+            const teamConfig = document.getElementById('agentTeamConfig');
+
+            if (agentType === 'multi') {
+                teamConfig.style.display = 'block';
+            } else {
+                teamConfig.style.display = 'none';
+            }
+        }
+
+        // Update ElevenLabs voice preview
+        function updateVoicePreview() {
+            const voiceSelect = document.getElementById('elevenlabsVoice');
+            const customVoiceConfig = document.getElementById('customVoiceConfig');
+
+            if (voiceSelect.value === 'custom') {
+                customVoiceConfig.style.display = 'block';
+            } else {
+                customVoiceConfig.style.display = 'none';
+            }
+        }
+
+        // Update slider values for ElevenLabs
+        function updateSliderValue(sliderId, displayId) {
+            const slider = document.getElementById(sliderId);
+            const display = document.getElementById(displayId);
+            if (slider && display) {
+                display.textContent = slider.value;
+            }
+        }
+
+        // Initialize ElevenLabs sliders
+        function initializeElevenLabsSliders() {
+            const stabilitySlider = document.getElementById('stabilitySlider');
+            const similaritySlider = document.getElementById('similaritySlider');
+
+            if (stabilitySlider) {
+                stabilitySlider.addEventListener('input', function() {
+                    this.nextElementSibling.textContent = this.value;
+                });
+            }
+
+            if (similaritySlider) {
+                similaritySlider.addEventListener('input', function() {
+                    this.nextElementSibling.textContent = this.value;
+                });
+            }
+        }
+
+        // Step navigation
+        function goToStep1() {
+            showStep(1);
+        }
+
+        function goToStep2() {
+            if (!selectedProvider) {
+                alert('Please select an AI provider first!');
+                return;
+            }
+            showStep(2);
+            loadUseCases();
+        }
+
+        function goToStep3() {
+            if (!selectedUseCase) {
+                alert('Please select a use case first!');
+                return;
+            }
+            showStep(3);
+            loadProviderConfig();
+        }
+
+        function goToStep4() {
+            // Collect configuration data
+            agentConfig.name = document.getElementById('agentName').value;
+            agentConfig.description = document.getElementById('agentDescription').value;
+            
+            showStep(4);
+            updateSummary();
+            updateApiKeyStatus();
+        }
+
+        function showStep(step) {
+            // Hide all steps
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Show selected step
+            document.getElementById('step' + step).style.display = 'block';
+            
+            // Update step indicators
+            updateStepIndicators(step);
+            currentStep = step;
+        }
+
+        function updateStepIndicators(activeStep) {
+            const indicators = ['step2', 'step3', 'step4'];
+            const lines = ['line2', 'line3'];
+            
+            for (let i = 2; i <= 4; i++) {
+                const indicator = document.getElementById('step' + i);
+                const line = document.getElementById('line' + i);
+                
+                if (i < activeStep) {
+                    indicator?.classList.add('completed');
+                    indicator?.classList.remove('active');
+                    line?.classList.add('active');
+                } else if (i === activeStep) {
+                    indicator?.classList.add('active');
+                    indicator?.classList.remove('completed');
+                } else {
+                    indicator?.classList.remove('active', 'completed');
+                    line?.classList.remove('active');
+                }
+            }
+        }
+
+        function updateSummary() {
+            document.getElementById('summaryName').textContent = agentConfig.name || 'Unnamed Agent';
+            document.getElementById('summaryProvider').textContent = selectedProvider ? selectedProvider.charAt(0).toUpperCase() + selectedProvider.slice(1) + ' AI' : '-';
+            document.getElementById('summaryUseCase').textContent = selectedUseCase ? selectedUseCase.charAt(0).toUpperCase() + selectedUseCase.slice(1).replace('_', ' ') : '-';
+        }
+
+        function updateApiKeyStatus() {
+            const statusDiv = document.getElementById('apiKeyStatus');
+            
+            if (selectedProvider === 'relevance') {
+                statusDiv.innerHTML = `
+                    <div class="text-left">
+                        <h4 class="font-semibold text-gray-800 mb-2">Relevance AI Configuration</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                <span>API Key will be securely stored</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                                <span>Region: Auto-detected based on your location</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-link text-purple-500 mr-2"></i>
+                                <span>Webhook URL will be generated after deployment</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                statusDiv.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-check-circle text-4xl text-green-500 mb-4"></i>
+                        <p class="text-gray-600">Provider configuration ready</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testAgent() {
+            const btn = document.getElementById('testBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Testing...';
+            btn.disabled = true;
+            
+            // Simulate test
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-check mr-2"></i>Test Successful!';
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-play mr-2"></i>Test Agent';
+                    btn.disabled = false;
+                }, 2000);
+            }, 3000);
+        }
+
+        async function deployAgent() {
+            const btn = document.getElementById('deployBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Deploying...';
+            btn.disabled = true;
+            
+            try {
+                // Prepare agent data
+                const agentData = {
+                    name: agentConfig.name,
+                    description: agentConfig.description,
+                    provider: selectedProvider,
+                    use_case: selectedUseCase,
+                    language: 'hindi',
+                    is_active: true,
+                    provider_config: {}
+                };
+                
+                // Add provider-specific configuration
+                if (selectedProvider === 'relevance') {
+                    agentData.provider_config = {
+                        api_key: document.getElementById('relevanceApiKey')?.value,
+                        region: document.getElementById('relevanceRegion')?.value,
+                        agent_type: document.getElementById('relevanceAgentType')?.value
+                    };
+                } else if (selectedProvider === 'elevenlabs') {
+                    agentData.provider_config = {
+                        api_key: document.getElementById('elevenlabsApiKey')?.value,
+                        voice_id: document.getElementById('elevenlabsVoice')?.value,
+                        voice_settings: {
+                            stability: parseFloat(document.getElementById('stabilitySlider')?.value || 0.75),
+                            similarity_boost: parseFloat(document.getElementById('similaritySlider')?.value || 0.75),
+                            style: 0.0,
+                            use_speaker_boost: true
+                        },
+                        phone_integration: {
+                            webhooks_enabled: true,
+                            conversation_summaries: true,
+                            call_recording: false
+                        }
+                    };
+
+                    // Add custom voice ID if selected
+                    if (agentData.provider_config.voice_id === 'custom') {
+                        const customVoiceId = document.querySelector('#customVoiceConfig input')?.value;
+                        if (customVoiceId) {
+                            agentData.provider_config.voice_id = customVoiceId;
+                        }
+                    }
+                }
+                
+                // Get organization and channel from URL or localStorage
+                const urlParams = new URLSearchParams(window.location.search);
+                const orgId = urlParams.get('orgId') || localStorage.getItem('currentOrgId');
+                const channelId = urlParams.get('channelId') || localStorage.getItem('currentChannelId');
+                
+                if (orgId) agentData.organization_id = orgId;
+                if (channelId) agentData.channel_id = channelId;
+                
+                // Create agent via API
+                const response = await fetch('/api/voice-agents', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(agentData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to create agent');
+                }
+                
+                const result = await response.json();
+                
+                btn.innerHTML = '<i class="fas fa-check mr-2"></i>Deployed Successfully!';
+                
+                setTimeout(() => {
+                    alert(`🎉 ${selectedProvider === 'relevance' ? 'Relevance AI' : selectedProvider.charAt(0).toUpperCase() + selectedProvider.slice(1)} agent deployed successfully!\n\nAgent ID: ${result.voice_agent?.id || 'Generated'}\n\nYou can now manage your agent from the AI Agents section.`);
+                    window.location.href = '/agent-setup.html';
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Error deploying agent:', error);
+                btn.innerHTML = '<i class="fas fa-rocket mr-2"></i>Deploy Agent';
+                btn.disabled = false;
+                alert('❌ Error deploying agent: ' + error.message);
+            }
+        }
+
+        function saveAndContinueLater() {
+            // Save current configuration to localStorage
+            localStorage.setItem('agentDraft', JSON.stringify({
+                provider: selectedProvider,
+                useCase: selectedUseCase,
+                config: agentConfig,
+                timestamp: new Date().toISOString()
+            }));
+            
+            alert('💾 Draft saved! You can continue creating this agent later from the dashboard.');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Enhanced agent creation page loaded!');
+            
+            // Check for saved draft
+            const savedDraft = localStorage.getItem('agentDraft');
+            if (savedDraft) {
+                const draft = JSON.parse(savedDraft);
+                const draftAge = (new Date() - new Date(draft.timestamp)) / (1000 * 60 * 60); // hours
+                
+                if (draftAge < 24) {
+                    if (confirm('Found a saved draft from ' + new Date(draft.timestamp).toLocaleString() + '. Would you like to continue?')) {
+                        // Restore draft
+                        selectedProvider = draft.provider;
+                        selectedUseCase = draft.useCase;
+                        agentConfig = draft.config;
+                        
+                        // Navigate to appropriate step
+                        if (selectedProvider) {
+                            selectProvider(selectedProvider);
+                            if (selectedUseCase) {
+                                goToStep3();
+                            } else {
+                                goToStep2();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

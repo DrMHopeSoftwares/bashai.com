@@ -207,4 +207,4 @@ Copyright © 2024 DrM Hope Softwares. All rights reserved.
 ---
 
 **Made with ❤️ by DrM Hope Softwares | Powered by Clinivoice AI**
-# bashai.com
+# bhashai.com

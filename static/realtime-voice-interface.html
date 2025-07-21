@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realtime Voice Chat - BhashAI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .voice-interface {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 2rem;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .status-indicator {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        .status-disconnected {
+            background: #fee;
+            color: #c53030;
+            border: 1px solid #fed7d7;
+        }
+
+        .status-connecting {
+            background: #fef5e7;
+            color: #c05621;
+            border: 1px solid #fbd38d;
+        }
+
+        .status-connected {
+            background: #f0fff4;
+            color: #2d7d40;
+            border: 1px solid #9ae6b4;
+        }
+
+        .voice-controls {
+            margin: 2rem 0;
+        }
+
+        .voice-agent-selector {
+            margin-bottom: 1.5rem;
+        }
+
+        .voice-agent-selector select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: white;
+        }
+
+        .voice-button {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .voice-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .start-button {
+            background: linear-gradient(45deg, #48bb78, #38a169);
+            color: white;
+        }
+
+        .start-button:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(72, 187, 120, 0.3);
+        }
+
+        .recording-button {
+            background: linear-gradient(45deg, #f56565, #e53e3e);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(245, 101, 101, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(245, 101, 101, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 101, 101, 0); }
+        }
+
+        .stop-button {
+            background: linear-gradient(45deg, #718096, #4a5568);
+            color: white;
+        }
+
+        .stop-button:hover:not(:disabled) {
+            transform: scale(1.05);
+        }
+
+        .text-input-section {
+            margin: 1.5rem 0;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .text-input-section.active {
+            opacity: 1;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .send-text-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .send-text-button:hover:not(:disabled) {
+            background: #5a67d8;
+        }
+
+        .conversation-area {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            max-height: 300px;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        .message {
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+
+        .user-message {
+            background: #e6fffa;
+            color: #234e52;
+            text-align: right;
+        }
+
+        .assistant-message {
+            background: #edf2f7;
+            color: #2d3748;
+        }
+
+        .timestamp {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-top: 0.25rem;
+        }
+
+        .session-info {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            color: #4a5568;
+        }
+
+        .usage-meter {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 8px;
+            margin: 0.5rem 0;
+            overflow: hidden;
+        }
+
+        .usage-fill {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 0.75rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .audio-visualizer {
+            height: 60px;
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            margin: 1rem 0;
+            gap: 2px;
+        }
+
+        .audio-bar {
+            width: 4px;
+            background: #667eea;
+            border-radius: 2px;
+            height: 10px;
+            transition: height 0.1s ease;
+        }
+
+        .credits-info {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 1rem;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="voice-interface">
+        <div class="logo">🗣️ BhashAI Realtime</div>
+        
+        <div id="status" class="status-indicator status-disconnected">
+            Disconnected
+        </div>
+
+        <div class="voice-agent-selector">
+            <select id="voiceAgentSelect">
+                <option value="">Select Voice Agent...</option>
+                <option value="demo-agent">Demo Assistant (Hindi/English)</option>
+                <option value="healthcare-agent">Healthcare Assistant</option>
+                <option value="sales-agent">Sales Representative</option>
+                <option value="support-agent">Customer Support</option>
+            </select>
+        </div>
+
+        <div class="voice-controls">
+            <button id="startSessionBtn" class="voice-button start-button" title="Start Voice Session">
+                🎙️
+            </button>
+            <button id="recordBtn" class="voice-button recording-button" style="display: none;" title="Recording... Click to stop">
+                ⏹️
+            </button>
+            <button id="stopSessionBtn" class="voice-button stop-button" style="display: none;" title="End Session">
+                ❌
+            </button>
+        </div>
+
+        <div class="audio-visualizer" id="audioVisualizer" style="display: none;">
+            <div class="audio-bar"></div>
+            <div class="audio-bar"></div>
+            <div class="audio-bar"></div>
+            <div class="audio-bar"></div>
+            <div class="audio-bar"></div>
+            <div class="audio-bar"></div>
+            <div class="audio-bar"></div>
+            <div class="audio-bar"></div>
+        </div>
+
+        <div class="text-input-section" id="textInputSection">
+            <input type="text" id="textInput" class="text-input" placeholder="Type a message..." disabled>
+            <button id="sendTextBtn" class="send-text-button" disabled>Send</button>
+        </div>
+
+        <div class="conversation-area" id="conversationArea">
+            <div style="text-align: center; color: #666; font-style: italic;">
+                No conversation yet. Start a voice session to begin!
+            </div>
+        </div>
+
+        <div class="session-info" id="sessionInfo" style="display: none;">
+            <div><strong>Session:</strong> <span id="sessionId">-</span></div>
+            <div><strong>Duration:</strong> <span id="sessionDuration">00:00</span></div>
+            <div><strong>Agent:</strong> <span id="currentAgent">-</span></div>
+            <div class="usage-meter">
+                <div class="usage-fill" id="usageFill"></div>
+            </div>
+            <div>Trial Usage: <span id="usageText">0/30 minutes</span></div>
+        </div>
+
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+        <div class="credits-info">
+            <strong>Realtime Voice Chat:</strong> Natural conversation in Hindi/English<br>
+            Powered by OpenAI GPT-4o Realtime API
+        </div>
+    </div>
+
+    <!-- Socket.IO Client -->
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    
+    <script>
+        class RealtimeVoiceInterface {
+            constructor() {
+                this.socket = null;
+                this.isConnected = false;
+                this.isRecording = false;
+                this.currentSession = null;
+                this.mediaRecorder = null;
+                this.audioContext = null;
+                this.audioStream = null;
+                this.sessionStartTime = null;
+                this.durationInterval = null;
+                
+                this.initializeElements();
+                this.initializeEventListeners();
+                this.connectWebSocket();
+            }
+
+            initializeElements() {
+                this.elements = {
+                    status: document.getElementById('status'),
+                    voiceAgentSelect: document.getElementById('voiceAgentSelect'),
+                    startSessionBtn: document.getElementById('startSessionBtn'),
+                    recordBtn: document.getElementById('recordBtn'),
+                    stopSessionBtn: document.getElementById('stopSessionBtn'),
+                    textInput: document.getElementById('textInput'),
+                    sendTextBtn: document.getElementById('sendTextBtn'),
+                    textInputSection: document.getElementById('textInputSection'),
+                    conversationArea: document.getElementById('conversationArea'),
+                    sessionInfo: document.getElementById('sessionInfo'),
+                    sessionId: document.getElementById('sessionId'),
+                    sessionDuration: document.getElementById('sessionDuration'),
+                    currentAgent: document.getElementById('currentAgent'),
+                    usageFill: document.getElementById('usageFill'),
+                    usageText: document.getElementById('usageText'),
+                    errorMessage: document.getElementById('errorMessage'),
+                    audioVisualizer: document.getElementById('audioVisualizer')
+                };
+            }
+
+            initializeEventListeners() {
+                this.elements.startSessionBtn.addEventListener('click', () => this.startVoiceSession());
+                this.elements.recordBtn.addEventListener('click', () => this.stopRecording());
+                this.elements.stopSessionBtn.addEventListener('click', () => this.endVoiceSession());
+                this.elements.sendTextBtn.addEventListener('click', () => this.sendTextMessage());
+                this.elements.textInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendTextMessage();
+                });
+            }
+
+            connectWebSocket() {
+                this.updateStatus('connecting', 'Connecting...');
+                
+                this.socket = io();
+                
+                this.socket.on('connect', () => {
+                    this.isConnected = true;
+                    this.updateStatus('connected', 'Connected');
+                    this.elements.startSessionBtn.disabled = false;
+                });
+
+                this.socket.on('disconnect', () => {
+                    this.isConnected = false;
+                    this.updateStatus('disconnected', 'Disconnected');
+                    this.resetInterface();
+                });
+
+                this.socket.on('voice_session_started', (data) => {
+                    this.handleSessionStarted(data);
+                });
+
+                this.socket.on('audio_output', (data) => {
+                    this.playAudioOutput(data);
+                });
+
+                this.socket.on('transcript', (data) => {
+                    this.addMessageToConversation(data.text, data.role, data.timestamp);
+                });
+
+                this.socket.on('voice_session_ended', (data) => {
+                    this.handleSessionEnded(data);
+                });
+
+                this.socket.on('error', (data) => {
+                    this.showError(data.message);
+                });
+
+                this.socket.on('realtime_error', (data) => {
+                    this.showError(`Realtime API Error: ${data.message}`);
+                });
+            }
+
+            updateStatus(type, message) {
+                this.elements.status.className = `status-indicator status-${type}`;
+                this.elements.status.textContent = message;
+            }
+
+            async startVoiceSession() {
+                const selectedAgent = this.elements.voiceAgentSelect.value;
+                if (!selectedAgent) {
+                    this.showError('Please select a voice agent first');
+                    return;
+                }
+
+                try {
+                    // Request microphone permission
+                    this.audioStream = await navigator.mediaDevices.getUserMedia({ 
+                        audio: {
+                            sampleRate: 24000,
+                            channelCount: 1,
+                            echoCancellation: true,
+                            noiseSuppression: true
+                        }
+                    });
+
+                    // Get auth token (in real app, this would come from login)
+                    const authToken = this.getAuthToken();
+                    
+                    this.socket.emit('start_voice_session', {
+                        auth_token: authToken,
+                        voice_agent_id: selectedAgent
+                    });
+
+                    this.elements.startSessionBtn.style.display = 'none';
+                    this.elements.recordBtn.style.display = 'inline-block';
+                    this.elements.stopSessionBtn.style.display = 'inline-block';
+                    this.elements.voiceAgentSelect.disabled = true;
+
+                } catch (error) {
+                    this.showError('Microphone access denied. Please enable microphone access and try again.');
+                }
+            }
+
+            handleSessionStarted(data) {
+                this.currentSession = data.session_id;
+                this.sessionStartTime = new Date();
+                
+                this.elements.sessionInfo.style.display = 'block';
+                this.elements.sessionId.textContent = data.session_id.substring(0, 8) + '...';
+                this.elements.currentAgent.textContent = data.voice_agent;
+                this.elements.textInputSection.classList.add('active');
+                this.elements.textInput.disabled = false;
+                this.elements.sendTextBtn.disabled = false;
+
+                this.startDurationTimer();
+                this.startRecording();
+                this.clearConversation();
+            }
+
+            startDurationTimer() {
+                this.durationInterval = setInterval(() => {
+                    if (this.sessionStartTime) {
+                        const elapsed = Date.now() - this.sessionStartTime.getTime();
+                        const minutes = Math.floor(elapsed / 60000);
+                        const seconds = Math.floor((elapsed % 60000) / 1000);
+                        this.elements.sessionDuration.textContent = 
+                            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                        
+                        // Update usage meter (assuming 30-minute trial limit)
+                        const usagePercent = Math.min((minutes / 30) * 100, 100);
+                        this.elements.usageFill.style.width = `${usagePercent}%`;
+                        this.elements.usageText.textContent = `${minutes}/30 minutes`;
+                    }
+                }, 1000);
+            }
+
+            async startRecording() {
+                if (!this.audioStream) return;
+
+                this.mediaRecorder = new MediaRecorder(this.audioStream, {
+                    mimeType: 'audio/webm;codecs=opus'
+                });
+
+                this.mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0 && this.currentSession) {
+                        // Convert to base64 and send
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            const audioData = reader.result.split(',')[1]; // Remove data:audio/webm;base64,
+                            this.socket.emit('send_audio', {
+                                audio_data: audioData
+                            });
+                        };
+                        reader.readAsDataURL(event.data);
+                    }
+                };
+
+                this.mediaRecorder.start(250); // Send chunks every 250ms
+                this.isRecording = true;
+                this.elements.audioVisualizer.style.display = 'flex';
+                this.animateAudioBars();
+            }
+
+            stopRecording() {
+                if (this.mediaRecorder && this.isRecording) {
+                    this.mediaRecorder.stop();
+                    this.isRecording = false;
+                    this.elements.audioVisualizer.style.display = 'none';
+                    
+                    // Commit audio buffer
+                    this.socket.emit('commit_audio', {});
+                }
+            }
+
+            endVoiceSession() {
+                if (this.currentSession) {
+                    this.socket.emit('end_voice_session', {});
+                }
+                this.resetInterface();
+            }
+
+            handleSessionEnded(data) {
+                this.resetInterface();
+                this.addSystemMessage(`Session ended. Duration: ${data.duration_minutes} minutes`);
+            }
+
+            resetInterface() {
+                this.currentSession = null;
+                this.sessionStartTime = null;
+                
+                if (this.durationInterval) {
+                    clearInterval(this.durationInterval);
+                    this.durationInterval = null;
+                }
+
+                if (this.audioStream) {
+                    this.audioStream.getTracks().forEach(track => track.stop());
+                    this.audioStream = null;
+                }
+
+                if (this.mediaRecorder) {
+                    this.mediaRecorder = null;
+                }
+
+                this.elements.startSessionBtn.style.display = 'inline-block';
+                this.elements.recordBtn.style.display = 'none';
+                this.elements.stopSessionBtn.style.display = 'none';
+                this.elements.voiceAgentSelect.disabled = false;
+                this.elements.sessionInfo.style.display = 'none';
+                this.elements.textInputSection.classList.remove('active');
+                this.elements.textInput.disabled = true;
+                this.elements.sendTextBtn.disabled = true;
+                this.elements.audioVisualizer.style.display = 'none';
+                
+                this.isRecording = false;
+            }
+
+            sendTextMessage() {
+                const text = this.elements.textInput.value.trim();
+                if (!text || !this.currentSession) return;
+
+                this.socket.emit('send_text', { text: text });
+                this.addMessageToConversation(text, 'user');
+                this.elements.textInput.value = '';
+            }
+
+            playAudioOutput(data) {
+                // Decode base64 audio and play
+                const audioData = atob(data.audio_data);
+                const audioBuffer = new ArrayBuffer(audioData.length);
+                const view = new Uint8Array(audioBuffer);
+                
+                for (let i = 0; i < audioData.length; i++) {
+                    view[i] = audioData.charCodeAt(i);
+                }
+
+                // Create audio context and play
+                if (!this.audioContext) {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+
+                // Note: This is a simplified version. In production, you'd need proper PCM16 decoding
+                console.log('Received audio output:', data.format, 'Sample rate:', data.sample_rate);
+            }
+
+            addMessageToConversation(text, role, timestamp = null) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${role}-message`;
+                
+                const messageText = document.createElement('div');
+                messageText.textContent = text;
+                messageDiv.appendChild(messageText);
+
+                if (timestamp) {
+                    const timestampDiv = document.createElement('div');
+                    timestampDiv.className = 'timestamp';
+                    timestampDiv.textContent = new Date(timestamp).toLocaleTimeString();
+                    messageDiv.appendChild(timestampDiv);
+                }
+
+                this.elements.conversationArea.appendChild(messageDiv);
+                this.elements.conversationArea.scrollTop = this.elements.conversationArea.scrollHeight;
+            }
+
+            addSystemMessage(text) {
+                const messageDiv = document.createElement('div');
+                messageDiv.style.textAlign = 'center';
+                messageDiv.style.fontStyle = 'italic';
+                messageDiv.style.color = '#666';
+                messageDiv.style.margin = '1rem 0';
+                messageDiv.textContent = text;
+                
+                this.elements.conversationArea.appendChild(messageDiv);
+                this.elements.conversationArea.scrollTop = this.elements.conversationArea.scrollHeight;
+            }
+
+            clearConversation() {
+                this.elements.conversationArea.innerHTML = '';
+                this.addSystemMessage('Voice session started. You can speak or type messages.');
+            }
+
+            animateAudioBars() {
+                if (!this.isRecording) return;
+
+                const bars = this.elements.audioVisualizer.querySelectorAll('.audio-bar');
+                bars.forEach(bar => {
+                    const height = Math.random() * 40 + 10;
+                    bar.style.height = `${height}px`;
+                });
+
+                setTimeout(() => this.animateAudioBars(), 100);
+            }
+
+            showError(message) {
+                this.elements.errorMessage.textContent = message;
+                this.elements.errorMessage.style.display = 'block';
+                setTimeout(() => {
+                    this.elements.errorMessage.style.display = 'none';
+                }, 5000);
+            }
+
+            getAuthToken() {
+                // In a real application, this would retrieve the actual auth token
+                // For demo purposes, returning a placeholder
+                return localStorage.getItem('auth_token') || 'demo-token';
+            }
+        }
+
+        // Initialize the interface when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new RealtimeVoiceInterface();
+        });
+    </script>
+</body>
+</html>

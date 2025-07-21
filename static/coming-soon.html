@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BhashAI Mobile App - Coming Soon | AI Voice Agents on the Go</title>
+    <meta name="description" content="BhashAI Mobile App is coming soon! Manage your AI voice agents, monitor calls, and access multilingual voice AI features from anywhere. Get notified when we launch.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+
+        .phone-mockup {
+            background: linear-gradient(145deg, #1f2937, #374151);
+            border-radius: 30px;
+            padding: 8px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phone-screen {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 22px;
+            height: 600px;
+            width: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-preview {
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .countdown-timer {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .time-unit {
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .notification-signup {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .app-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-white/10 backdrop-blur-md border-b border-white/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-white">BhashAI</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-white/80 hover:text-white">Home</a>
+                    <a href="/dashboard.html" class="bg-white text-indigo-600 px-4 py-2 rounded-lg hover:bg-gray-100">Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="py-20 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <!-- Left Content -->
+                <div>
+                    <div class="text-6xl mb-6">📱</div>
+                    <h1 class="text-5xl font-bold mb-6">
+                        BhashAI Mobile App
+                        <span class="block text-3xl text-purple-200 mt-2">Coming Soon!</span>
+                    </h1>
+                    <p class="text-xl mb-8 text-white/90">
+                        Manage your AI voice agents on the go. Monitor calls, track performance,
+                        and access multilingual voice AI features from anywhere in India.
+                    </p>
+
+                    <!-- Key Features Preview -->
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <span>Real-time call monitoring and analytics</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <span>Voice agent management in 20+ Indian languages</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <span>Offline mode for essential features</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <span>Push notifications for important events</span>
+                        </div>
+                    </div>
+
+                    <!-- App Store Buttons Preview -->
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <div class="bg-black text-white px-6 py-3 rounded-lg flex items-center space-x-3 opacity-50">
+                            <i class="fab fa-apple text-2xl"></i>
+                            <div>
+                                <div class="text-xs">Download on the</div>
+                                <div class="text-lg font-semibold">App Store</div>
+                            </div>
+                        </div>
+                        <div class="bg-black text-white px-6 py-3 rounded-lg flex items-center space-x-3 opacity-50">
+                            <i class="fab fa-google-play text-2xl"></i>
+                            <div>
+                                <div class="text-xs">Get it on</div>
+                                <div class="text-lg font-semibold">Google Play</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Content - Phone Mockup -->
+                <div class="flex justify-center">
+                    <div class="phone-mockup floating">
+                        <div class="phone-screen">
+                            <div class="app-preview">
+                                <!-- App Header -->
+                                <div class="flex items-center justify-between mb-6">
+                                    <div class="app-icon">
+                                        <i class="fas fa-microphone"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-gray-800">BhashAI</h3>
+                                        <p class="text-sm text-gray-500">Voice AI Platform</p>
+                                    </div>
+                                    <div class="w-8 h-8 bg-gray-200 rounded-full"></div>
+                                </div>
+
+                                <!-- Quick Stats -->
+                                <div class="grid grid-cols-2 gap-3 mb-6">
+                                    <div class="bg-indigo-50 p-3 rounded-lg">
+                                        <div class="text-2xl font-bold text-indigo-600">24</div>
+                                        <div class="text-xs text-gray-600">Active Agents</div>
+                                    </div>
+                                    <div class="bg-green-50 p-3 rounded-lg">
+                                        <div class="text-2xl font-bold text-green-600">1.2K</div>
+                                        <div class="text-xs text-gray-600">Calls Today</div>
+                                    </div>
+                                </div>
+
+                                <!-- Recent Activity -->
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-gray-800 mb-3">Recent Activity</h4>
+                                    <div class="space-y-3">
+                                        <div class="flex items-center space-x-3 p-2 bg-gray-50 rounded-lg">
+                                            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                                                <i class="fas fa-phone text-white text-xs"></i>
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="text-sm font-medium">Hindi Support Call</div>
+                                                <div class="text-xs text-gray-500">2 min ago</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-3 p-2 bg-gray-50 rounded-lg">
+                                            <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                                                <i class="fas fa-check text-white text-xs"></i>
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="text-sm font-medium">Tamil Agent Updated</div>
+                                                <div class="text-xs text-gray-500">5 min ago</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">🚀 App Features</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Everything you need to manage your AI voice agents from your mobile device
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card">
+                    <div class="text-4xl mb-4">📊</div>
+                    <h3 class="text-xl font-semibold mb-3">Real-time Analytics</h3>
+                    <p class="text-gray-600">Monitor call volumes, success rates, and performance metrics in real-time with beautiful charts and insights.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="text-4xl mb-4">🎙️</div>
+                    <h3 class="text-xl font-semibold mb-3">Voice Agent Management</h3>
+                    <p class="text-gray-600">Create, edit, and deploy voice agents in multiple Indian languages directly from your mobile device.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="text-4xl mb-4">🔔</div>
+                    <h3 class="text-xl font-semibold mb-3">Smart Notifications</h3>
+                    <p class="text-gray-600">Get instant alerts for important events, failed calls, and system updates to stay on top of your operations.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="text-4xl mb-4">🌐</div>
+                    <h3 class="text-xl font-semibold mb-3">Offline Mode</h3>
+                    <p class="text-gray-600">Access essential features and cached data even when you're offline or have poor connectivity.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="text-4xl mb-4">🔒</div>
+                    <h3 class="text-xl font-semibold mb-3">Secure Access</h3>
+                    <p class="text-gray-600">Biometric authentication and end-to-end encryption to keep your voice AI data secure.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="text-4xl mb-4">⚡</div>
+                    <h3 class="text-xl font-semibold mb-3">Quick Actions</h3>
+                    <p class="text-gray-600">Perform common tasks with shortcuts and widgets for faster voice agent management.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Countdown Section -->
+    <section class="py-20 bg-gradient-to-br from-indigo-600 to-purple-700 text-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl font-bold mb-8">⏰ Launch Countdown</h2>
+            <p class="text-xl mb-12">We're putting the finishing touches on the BhashAI Mobile App</p>
+
+            <div class="countdown-timer mb-12">
+                <div class="flex justify-center space-x-6" id="countdown">
+                    <div class="time-unit">
+                        <div class="text-3xl font-bold" id="days">30</div>
+                        <div class="text-sm">Days</div>
+                    </div>
+                    <div class="time-unit">
+                        <div class="text-3xl font-bold" id="hours">12</div>
+                        <div class="text-sm">Hours</div>
+                    </div>
+                    <div class="time-unit">
+                        <div class="text-3xl font-bold" id="minutes">45</div>
+                        <div class="text-sm">Minutes</div>
+                    </div>
+                    <div class="time-unit">
+                        <div class="text-3xl font-bold" id="seconds">30</div>
+                        <div class="text-sm">Seconds</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Signup -->
+            <div class="notification-signup max-w-md mx-auto">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Get Notified When We Launch!</h3>
+                <p class="text-gray-600 mb-6">Be the first to know when the BhashAI Mobile App is available for download.</p>
+
+                <form id="notification-form" class="space-y-4">
+                    <div>
+                        <input type="email" id="email" placeholder="Enter your email address"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    </div>
+                    <div>
+                        <input type="tel" id="phone" placeholder="Phone number (optional)"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors">
+                        🔔 Notify Me When Available
+                    </button>
+                </form>
+
+                <div id="signup-result" class="mt-4 text-center"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center mb-12">❓ Frequently Asked Questions</h2>
+
+            <div class="space-y-6">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-semibold mb-3">When will the BhashAI Mobile App be available?</h3>
+                    <p class="text-gray-600">We're targeting a launch in Q2 2024. Sign up for notifications to be the first to know when it's available for download.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-semibold mb-3">Which platforms will be supported?</h3>
+                    <p class="text-gray-600">The app will be available for both iOS (iPhone/iPad) and Android devices. We're ensuring compatibility with the latest OS versions.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-semibold mb-3">Will all web features be available on mobile?</h3>
+                    <p class="text-gray-600">The mobile app will include all essential features for managing voice agents, monitoring calls, and accessing analytics. Some advanced configuration features may remain web-only initially.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-semibold mb-3">Can I use the app offline?</h3>
+                    <p class="text-gray-600">Yes! The app will include offline mode for viewing cached data, accessing recent call logs, and performing basic agent management tasks.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-semibold mb-3">Will there be additional costs for the mobile app?</h3>
+                    <p class="text-gray-600">The BhashAI Mobile App will be free to download and use with your existing BhashAI account. No additional subscription fees.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gradient-to-br from-indigo-600 to-purple-700 text-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl font-bold mb-6">Ready to Get Started?</h2>
+            <p class="text-xl mb-8">
+                While you wait for the mobile app, start using BhashAI's powerful web platform today!
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/dashboard.html" class="bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                    🚀 Start Free Trial
+                </a>
+                <a href="/book-demo.html" class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-indigo-600 transition-colors">
+                    📞 Book a Demo
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">BhashAI</h3>
+                    <p class="text-gray-400">India's first regional language AI voice agent platform</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Platform</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="/dashboard.html" class="hover:text-white">Dashboard</a></li>
+                        <li><a href="/voice-samples.html" class="hover:text-white">Voice Samples</a></li>
+                        <li><a href="/book-demo.html" class="hover:text-white">Book Demo</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Mobile App</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><span class="opacity-50">iOS App (Coming Soon)</span></li>
+                        <li><span class="opacity-50">Android App (Coming Soon)</span></li>
+                        <li><a href="#notification-form" class="hover:text-white">Get Notified</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Connect</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">Twitter</a></li>
+                        <li><a href="#" class="hover:text-white">LinkedIn</a></li>
+                        <li><a href="#" class="hover:text-white">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 BhashAI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Countdown Timer
+        function updateCountdown() {
+            // Set launch date (30 days from now for demo)
+            const launchDate = new Date();
+            launchDate.setDate(launchDate.getDate() + 30);
+
+            const now = new Date().getTime();
+            const distance = launchDate.getTime() - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('days').textContent = days;
+            document.getElementById('hours').textContent = hours;
+            document.getElementById('minutes').textContent = minutes;
+            document.getElementById('seconds').textContent = seconds;
+        }
+
+        // Update countdown every second
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // Notification signup form
+        document.getElementById('notification-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const resultDiv = document.getElementById('signup-result');
+
+            // Show loading state
+            resultDiv.innerHTML = '<div class="text-indigo-600">📧 Signing you up...</div>';
+
+            try {
+                // Simulate API call (replace with actual implementation)
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                resultDiv.innerHTML = `
+                    <div class="text-green-600 font-semibold">
+                        ✅ Success! You'll be notified when the app launches.
+                    </div>
+                `;
+
+                // Clear form
+                document.getElementById('email').value = '';
+                document.getElementById('phone').value = '';
+
+                // Show success notification
+                showNotification('Successfully signed up for app launch notifications!');
+
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="text-red-600">
+                        ❌ Error signing up. Please try again.
+                    </div>
+                `;
+            }
+        });
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
+            notification.textContent = message;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 4000);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            showNotification('BhashAI Mobile App coming soon! Sign up for notifications.');
+        });
+    </script>
+</body>
+</html>

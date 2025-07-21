@@ -8,31 +8,69 @@ from typing import Dict, List, Optional
 from plivo_integration import PlivoAPI
 from twilio_integration import TwilioAPI
 from telnyx_integration import TelnyxAPI
+from bolna_integration import BolnaAPI
+from elevenlabs_integration import ElevenLabsAPI
 
 
 class PhoneProviderManager:
     """Unified manager for multiple phone number providers"""
     
     def __init__(self):
-        self.providers = {
-            'plivo': PlivoAPI(),
-            'twilio': TwilioAPI(),
-            'telnyx': TelnyxAPI(),
+        self.providers = {}
+
+        # Initialize providers with error handling to prevent server crashes
+        provider_classes = {
+            'plivo': PlivoAPI,
+            'twilio': TwilioAPI,
+            'telnyx': TelnyxAPI,
+            'bolna': BolnaAPI,
+            'elevenlabs': ElevenLabsAPI,
         }
+
+        for name, provider_class in provider_classes.items():
+            try:
+                self.providers[name] = provider_class()
+                print(f"✅ {name.title()} provider initialized successfully")
+            except Exception as e:
+                print(f"⚠️  {name.title()} provider failed to initialize: {e}")
+                print(f"   {name.title()} will use mock mode")
+                self.providers[name] = None
         
         # Provider availability based on credentials
         self.available_providers = {}
         for name, provider in self.providers.items():
-            self.available_providers[name] = not getattr(provider, 'use_mock', True)
+            if provider is None:
+                self.available_providers[name] = False
+            else:
+                self.available_providers[name] = not getattr(provider, 'use_mock', True)
     
     def get_provider(self, provider_name: str):
         """Get provider instance by name"""
         provider = self.providers.get(provider_name.lower())
-        if not provider:
-            raise ValueError(f"Unsupported provider: {provider_name}. Supported: plivo, twilio, telnyx")
+        if provider is None:
+            print(f"⚠️  Provider '{provider_name}' not available, using mock mode")
+            return self._create_mock_provider(provider_name)
         return provider
-    
-    def search_phone_numbers(self, 
+
+    def _create_mock_provider(self, provider_name: str):
+        """Create a mock provider for when the real provider fails to initialize"""
+        class MockProvider:
+            def __init__(self, name):
+                self.name = name
+                self.use_mock = True
+
+            def __getattr__(self, name):
+                def mock_method(*args, **kwargs):
+                    return {
+                        'success': True,
+                        'message': f'Mock response from {self.name}',
+                        'mock': True
+                    }
+                return mock_method
+
+        return MockProvider(provider_name)
+
+    def search_phone_numbers(self,
                            provider_name: str,
                            country_code: str = 'US',
                            pattern: str = None,
@@ -91,6 +129,27 @@ class PhoneProviderManager:
                     features=['voice', 'sms'],
                     limit=limit
                 )
+            elif provider_name.lower() == 'bolna':
+                # For Bolna, extract area code from pattern and pass capabilities
+                area_code = None
+                if pattern and pattern.isdigit() and len(pattern) == 3:
+                    area_code = pattern
+                
+                # Convert capabilities from any format to list
+                capabilities = None
+                if hasattr(self, 'capabilities') and self.capabilities:
+                    if isinstance(self.capabilities, str):
+                        capabilities = self.capabilities.split(',')
+                    elif isinstance(self.capabilities, list):
+                        capabilities = self.capabilities
+                
+                return provider.search_phone_numbers(
+                    country_code=country_code,
+                    area_code=area_code,
+                    pattern=pattern,
+                    capabilities=capabilities,
+                    limit=limit
+                )
             else:
                 return {
                     'success': False,
@@ -139,6 +198,11 @@ class PhoneProviderManager:
                 billing_group_id = kwargs.get('billing_group_id')
                 return provider.purchase_phone_number(
                     phone_number, connection_id, customer_reference, billing_group_id
+                )
+            elif provider_name.lower() == 'bolna':
+                friendly_name = kwargs.get('friendly_name')
+                return provider.purchase_phone_number(
+                    phone_number, friendly_name
                 )
             else:
                 return {
@@ -289,8 +353,97 @@ class PhoneProviderManager:
         return provider_countries.get(provider_name.lower(), [])
 
 
-# Global instance
+class VoiceProviderManager:
+    """Unified manager for voice synthesis and AI voice providers"""
+
+    def __init__(self):
+        self.voice_providers = {
+            'bolna': BolnaAPI(),
+            'elevenlabs': ElevenLabsAPI(),
+        }
+
+        # Voice provider availability based on credentials
+        self.available_voice_providers = {}
+        for name, provider in self.voice_providers.items():
+            self.available_voice_providers[name] = not getattr(provider, 'use_mock', True)
+
+    def get_voice_provider(self, provider_name: str):
+        """Get voice provider instance by name"""
+        provider = self.voice_providers.get(provider_name.lower())
+        if not provider:
+            raise ValueError(f"Unsupported voice provider: {provider_name}. Supported: bolna, elevenlabs")
+        return provider
+
+    def get_available_voices(self, provider_name: str) -> Dict:
+        """Get available voices from a voice provider"""
+        try:
+            provider = self.get_voice_provider(provider_name)
+
+            if hasattr(provider, 'get_available_voices'):
+                return provider.get_available_voices()
+            else:
+                return {
+                    'success': False,
+                    'error': f'Provider {provider_name} does not support voice listing'
+                }
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Error getting voices from {provider_name}: {str(e)}'
+            }
+
+    def create_voice_agent(self, provider_name: str, config: Dict) -> Dict:
+        """Create a voice agent with specified provider"""
+        try:
+            provider = self.get_voice_provider(provider_name)
+
+            if hasattr(provider, 'create_voice_agent'):
+                return provider.create_voice_agent(config)
+            else:
+                return {
+                    'success': False,
+                    'error': f'Provider {provider_name} does not support voice agent creation'
+                }
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Error creating voice agent with {provider_name}: {str(e)}'
+            }
+
+    def handle_voice_call(self, provider_name: str, agent_id: str, call_data: Dict) -> Dict:
+        """Handle voice call with specified provider and agent"""
+        try:
+            provider = self.get_voice_provider(provider_name)
+
+            if hasattr(provider, 'handle_voice_call'):
+                return provider.handle_voice_call(agent_id, call_data)
+            else:
+                return {
+                    'success': False,
+                    'error': f'Provider {provider_name} does not support voice call handling'
+                }
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Error handling voice call with {provider_name}: {str(e)}'
+            }
+
+    def get_voice_provider_status(self) -> Dict:
+        """Get status of all voice providers"""
+        status = {}
+        for name, available in self.available_voice_providers.items():
+            status[name] = {
+                'available': available,
+                'has_credentials': available,
+                'mock_mode': not available,
+                'type': 'voice_synthesis' if name == 'elevenlabs' else 'voice_agent'
+            }
+        return status
+
+
+# Global instances
 phone_provider_manager = PhoneProviderManager()
+voice_provider_manager = VoiceProviderManager()
 
 
 # Example usage and testing
