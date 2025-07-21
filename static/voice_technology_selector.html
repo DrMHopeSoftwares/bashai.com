@@ -25,6 +25,12 @@
     <div class="container mx-auto px-6 py-12">
         <!-- Header -->
         <div class="text-center mb-12">
+            <div id="orgCreationMessage" class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6" style="display: none;">
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                    <span class="text-green-800 font-medium">Organization created successfully! Now choose your voice technology to get started.</span>
+                </div>
+            </div>
             <h1 class="text-4xl font-bold text-gray-800 mb-4">Choose Your AI Voice Technology</h1>
             <p class="text-xl text-gray-600 max-w-3xl mx-auto">
                 Select the best AI voice technology for your use case. Each provider offers unique capabilities and pricing.
@@ -283,15 +289,45 @@
         function proceedWithTechnology(tech) {
             // Store selection and redirect to appropriate setup page
             localStorage.setItem('selectedVoiceTechnology', tech);
-            
-            const redirectUrls = {
-                'elevenlabs': '/create-agent-enhanced.html?provider=elevenlabs',
-                'bolna': '/agent-setup.html?provider=bolna',
-                'relevanceai': '/create-agent.html?provider=relevanceai',
-                'openai': '/realtime-voice-interface.html?provider=openai'
-            };
 
-            window.location.href = redirectUrls[tech];
+            // Check if we came from organization creation or selection
+            const urlParams = new URLSearchParams(window.location.search);
+            const orgId = urlParams.get('org');
+            const justCreatedOrg = localStorage.getItem('justCreatedOrganization');
+
+            if (orgId || justCreatedOrg) {
+                // Store the technology selection for this organization
+                if (orgId) {
+                    localStorage.setItem(`voiceTech_${orgId}`, tech);
+                }
+
+                // Clear the creation flag
+                localStorage.removeItem('justCreatedOrganization');
+
+                // Show success message and redirect to dashboard
+                alert(`Voice technology "${getTechName(tech)}" selected successfully! You can now purchase phone numbers and create agents.`);
+                window.location.href = '/dashboard.html';
+            } else {
+                // Original behavior - redirect to setup pages
+                const redirectUrls = {
+                    'elevenlabs': '/create-agent-enhanced.html?provider=elevenlabs',
+                    'bolna': '/agent-setup.html?provider=bolna',
+                    'relevanceai': '/create-agent.html?provider=relevanceai',
+                    'openai': '/realtime-voice-interface.html?provider=openai'
+                };
+
+                window.location.href = redirectUrls[tech];
+            }
+        }
+
+        function getTechName(tech) {
+            const techNames = {
+                'elevenlabs': 'ElevenLabs',
+                'bolna': 'Bolna.com',
+                'relevanceai': 'RelevanceAI',
+                'openai': 'OpenAI Speech-to-Speech'
+            };
+            return techNames[tech] || tech;
         }
 
         // Auto-select if coming from a specific provider
@@ -304,6 +340,13 @@
                     card.click();
                 }
             }, 500);
+        }
+
+        // Show organization creation message if coming from org creation
+        const justCreatedOrg = localStorage.getItem('justCreatedOrganization');
+        const orgId = urlParams.get('org');
+        if (justCreatedOrg || orgId) {
+            document.getElementById('orgCreationMessage').style.display = 'block';
         }
     </script>
 </body>
