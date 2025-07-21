@@ -4048,6 +4048,12 @@ def serve_test_elevenlabs_call():
     """Serve ElevenLabs test call interface"""
     return send_from_directory(app.static_folder, 'test-elevenlabs-call.html')
 
+@app.route('/voice_technology_selector.html')
+@app.route('/voice-technology-selector.html')
+def serve_voice_technology_selector():
+    """Serve Voice Technology Selector page"""
+    return send_from_directory(app.static_folder, 'voice_technology_selector.html')
+
 # OpenAI Realtime Phone Call API Endpoints
 @app.route('/api/realtime/make-call', methods=['POST'])
 @login_required
