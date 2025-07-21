@@ -38,6 +38,45 @@
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.3);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            color: #1f2937; /* Ensure dark text on light background */
+        }
+
+        .glassmorphism * {
+            color: inherit; /* Inherit the dark color from parent */
+        }
+
+        .glassmorphism h1, .glassmorphism h2, .glassmorphism h3, .glassmorphism h4, .glassmorphism h5, .glassmorphism h6 {
+            color: #1f2937 !important;
+        }
+
+        .glassmorphism p, .glassmorphism span:not(.text-white):not(.bg-blue-500):not(.bg-green-500):not(.bg-purple-500):not(.bg-orange-500), .glassmorphism div:not(.bg-gradient-to-r) {
+            color: #374151 !important;
+        }
+
+        .glassmorphism .text-white {
+            color: white !important; /* Keep intentionally white text white */
+        }
+
+        /* Fix for step indicators and progress text */
+        .glassmorphism .step-indicator {
+            color: white !important; /* Step numbers should be white on colored background */
+        }
+
+        .glassmorphism .text-gray-800,
+        .glassmorphism .text-gray-700,
+        .glassmorphism .text-gray-600,
+        .glassmorphism .text-gray-500 {
+            color: #374151 !important;
+        }
+
+        /* Ensure progress step labels are visible */
+        .glassmorphism .space-y-4 span {
+            color: #374151 !important;
+        }
+
+        /* Fix for any content that might have inherited white color */
+        .glassmorphism *:not(.text-white):not(.step-indicator):not(.bg-gradient-to-r *):not(.bg-blue-500 *):not(.bg-green-500 *):not(.bg-purple-500 *):not(.bg-orange-500 *) {
+            color: #374151 !important;
         }
 
         .sidebar {
