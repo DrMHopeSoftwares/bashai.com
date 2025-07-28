@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Test</title>
+</head>
+<body>
+    <h1>Debug Test Page</h1>
+    <p>If you can see this page, the server is running main:app</p>
+    <button onclick="testFunction()" style="padding: 20px; background: red; color: white; border: none; cursor: pointer;">CLICK ME - Test Button</button>
+    <p id="result"></p>
+    
+    <script>
+        function testFunction() {
+            document.getElementById('result').innerHTML = 'Button works! Server is running main:app with latest fixes.';
+            alert('JavaScript is working!');
+        }
+        
+        // Auto-test on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('result').innerHTML = 'Page loaded, JavaScript is active.';
+        });
+    </script>
+</body>
+</html>

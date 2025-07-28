@@ -1,0 +1,33 @@
+
+# Add this to main.py in the get_current_user() function, before creating new trial user
+
+# Check if user exists by email (for admin users who signed up via Clerk)
+user_email = clerk_user.get('email_addresses', [{}])[0].get('email_address', '')
+existing_users_by_email = supabase_request('GET', 'users', params={'email': f'eq.{user_email}'})
+
+if existing_users_by_email and len(existing_users_by_email) > 0:
+    existing_user = existing_users_by_email[0]
+    
+    # If it's an admin user, update their ID to match Clerk user_id
+    if existing_user.get('role') == 'admin':
+        print(f"Linking existing admin user {user_email} to Clerk ID {user_id}")
+        
+        # Update the existing admin user with Clerk user_id
+        update_data = {
+            'id': user_id,  # Update to Clerk user_id
+            'status': 'active'  # Ensure they're active
+        }
+        
+        # Update by email since ID is changing
+        result = supabase_request('PATCH', f'users?email=eq.{user_email}', data=update_data)
+        
+        if result and len(result) > 0:
+            updated_user = result[0]
+            trial_status = check_trial_status(updated_user)
+            
+            return jsonify({
+                'user': updated_user,
+                'trial_status': trial_status,
+                'clerk_data': clerk_user,
+                'admin_linked': True
+            })

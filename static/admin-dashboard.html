@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperAdmin Dashboard - Clinivoice</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#8B5CF6',
+                        accent: '#10B981'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Modern CSS Variables */
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --secondary: #7C3AED;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+            --gray-900: #111827;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            background-color: var(--gray-50);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .btn {
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 16px;
+            padding: 32px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+        }
+
+        .enterprise-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            border: 2px solid var(--gray-200);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .enterprise-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div class="text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">Loading SuperAdmin Dashboard...</p>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboardContent" class="hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center">
+                        <h1 class="text-2xl font-bold text-gray-900">SuperAdmin Dashboard</h1>
+                        <span class="ml-3 px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">ADMIN</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span id="userEmail" class="text-gray-700"></span>
+                        <button onclick="window.location.href='/dashboard.html'" class="text-blue-600 hover:text-blue-700 px-3 py-1 rounded border border-blue-200 hover:bg-blue-50">
+                            User Dashboard
+                        </button>
+                        <button id="signOutBtn" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                            Sign Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="px-4 py-6 sm:px-0">
+                
+                <!-- Admin Welcome Section -->
+                <div class="admin-header mb-8">
+                    <div class="relative z-10">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mr-4">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                </svg>
+                            </div>
+                            <h2 class="text-3xl font-bold">Enterprise Management</h2>
+                        </div>
+                        <p class="text-white/90 text-lg font-medium">Create and manage enterprises. Each enterprise contains multiple organizations with their own channels and voice agents.</p>
+                    </div>
+                </div>
+
+                <!-- Stats Overview -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="stat-card">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-lg bg-blue-100 mr-4">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Total Enterprises</p>
+                                <p id="totalEnterprises" class="text-2xl font-bold text-gray-900">-</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-lg bg-green-100 mr-4">
+                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Active Users</p>
+                                <p id="totalUsers" class="text-2xl font-bold text-gray-900">-</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-lg bg-purple-100 mr-4">
+                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Voice Agents</p>
+                                <p id="totalAgents" class="text-2xl font-bold text-gray-900">-</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-lg bg-orange-100 mr-4">
+                                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-sm">Trial Enterprises</p>
+                                <p id="trialEnterprises" class="text-2xl font-bold text-gray-900">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enterprise Management Section -->
+                <div class="card mb-8" style="padding: 32px;">
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold">Enterprise Management</h2>
+                                <p class="text-gray-600 font-medium">Create and manage top-level enterprises. Each enterprise can contain multiple organizations.</p>
+                            </div>
+                        </div>
+                        <button id="createEnterpriseBtn" class="btn btn-primary" style="padding: 12px 24px; font-size: 15px;">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Create Enterprise
+                        </button>
+                    </div>
+
+                    <!-- Enterprises List -->
+                    <div id="enterprisesList" class="space-y-4">
+                        <!-- Enterprises will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- System Actions -->
+                <div class="card" style="padding: 32px;">
+                    <h3 class="text-xl font-bold text-gray-900 mb-6">System Administration</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <button onclick="showUserManagement()" class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                            <span>Manage Users</span>
+                        </button>
+                        <button onclick="showSystemAnalytics()" class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            <span>System Analytics</span>
+                        </button>
+                        <button onclick="showSystemSettings()" class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            <span>System Settings</span>
+                        </button>
+                        <button onclick="showSupport()" class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                            <span>Support</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Create Enterprise Modal -->
+    <div id="createEnterpriseModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-medium text-gray-900">Create New Enterprise</h3>
+                    <button id="closeEnterpriseModal" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <p class="text-sm text-gray-600 mt-1">Create a new enterprise to manage organizations and voice agents</p>
+            </div>
+            <form id="createEnterpriseForm" class="px-6 py-4">
+                <div class="mb-4">
+                    <label for="enterpriseName" class="block text-sm font-medium text-gray-700 mb-2">Enterprise Name</label>
+                    <input type="text" id="enterpriseName" name="enterpriseName" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="Enter enterprise name">
+                </div>
+                <div class="mb-4">
+                    <label for="enterpriseType" class="block text-sm font-medium text-gray-700 mb-2">Enterprise Type</label>
+                    <select id="enterpriseType" name="enterpriseType" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="healthcare">Healthcare</option>
+                        <option value="retail">Retail</option>
+                        <option value="banking">Banking</option>
+                        <option value="education">Education</option>
+                        <option value="sme">Small & Medium Enterprise</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="ownerEmail" class="block text-sm font-medium text-gray-700 mb-2">Owner Email</label>
+                    <input type="email" id="ownerEmail" name="ownerEmail" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="Enter owner's email address">
+                </div>
+                <div class="mb-6">
+                    <label for="enterpriseStatus" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select id="enterpriseStatus" name="enterpriseStatus" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="trial">Trial (14 days)</option>
+                        <option value="active">Active</option>
+                        <option value="suspended">Suspended</option>
+                    </select>
+                </div>
+                <div class="flex space-x-3">
+                    <button type="button" id="cancelEnterpriseBtn" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Create Enterprise
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JWT Authentication - No external scripts needed -->
+
+    <script>
+        let currentUser = null;
+        let enterprises = [];
+
+        window.addEventListener('load', async () => {
+            try {
+                console.log('🚀 Admin Dashboard Loading...');
+
+                // Check JWT authentication
+                const isAuthenticated = await initializeAuth();
+                if (!isAuthenticated) {
+                    return; // Will redirect to login
+                }
+
+                console.log('✅ Admin authentication successful');
+
+                // Show admin dashboard
+                showAdminDashboard(currentUser);
+
+                // Load dashboard data
+                await loadDashboardData();
+
+            } catch (error) {
+                console.error('❌ Error initializing admin dashboard:', error);
+                window.location.href = '/login';
+            }
+        });
+
+        async function initializeAuth() {
+            try {
+                const token = localStorage.getItem('auth_token');
+                if (!token) {
+                    console.log('❌ No auth token found, redirecting to login');
+                    window.location.href = '/login';
+                    return false;
+                }
+
+                // Verify token and get user profile
+                const response = await fetch('/api/auth/profile', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const userData = await response.json();
+                    currentUser = userData.user || userData;
+
+                    console.log('✅ User authenticated:', currentUser.email);
+                    console.log('👑 User role:', currentUser.role);
+
+                    // Check if user is admin
+                    if (currentUser.role !== 'admin') {
+                        console.log('❌ User is not admin, redirecting to regular dashboard');
+                        window.location.href = '/dashboard.html';
+                        return false;
+                    }
+
+                    return true;
+                } else {
+                    console.log('❌ Token invalid, redirecting to login');
+                    localStorage.removeItem('auth_token');
+                    window.location.href = '/login';
+                    return false;
+                }
+
+            } catch (error) {
+                console.error('❌ Authentication error:', error);
+                window.location.href = '/login';
+                return false;
+            }
+        }
+
+        function showAdminDashboard(user) {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('dashboardContent').classList.remove('hidden');
+
+            // Update user info
+            const userEmailElement = document.getElementById('userEmail');
+            if (userEmailElement && user.email) {
+                userEmailElement.textContent = user.email;
+            }
+
+            // Update user name if available
+            const userNameElement = document.getElementById('userName');
+            if (userNameElement && user.name) {
+                userNameElement.textContent = user.name;
+            }
+
+            console.log('✅ Admin dashboard displayed for:', user.email);
+        }
+
+        async function loadDashboardData() {
+            try {
+                console.log('🔄 Loading admin dashboard data...');
+
+                // Load system statistics
+                await loadSystemStats();
+
+                // Load enterprises
+                await loadEnterprises();
+
+                // Initialize admin UI
+                initializeAdminUI();
+
+                console.log('✅ Admin dashboard data loaded');
+            } catch (error) {
+                console.error('❌ Error loading dashboard data:', error);
+            }
+        }
+
+        async function loadSystemStats() {
+            try {
+                console.log('🔄 Loading system stats...');
+                // Load system statistics
+                const statsResponse = await apiRequest('/api/admin/stats');
+                console.log('📊 Stats API response:', statsResponse);
+                
+                if (statsResponse) {
+                    document.getElementById('totalEnterprises').textContent = statsResponse.total_enterprises || '0';
+                    document.getElementById('totalUsers').textContent = statsResponse.total_users || '0';
+                    document.getElementById('totalAgents').textContent = statsResponse.total_agents || '0';
+                    document.getElementById('trialEnterprises').textContent = statsResponse.trial_enterprises || '0';
+                    console.log('✅ System stats loaded successfully');
+                } else {
+                    console.warn('⚠️ No stats response received');
+                }
+            } catch (error) {
+                console.error('❌ Error loading system stats:', error);
+                // Set default values
+                document.getElementById('totalEnterprises').textContent = '0';
+                document.getElementById('totalUsers').textContent = '0';
+                document.getElementById('totalAgents').textContent = '0';
+                document.getElementById('trialEnterprises').textContent = '0';
+            }
+        }
+
+        async function loadEnterprises() {
+            try {
+                const enterprisesResponse = await apiRequest('/api/admin/enterprises');
+                if (enterprisesResponse && enterprisesResponse.enterprises) {
+                    enterprises = enterprisesResponse.enterprises;
+                    renderEnterprises();
+                }
+            } catch (error) {
+                console.error('Error loading enterprises:', error);
+                renderEnterprises(); // Render empty state
+            }
+        }
+
+        function renderEnterprises() {
+            const enterprisesList = document.getElementById('enterprisesList');
+            
+            if (enterprises.length === 0) {
+                enterprisesList.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">No enterprises yet</h3>
+                        <p class="text-gray-600 mb-6">Create your first enterprise to get started!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            enterprisesList.innerHTML = enterprises.map(enterprise => `
+                <div class="enterprise-card" onclick="viewEnterprise('${enterprise.id}')">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900">${enterprise.name}</h3>
+                                <p class="text-gray-600">${enterprise.type} • ${enterprise.contact_email}</p>
+                                <p class="text-sm text-gray-500">Created: ${new Date(enterprise.created_at).toLocaleDateString()}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full ${enterprise.status === 'active' ? 'bg-green-100 text-green-800' : enterprise.status === 'trial' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">
+                                ${enterprise.status}
+                            </span>
+                            <button onclick="event.stopPropagation(); editEnterprise('${enterprise.id}')" class="text-blue-600 hover:text-blue-700">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function initializeAdminUI() {
+            try {
+                // Modal handlers
+                const createBtn = document.getElementById('createEnterpriseBtn');
+                const closeBtn = document.getElementById('closeEnterpriseModal');
+                const cancelBtn = document.getElementById('cancelEnterpriseBtn');
+                const form = document.getElementById('createEnterpriseForm');
+                const signOutBtn = document.getElementById('signOutBtn');
+                
+                if (createBtn) {
+                    createBtn.addEventListener('click', openCreateEnterpriseModal);
+                    console.log('✅ Create Enterprise button event listener added');
+                } else {
+                    console.error('❌ Create Enterprise button not found');
+                }
+                
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', closeCreateEnterpriseModal);
+                } else {
+                    console.error('❌ Close Enterprise modal button not found');
+                }
+                
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', closeCreateEnterpriseModal);
+                } else {
+                    console.error('❌ Cancel Enterprise button not found');
+                }
+                
+                if (form) {
+                    form.addEventListener('submit', handleCreateEnterprise);
+                } else {
+                    console.error('❌ Create Enterprise form not found');
+                }
+                
+                if (signOutBtn) {
+                    signOutBtn.addEventListener('click', handleSignOut);
+                } else {
+                    console.error('❌ Sign out button not found');
+                }
+                
+                console.log('✅ Admin UI initialization completed');
+            } catch (error) {
+                console.error('❌ Error initializing admin UI:', error);
+            }
+        }
+
+        function openCreateEnterpriseModal() {
+            try {
+                console.log('🔄 Opening Create Enterprise modal...');
+                const modal = document.getElementById('createEnterpriseModal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    console.log('✅ Create Enterprise modal opened');
+                } else {
+                    console.error('❌ Create Enterprise modal not found');
+                    alert('Error: Modal not found. Please refresh the page.');
+                }
+            } catch (error) {
+                console.error('❌ Error opening modal:', error);
+                alert('Error opening modal: ' + error.message);
+            }
+        }
+
+        function closeCreateEnterpriseModal() {
+            document.getElementById('createEnterpriseModal').classList.add('hidden');
+            document.getElementById('createEnterpriseModal').classList.remove('flex');
+            document.getElementById('createEnterpriseForm').reset();
+            
+            // Reset modal to create mode
+            document.querySelector('#createEnterpriseModal h3').textContent = 'Create New Enterprise';
+            document.querySelector('#createEnterpriseModal button[type="submit"]').textContent = 'Create Enterprise';
+            delete document.getElementById('createEnterpriseForm').dataset.enterpriseId;
+        }
+
+        async function handleCreateEnterprise(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const enterpriseData = {
+                name: formData.get('enterpriseName'),
+                type: formData.get('enterpriseType'),
+                contact_email: formData.get('ownerEmail'),
+                status: formData.get('enterpriseStatus')
+            };
+
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            const enterpriseId = e.target.dataset.enterpriseId;
+            const isEdit = !!enterpriseId;
+            
+            submitButton.disabled = true;
+            submitButton.textContent = isEdit ? 'Updating...' : 'Creating...';
+
+            try {
+                let result;
+                if (isEdit) {
+                    // Update existing enterprise
+                    result = await apiRequest(`/api/admin/enterprises/${enterpriseId}`, {
+                        method: 'PATCH',
+                        body: JSON.stringify(enterpriseData)
+                    });
+                } else {
+                    // Create new enterprise
+                    result = await apiRequest('/api/admin/enterprises', {
+                        method: 'POST',
+                        body: JSON.stringify(enterpriseData)
+                    });
+                }
+
+                if (result) {
+                    alert(isEdit ? 'Enterprise updated successfully!' : 'Enterprise created successfully!');
+                    closeCreateEnterpriseModal();
+                    loadEnterprises(); // Reload the list
+                    loadSystemStats(); // Update stats
+                }
+            } catch (error) {
+                console.error(`Error ${isEdit ? 'updating' : 'creating'} enterprise:`, error);
+                alert(`Failed to ${isEdit ? 'update' : 'create'} enterprise: ` + error.message);
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = isEdit ? 'Update Enterprise' : 'Create Enterprise';
+            }
+        }
+
+        function viewEnterprise(enterpriseId) {
+            // Navigate to enterprise detail view or regular dashboard with enterprise context
+            window.location.href = `/dashboard.html?enterprise=${enterpriseId}`;
+        }
+
+        function editEnterprise(enterpriseId) {
+            // Find the enterprise to edit
+            const enterprise = enterprises.find(e => e.id === enterpriseId);
+            if (!enterprise) {
+                alert('Enterprise not found');
+                return;
+            }
+            
+            // Pre-fill the form with enterprise data
+            document.getElementById('enterpriseName').value = enterprise.name;
+            document.getElementById('enterpriseType').value = enterprise.type;
+            document.getElementById('ownerEmail').value = enterprise.contact_email;
+            document.getElementById('enterpriseStatus').value = enterprise.status;
+            
+            // Change modal title and button text
+            document.querySelector('#createEnterpriseModal h3').textContent = 'Edit Enterprise';
+            document.querySelector('#createEnterpriseModal button[type="submit"]').textContent = 'Update Enterprise';
+            
+            // Store the enterprise ID for updating
+            document.getElementById('createEnterpriseForm').dataset.enterpriseId = enterpriseId;
+            
+            openCreateEnterpriseModal();
+        }
+        
+        // System Administration Functions
+        function showUserManagement() {
+            const userManagementContent = `
+                <div class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-medium text-gray-900">User Management</h3>
+                                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="px-6 py-4">
+                            <div id="usersList">Loading users...</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', userManagementContent);
+            loadAllUsers();
+        }
+        
+        function showSystemAnalytics() {
+            const analyticsContent = `
+                <div class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-medium text-gray-900">System Analytics</h3>
+                                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="px-6 py-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="bg-blue-50 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-blue-900 mb-2">Enterprise Growth</h4>
+                                    <p class="text-blue-700">Track enterprise registration trends over time</p>
+                                    <div class="mt-4 h-32 bg-blue-100 rounded flex items-center justify-center">
+                                        <span class="text-blue-600">Chart will be implemented</span>
+                                    </div>
+                                </div>
+                                <div class="bg-green-50 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-green-900 mb-2">User Activity</h4>
+                                    <p class="text-green-700">Monitor user engagement and activity patterns</p>
+                                    <div class="mt-4 h-32 bg-green-100 rounded flex items-center justify-center">
+                                        <span class="text-green-600">Chart will be implemented</span>
+                                    </div>
+                                </div>
+                                <div class="bg-purple-50 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-purple-900 mb-2">Voice Agent Usage</h4>
+                                    <p class="text-purple-700">Analyze voice agent performance and usage</p>
+                                    <div class="mt-4 h-32 bg-purple-100 rounded flex items-center justify-center">
+                                        <span class="text-purple-600">Chart will be implemented</span>
+                                    </div>
+                                </div>
+                                <div class="bg-orange-50 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-orange-900 mb-2">Revenue Analytics</h4>
+                                    <p class="text-orange-700">Track revenue and subscription metrics</p>
+                                    <div class="mt-4 h-32 bg-orange-100 rounded flex items-center justify-center">
+                                        <span class="text-orange-600">Chart will be implemented</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', analyticsContent);
+        }
+        
+        function showSystemSettings() {
+            const settingsContent = `
+                <div class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-medium text-gray-900">System Settings</h3>
+                                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="px-6 py-4 space-y-6">
+                            <div>
+                                <h4 class="text-lg font-medium text-gray-900 mb-4">Platform Configuration</h4>
+                                <div class="space-y-4">
+                                    <div class="flex items-center justify-between p-3 border rounded-lg">
+                                        <div>
+                                            <p class="font-medium">Trial Period Duration</p>
+                                            <p class="text-sm text-gray-600">Default trial period for new enterprises</p>
+                                        </div>
+                                        <select class="border rounded px-3 py-1">
+                                            <option>14 days</option>
+                                            <option>30 days</option>
+                                            <option>60 days</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 border rounded-lg">
+                                        <div>
+                                            <p class="font-medium">Auto-approve Enterprises</p>
+                                            <p class="text-sm text-gray-600">Automatically approve new enterprise registrations</p>
+                                        </div>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="rounded border-gray-300 text-blue-600 mr-2">
+                                            <span class="text-sm">Enabled</span>
+                                        </label>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 border rounded-lg">
+                                        <div>
+                                            <p class="font-medium">Maintenance Mode</p>
+                                            <p class="text-sm text-gray-600">Put the platform in maintenance mode</p>
+                                        </div>
+                                        <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                                            Enable
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex justify-end space-x-3 pt-4 border-t">
+                                <button onclick="closeModal()" class="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50">
+                                    Cancel
+                                </button>
+                                <button onclick="saveSystemSettings()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                    Save Settings
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', settingsContent);
+        }
+        
+        function showSupport() {
+            const supportContent = `
+                <div class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-medium text-gray-900">System Support</h3>
+                                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="px-6 py-4 space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+                                    <h4 class="font-semibold text-gray-900 mb-2">System Health Check</h4>
+                                    <p class="text-sm text-gray-600 mb-3">Run comprehensive system diagnostics</p>
+                                    <button class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">
+                                        Run Health Check
+                                    </button>
+                                </div>
+                                <div class="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+                                    <h4 class="font-semibold text-gray-900 mb-2">Database Backup</h4>
+                                    <p class="text-sm text-gray-600 mb-3">Create manual database backup</p>
+                                    <button class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+                                        Create Backup
+                                    </button>
+                                </div>
+                                <div class="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+                                    <h4 class="font-semibold text-gray-900 mb-2">System Logs</h4>
+                                    <p class="text-sm text-gray-600 mb-3">View and download system logs</p>
+                                    <button class="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700">
+                                        View Logs
+                                    </button>
+                                </div>
+                                <div class="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+                                    <h4 class="font-semibold text-gray-900 mb-2">Clear Cache</h4>
+                                    <p class="text-sm text-gray-600 mb-3">Clear system cache and temporary files</p>
+                                    <button class="w-full bg-orange-600 text-white py-2 rounded hover:bg-orange-700">
+                                        Clear Cache
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="border-t pt-4">
+                                <h4 class="font-semibold text-gray-900 mb-3">Contact Support</h4>
+                                <div class="space-y-2 text-sm">
+                                    <p><strong>Email:</strong> support@drmhope.com</p>
+                                    <p><strong>Phone:</strong> +91-9876543210</p>
+                                    <p><strong>Emergency:</strong> +91-9876543211</p>
+                                    <p><strong>Documentation:</strong> <a href="#" class="text-blue-600 hover:underline">docs.drmhope.com</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', supportContent);
+        }
+        
+        function closeModal() {
+            const modals = document.querySelectorAll('.fixed.inset-0.bg-gray-600');
+            modals.forEach(modal => modal.remove());
+        }
+        
+        async function loadAllUsers() {
+            try {
+                console.log('🔄 Loading users...');
+                const response = await apiRequest('/api/admin/users');
+                console.log('📊 Users API response:', response);
+                
+                const users = response?.users || [];
+                console.log(`📋 Found ${users.length} users`);
+                
+                const usersListElement = document.getElementById('usersList');
+                if (!usersListElement) {
+                    console.error('❌ Users list element not found');
+                    return;
+                }
+                
+                if (users.length === 0) {
+                    usersListElement.innerHTML = '<p class="text-gray-500 text-center">No users found.</p>';
+                    return;
+                }
+                
+                usersListElement.innerHTML = `
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Enterprise</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                ${users.map(user => `
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div>
+                                                <div class="text-sm font-medium text-gray-900">${user.name}</div>
+                                                <div class="text-sm text-gray-500">${user.email}</div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}">
+                                                ${user.role}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                                                ${user.status}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            ${user.enterprise_id ? 'Yes' : 'No'}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <button onclick="editUser('${user.id}')" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+                                            <button onclick="deleteUser('${user.id}')" class="text-red-600 hover:text-red-900">Delete</button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('❌ Error loading users:', error);
+                const usersListElement = document.getElementById('usersList');
+                if (usersListElement) {
+                    usersListElement.innerHTML = `
+                        <div class="text-center py-4">
+                            <p class="text-red-500 mb-2">Error loading users</p>
+                            <p class="text-sm text-gray-600">${error.message || 'Unknown error'}</p>
+                            <button onclick="loadAllUsers()" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                Retry
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        function editUser(userId) {
+            alert(`Edit user functionality will be implemented for user: ${userId}`);
+        }
+        
+        function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                alert(`Delete user functionality will be implemented for user: ${userId}`);
+            }
+        }
+        
+        function saveSystemSettings() {
+            try {
+                // Get form values
+                const trialPeriod = document.querySelector('select').value;
+                const autoApprove = document.querySelector('input[type="checkbox"]').checked;
+                
+                console.log('Saving system settings:', { trialPeriod, autoApprove });
+                
+                // Here you would normally make an API call to save settings
+                // For now, just show success message
+                alert('System settings saved successfully!');
+                closeModal();
+                
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                alert('Error saving settings: ' + error.message);
+            }
+        }
+
+        async function handleSignOut() {
+            try {
+                // Call logout API
+                const token = localStorage.getItem('auth_token');
+                if (token) {
+                    await fetch('/api/auth/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+
+                // Clear local storage
+                localStorage.removeItem('auth_token');
+
+                // Redirect to login
+                window.location.href = '/login';
+            } catch (error) {
+                console.error('Error signing out:', error);
+                // Still redirect even if logout API fails
+                localStorage.removeItem('auth_token');
+                window.location.href = '/login';
+            }
+        }
+
+        // API helper function
+        async function apiRequest(url, options = {}) {
+            try {
+                console.log(`🌐 Making API request to: ${url}`);
+
+                const token = localStorage.getItem('auth_token');
+                console.log('🔑 JWT token available:', token ? 'Yes' : 'No');
+
+                const headers = {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                };
+
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+
+                console.log('📤 Request headers:', headers);
+
+                const response = await fetch(url, {
+                    ...options,
+                    headers
+                });
+
+                console.log(`📥 Response status: ${response.status} ${response.statusText}`);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ API Error Response:', errorText);
+                    
+                    let errorMessage;
+                    try {
+                        const errorJson = JSON.parse(errorText);
+                        errorMessage = errorJson.message || errorText;
+                    } catch {
+                        errorMessage = errorText;
+                    }
+                    
+                    // Specific handling for JWT token errors
+                    if (errorText.includes('Invalid token') || errorText.includes('Authentication required')) {
+                        errorMessage = `Authentication Error: ${errorMessage}\n\nYour session has expired. Please login again.`;
+                        // Redirect to login on auth errors
+                        setTimeout(() => {
+                            localStorage.removeItem('auth_token');
+                            window.location.href = '/login';
+                        }, 2000);
+                    }
+                    
+                    throw new Error(errorMessage);
+                }
+
+                const result = await response.json();
+                console.log('✅ API Response:', result);
+                return result;
+            } catch (error) {
+                console.error('❌ API request error:', error);
+                throw error;
+            }
+        }
+    </script>
+</body>
+</html>

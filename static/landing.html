@@ -1,0 +1,3141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BhashAI - Enterprise AI Voice Platform for Business</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Multi-language Support -->
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Add subtle animations */
+        * {
+            transition: color 0.2s ease, background-color 0.2s ease;
+        }
+
+        /* Enhanced focus states for accessibility */
+        button:focus, a:focus, select:focus {
+            outline: 2px solid #4f46e5;
+            outline-offset: 2px;
+        }
+
+        /* Professional hover effects */
+        .solution-card, .milestone-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .solution-card:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .hindi-text {
+            font-family: 'Noto Sans Devanagari', sans-serif;
+        }
+
+        /* Government-style header */
+        .top-header {
+            background: linear-gradient(135deg, #ff9933 0%, #ffffff 50%, #138808 100%);
+            padding: 8px 0;
+            font-size: 12px;
+            color: #333;
+            font-weight: 600;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .top-header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .gov-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .gov-links a {
+            color: #333;
+            text-decoration: none;
+            font-size: 11px;
+        }
+
+        .accessibility-tools {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .font-size-controls {
+            display: flex;
+            gap: 2px;
+        }
+
+        .font-btn {
+            background: none;
+            border: 1px solid #666;
+            color: #666;
+            padding: 2px 6px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .lang-selector {
+            background: none;
+            border: 1px solid #666;
+            color: #666;
+            padding: 2px 8px;
+            font-size: 11px;
+        }
+
+        .gov-header {
+            background: white;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e2e8f0;
+            position: relative;
+        }
+
+        .partner-logos {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+        }
+
+        .logo-item {
+            width: 50px;
+            height: 35px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            color: #64748b;
+            text-align: center;
+            line-height: 1.1;
+            font-weight: 600;
+        }
+
+        .gov-header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            position: relative;
+        }
+
+        .gov-logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .emblem {
+            width: 60px;
+            height: 60px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23FF8C42" stroke="%23B8860B" stroke-width="2"/><circle cx="50" cy="50" r="35" fill="%23FFD700"/><text x="50" y="58" text-anchor="middle" fill="%23B8860B" font-size="24" font-weight="bold">अ</text></svg>');
+            background-size: cover;
+            border-radius: 50%;
+        }
+
+        .ministry-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ministry-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1e293b;
+            line-height: 1.2;
+            max-width: 200px;
+        }
+
+        .mission-text {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-style: italic;
+            max-width: 200px;
+            line-height: 1.3;
+        }
+
+        .brand-logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #dc2626;
+            letter-spacing: -0.02em;
+            position: absolute;
+            right: 50%;
+            transform: translateX(50%);
+        }
+
+        .main-header {
+            background: white;
+            padding: 0.75rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10001;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem; /* Space between nav and cta buttons */
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.2);
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .company-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            letter-spacing: -0.025em;
+        }
+
+        .tagline {
+            font-size: 0.9rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .mobile-app-btn {
+            background: #059669;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-app-btn:hover {
+            background: #047857;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #374151;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:hover {
+            color: #059669;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-login {
+            background: #059669;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            background: #047857;
+        }
+
+        .btn-dashboard {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-dashboard:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.15);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            color: #1e293b;
+            padding: 6rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="%234f46e5" stop-opacity="0.03"/><stop offset="100%" stop-color="%234f46e5" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="400" cy="700" r="120" fill="url(%23a)"/></svg>');
+            opacity: 1;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-subtitle {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #334155;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+        }
+
+        .hero-description {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .hero-supported {
+            font-size: 1rem;
+            color: #64748b;
+            margin-bottom: 2rem;
+        }
+
+        .hero-supported .company {
+            color: #059669;
+            font-weight: 600;
+        }
+        
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .hero-btn-primary {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.2);
+        }
+        
+        .hero-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+        }
+        
+        .hero-btn-secondary {
+            background: transparent;
+            color: #4f46e5;
+            padding: 14px 28px;
+            border: 2px solid rgba(79, 70, 229, 0.2);
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .hero-btn-secondary:hover {
+            background: rgba(79, 70, 229, 0.1);
+            border-color: #4f46e5;
+            transform: translateY(-1px);
+        }
+        
+        @media (max-width: 768px) {
+            .hero-cta {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .hero-btn-primary,
+            .hero-btn-secondary {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        .hero-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .hero-image {
+            width: 100%;
+            max-width: 500px;
+            height: 350px;
+            background: url('hero-ai-image.png') center/cover;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(79, 70, 229, 0.3);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 25px 50px -12px rgba(79, 70, 229, 0.3),
+                0 0 0 1px rgba(79, 70, 229, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            animation: heroGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes heroGlow {
+            from {
+                box-shadow: 
+                    0 25px 50px -12px rgba(79, 70, 229, 0.3),
+                    0 0 0 1px rgba(79, 70, 229, 0.1),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            }
+            to {
+                box-shadow: 
+                    0 25px 50px -12px rgba(79, 70, 229, 0.5),
+                    0 0 0 1px rgba(79, 70, 229, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                    0 0 40px rgba(79, 70, 229, 0.4);
+            }
+        }
+
+        .hero-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        /* Latest Updates Banner */
+        .updates-banner {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            padding: 1rem 0;
+            position: relative;
+        }
+
+        .updates-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .updates-label {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Quote Section */
+        .quote-section {
+            background: #f8fafc;
+            padding: 3rem 0;
+        }
+
+        .quote-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .quote-text {
+            font-size: 1.5rem;
+            font-style: italic;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .quote-text::before {
+            content: '"';
+            font-size: 3rem;
+            color: #4f46e5;
+            position: relative;
+            top: 10px;
+        }
+
+        .quote-author {
+            margin-top: 1rem;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .quote-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.2) 0%, rgba(124, 58, 237, 0.2) 100%), url('https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            box-shadow: 0 10px 40px rgba(79, 70, 229, 0.2);
+            border: 3px solid white;
+        }
+
+        /* Milestones Section */
+        .milestones {
+            padding: 5rem 0;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .milestones-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .milestones-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #d97706;
+            margin-bottom: 1rem;
+            letter-spacing: -0.025em;
+        }
+
+        .milestones-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .milestones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            align-items: stretch;
+        }
+
+        .milestone-card {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+        }
+
+        .milestone-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+            border-color: rgba(79, 70, 229, 0.3);
+        }
+
+        .milestone-featured {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
+            border: 2px solid rgba(79, 70, 229, 0.2);
+        }
+
+        .milestone-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 2rem;
+            box-shadow: 0 10px 30px rgba(79, 70, 229, 0.3);
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .milestone-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>') center/contain no-repeat;
+        }
+        
+        .milestone-icon.voice::before {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>') center/contain no-repeat;
+        }
+        
+        .milestone-icon.growth::before {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M16,6L18.29,8.29L13.41,13.17L9.41,9.17L2,16.59L3.41,18L9.41,12L13.41,16L19.71,9.71L22,12V6H16Z"/></svg>') center/contain no-repeat;
+        }
+        
+        .milestone-icon.business::before {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12,7V3H2V21H22V7H12M6,19H4V17H6V19M6,15H4V13H6V15M6,11H4V9H6V11M6,7H4V5H6V7M10,19H8V17H10V19M10,15H8V13H10V15M10,11H8V9H10V11M10,7H8V5H10V7M20,19H12V17H14V15H12V13H14V11H12V9H20V19M18,11H16V13H18V11M18,15H16V17H18V15Z"/></svg>') center/contain no-repeat;
+        }
+        
+        .milestone-icon.users::before {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H17c-.8 0-1.54.37-2.01.99l-2.54 3.26.05.05c.9.9.9 2.36 0 3.26l-.05.05 2.54 3.26c.47.62 1.21.99 2.01.99h1.54c.59 0 1.13-.29 1.46-.74L22 22zM12.5 11.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5S11 9.17 11 10s.67 1.5 1.5 1.5zm1.5 1h-2c-.83 0-1.5.67-1.5 1.5v6h5v-6c0-.83-.67-1.5-1.5-1.5zM5.5 6c1.11 0 2-.89 2-2s-.89-2-2-2-2 .89-2 2 .89 2 2 2zm1.5 2h-1c-.83 0-1.5.67-1.5 1.5v6h4v-6C8.5 8.67 7.83 8 7 8z"/></svg>') center/contain no-repeat;
+        }
+        
+        .milestone-icon.enterprise::before {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M20,6H16V4A2,2 0 0,0 14,2H10A2,2 0 0,0 8,4V6H4A2,2 0 0,0 2,8V19A2,2 0 0,0 4,21H20A2,2 0 0,0 22,19V8A2,2 0 0,0 20,6M10,4H14V6H10V4Z"/></svg>') center/contain no-repeat;
+        }
+
+        .milestone-icon.mobile::before {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M17,19H7V5H17M17,1H7C5.89,1 5,1.89 5,3V21C5,22.1 5.89,23 7,23H17C18.1,23 19,22.1 19,21V3C19,1.89 18.1,1 17,1Z"/></svg>') center/contain no-repeat;
+        }
+
+        .milestone-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #d97706;
+            margin-bottom: 0.75rem;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .milestone-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #334155;
+            line-height: 1.4;
+            text-align: center;
+        }
+
+
+        .milestone-cta {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .milestone-cta-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #059669;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .milestone-cta-link:hover {
+            color: #047857;
+            transform: translateX(5px);
+        }
+
+        @media (max-width: 768px) {
+            .milestones-container {
+                padding: 0 1rem;
+            }
+
+            .milestones-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .milestone-card {
+                padding: 1.5rem 1rem;
+                min-height: 180px;
+            }
+
+            .milestone-number {
+                font-size: 2.2rem;
+            }
+
+            .milestone-label {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .milestones-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .milestone-card {
+                padding: 1.5rem;
+                min-height: 160px;
+            }
+
+            .milestone-icon {
+                width: 70px;
+                height: 70px;
+                margin-bottom: 1rem;
+            }
+
+            .milestone-number {
+                font-size: 2rem;
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        .cta-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #4f46e5;
+            font-weight: 600;
+            text-decoration: none;
+            margin-top: 2rem;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid #4f46e5;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .cta-link:hover {
+            background: #10b981;
+            color: white;
+        }
+
+        /* Impact Section */
+        .impact {
+            background: #f8fafc;
+            padding: 5rem 0;
+        }
+
+        .impact-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .impact-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ff6b35;
+            margin-bottom: 1rem;
+        }
+
+        .impact-subtitle {
+            font-size: 1.2rem;
+            color: #64748b;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .impact-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .impact-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .impact-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .impact-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .impact-card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1a202c;
+        }
+
+        .impact-solutions {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* Services Section */
+        .services {
+            padding: 5rem 0;
+            background: white;
+        }
+
+        .services-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .services-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 1rem;
+        }
+
+        .services-subtitle {
+            color: #64748b;
+            margin-bottom: 2rem;
+        }
+
+        .services-link {
+            color: #10b981;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .services-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover {
+            background: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .service-icon::before {
+            content: '';
+            width: 30px;
+            height: 30px;
+            background: white;
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+        
+        .service-icon.voice-service::before {
+            mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>');
+        }
+        
+        .service-icon.call-service::before {
+            mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6.62,10.79C8.06,13.62 10.38,15.94 13.21,17.38L15.41,15.18C15.69,14.9 16.08,14.82 16.43,14.93C17.55,15.3 18.75,15.5 20,15.5A1,1 0 0,1 21,16.5V20A1,1 0 0,1 20,21A17,17 0 0,1 3,4A1,1 0 0,1 4,3H7.5A1,1 0 0,1 8.5,4C8.5,5.25 8.7,6.45 9.07,7.57C9.18,7.92 9.1,8.31 8.82,8.59L6.62,10.79Z"/></svg>');
+        }
+        
+        .service-icon.chat-service::before {
+            mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4A2,2 0 0,0 20,2M6,9H18V11H6V9M14,14H6V12H14V14M18,8H6V6H18V8Z"/></svg>');
+        }
+        
+        .service-icon.analytics-service::before {
+            mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16,6L18.29,8.29L13.41,13.17L9.41,9.17L2,16.59L3.41,18L9.41,12L13.41,16L19.71,9.71L22,12V6H16Z"/></svg>');
+        }
+
+        .service-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1a202c;
+        }
+
+        .service-description {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .service-link {
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* Pillars Section */
+        .pillars {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5rem 0;
+            text-align: center;
+        }
+
+        .pillars-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .pillars-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 4rem;
+            opacity: 0.9;
+        }
+
+        .pillars-showcase {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .pillars-image {
+            width: 100%;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+        }
+
+        /* Business Solutions Section */
+        .business-solutions {
+            padding: 5rem 0;
+            background: #f8fafc;
+        }
+
+        .solutions-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .solutions-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 1rem;
+        }
+
+        .solutions-subtitle {
+            font-size: 1.2rem;
+            color: #64748b;
+        }
+
+        .solutions-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .solution-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .solution-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .solution-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .solution-icon::before {
+            content: '';
+            width: 30px;
+            height: 30px;
+            background: white;
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+        
+        .solution-icon.ecommerce::before {
+            mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17,18C17.56,18 18,18.44 18,19A1,1 0 0,1 17,20C16.44,20 16,19.56 16,19C16,18.44 16.44,18 17,18M1,2V4H3L6.6,11.59L5.24,14.04C5.09,14.32 5,14.65 5,15A2,2 0 0,0 7,17H19V15H7.42A0.25,0.25 0 0,1 7.17,14.75C7.17,14.7 7.18,14.66 7.2,14.63L8.1,13H15.55C16.3,13 16.96,12.58 17.3,11.97L20.88,5H5.21L4.27,3H1M7,18C7.56,18 8,18.44 8,19A1,1 0 0,1 7,20C6.44,20 6,19.56 6,19C6,18.44 6.44,18 7,18Z"/></svg>');
+        }
+        
+        .solution-icon.banking::before {
+            mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5,6H23V18H5V6M14,9A3,3 0 0,1 17,12A3,3 0 0,1 14,15A3,3 0 0,1 11,12A3,3 0 0,1 14,9M9,8A2,2 0 0,1 7,10V14A2,2 0 0,1 9,16H19A2,2 0 0,1 21,14V10A2,2 0 0,1 19,8H9M1,10H3V20H19V22H1V10Z"/></svg>');
+        }
+        
+        .solution-icon.support::before {
+            mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,3A4,4 0 0,1 16,7A4,4 0 0,1 12,11A4,4 0 0,1 8,7A4,4 0 0,1 12,3M12,14.2C13.5,14.2 15.7,14.9 16.2,15.2L22,6.4L20.4,5.6L15.3,13.7C14.8,13.3 14,13.1 12.6,13.1C11.2,13.1 10.4,13.3 9.9,13.7L4.8,5.6L3.2,6.4L9,15.2C9.5,14.9 11.7,14.2 12.6,14.2M18,17V22H6V17H4V22A2,2 0 0,0 6,24H18A2,2 0 0,0 20,22V17H18Z"/></svg>');
+        }
+
+        .solution-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+
+        .solution-description {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .solution-features {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 10px;
+            font-style: italic;
+            color: #4f46e5;
+            font-size: 0.9rem;
+        }
+
+        /* Trial Signup Section */
+        .trial-signup {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .trial-signup::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="trial" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="%234f46e5" stop-opacity="0.05"/><stop offset="100%" stop-color="%234f46e5" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="150" fill="url(%23trial)"/><circle cx="800" cy="600" r="200" fill="url(%23trial)"/></svg>');
+            opacity: 1;
+        }
+        
+        .trial-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .trial-content h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+        
+        .trial-content p {
+            font-size: 1.2rem;
+            color: #64748b;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .trial-benefits {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .trial-benefits li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            color: #374151;
+            font-weight: 500;
+        }
+        
+        .trial-benefits li::before {
+            content: '✓';
+            background: #059669;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .trial-form {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .trial-form h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        .btn-trial {
+            width: 100%;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+        
+        .btn-trial:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+        }
+        
+        .btn-trial:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .trial-result {
+            margin-top: 1rem;
+            padding: 12px;
+            border-radius: 8px;
+            display: none;
+            font-weight: 500;
+        }
+        
+        .trial-result.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        .trial-result.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .trial-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .trial-content h2 {
+                font-size: 2rem;
+            }
+            
+            .trial-form {
+                padding: 2rem;
+            }
+        }
+
+        /* CTA Section */
+        .final-cta {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 5rem 0;
+            text-align: center;
+        }
+
+        .cta-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .cta-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .cta-description {
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+
+        .cta-button {
+            background: white;
+            color: #4f46e5;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Footer */
+        .footer {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 3rem 0 1rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .footer-section p,
+        .footer-section ul {
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section ul li a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: #667eea;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #374151;
+            padding-top: 2rem;
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        /* Professional spacing and typography */
+        section {
+            scroll-margin-top: 100px;
+        }
+
+        /* Improved button styling */
+        button, .btn-login, .btn-dashboard, .mobile-app-btn {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* Enhanced loading states */
+        .hero-image, .mobile-frame {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Professional gradient overlays */
+        .milestone-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(79, 70, 229, 0.02) 100%);
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        .milestone-card {
+            position: relative;
+        }
+
+        /* About Section */
+        .about {
+            padding: 5rem 0;
+            background: #f8fafc;
+        }
+
+        .about-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .about-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .about-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 1rem;
+        }
+
+        .about-mission {
+            font-size: 1.2rem;
+            color: #64748b;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .about-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .about-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 1rem;
+        }
+
+        .impact-metrics .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-icon {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #059669;
+            display: block;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            display: block;
+        }
+
+        /* Voice Samples Section */
+        .voice-samples {
+            padding: 5rem 0;
+            background: white;
+        }
+
+        .voice-samples-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .voice-samples-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .voice-samples-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 1rem;
+        }
+
+        .voice-samples-subtitle {
+            font-size: 1.2rem;
+            color: #64748b;
+        }
+
+        .voice-samples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .voice-sample-card {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .voice-sample-card:hover {
+            border-color: #059669;
+            transform: translateY(-2px);
+        }
+
+        .voice-sample-language {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #059669;
+            margin-bottom: 1rem;
+        }
+
+        .voice-sample-text {
+            font-style: italic;
+            color: #64748b;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .play-sample-btn {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .play-sample-btn:hover {
+            background: #047857;
+            transform: scale(1.05);
+        }
+
+        /* Pricing Section */
+        .pricing {
+            padding: 5rem 0;
+            background: #f8fafc;
+        }
+
+        .pricing-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .pricing-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .pricing-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-subtitle {
+            font-size: 1.2rem;
+            color: #64748b;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .pricing-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+        }
+
+        .pricing-card.featured {
+            border: 3px solid #059669;
+            transform: scale(1.05);
+        }
+
+        .pricing-plan {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #059669;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-price span {
+            font-size: 1rem;
+            color: #64748b;
+        }
+
+        .pricing-features {
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features .feature {
+            padding: 0.5rem 0;
+            color: #64748b;
+        }
+
+        .pricing-btn {
+            background: #059669;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .pricing-btn:hover {
+            background: #047857;
+            transform: translateY(-2px);
+        }
+
+        .pricing-calculator {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .calculator-link {
+            color: #059669;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        .calculator-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 5rem 0;
+            background: white;
+        }
+
+        .contact-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .contact-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .contact-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 1rem;
+        }
+
+        .contact-subtitle {
+            font-size: 1.2rem;
+            color: #64748b;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .contact-item h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-item p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .contact-item a {
+            color: #293431;
+            text-decoration: none;
+        }
+
+        .contact-item a:hover {
+            text-decoration: underline;
+        }
+
+        .whatsapp-btn, .demo-btn {
+            background: #059669;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-block;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .whatsapp-btn:hover, .demo-btn:hover {
+            background: #047857;
+            transform: translateY(-2px);
+        }
+
+        .contact-form {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 12px;
+        }
+
+        .contact-form h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-submit-btn {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .contact-submit-btn:hover {
+            background: #047857;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .header-right {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 2rem;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .quote-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .app-showcase {
+                grid-column: span 1;
+            }
+
+            .milestones-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .solutions-grid,
+            .impact-grid,
+            .services-grid,
+            .about-grid,
+            .voice-samples-grid,
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .pricing-card.featured {
+                transform: none;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .final-cta {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 5rem 0;
+            text-align: center;
+        }
+
+        .elevenlabs-agents-container {
+            padding: 4rem 2rem;
+            background-color: #f8fafc;
+            text-align: center;
+        }
+
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .agent-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .agent-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .agent-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.75rem;
+        }
+
+        .agent-description {
+            color: #64748b;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .start-chat-btn {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem; /* Added margin for spacing */
+        }
+
+        .start-chat-btn:hover {
+            background: #047857;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive adjustments for agents section */
+        @media (max-width: 768px) {
+            .agents-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Header -->
+    <div class="top-header">
+        <div class="top-header-content">
+            <div class="gov-links">
+                <a href="#">Skip to main content</a>
+                <span>|</span>
+                <a href="#">Screen Reader Access</a>
+            </div>
+            <div class="accessibility-tools">
+                <div class="font-size-controls">
+                    <button class="font-btn" onclick="changeFontSize('decrease')" title="Decrease font size">A-</button>
+                    <button class="font-btn" onclick="changeFontSize('reset')" title="Reset font size">A</button>
+                    <button class="font-btn" onclick="changeFontSize('increase')" title="Increase font size">A+</button>
+                </div>
+                <!-- Language switcher was here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Government Header -->
+    <header class="gov-header">
+        <div class="gov-header-content">
+            <div class="gov-logo-section">
+                <div class="emblem"></div>
+                <div class="ministry-info">
+                    <div class="ministry-name">BHASHAI - Bharat Bhasha AI Mission</div>
+                    <div class="mission-text">AI Voice Agent Infrastructure for India's Digital Future</div>
+                </div>
+            </div>
+            
+            <div class="brand-logo">BHASHAI</div>
+            
+            <div class="partner-logos">
+                <div class="logo-item"> <a href="/ai-voice.html">AI<br>VOICE</a></div>
+                <div class="logo-item">  <a href="/cloud-tech.html">CLOUD<br>TECH</a></div>
+                <div class="logo-item">  <a href="/enterprise-suite.html">ENTERPRISE<br>SUITE</a></div>
+                <div class="logo-item">  <a href="/business-hub.html">BUSINESS<br>HUB</a></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Navigation -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="header-right">
+                <nav>
+                <ul class="nav-links">
+                        <li><a href="#home"><span data-translate="nav.home">Home</span></a></li>
+                        <li><a href="#about"><span data-translate="nav.about">About</span></a></li>
+                        <li><a href="#services"><span data-translate="nav.features">Features</span></a></li>
+                        <li><a href="#solutions">Solutions</a></li>
+                        <li><a href="#pricing"><span data-translate="nav.pricing">Pricing</span></a></li>
+                        <li><a href="#contact"><span data-translate="nav.contact">Contact</span></a></li>
+                </ul>
+            </nav>
+
+            <div class="cta-buttons">
+                <a href="/coming-soon.html" class="mobile-app-btn">BHASHAI Mobile App ▼</a>
+                <a href="/login" class="btn-login">Login/Signup</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 data-translate="header.title">BHASHAI – India's First Regional Language AI Voice Agent Platform</h1>
+                <div class="hero-subtitle" data-translate="header.subtitle">🇮🇳 "AI Voice Agent Infrastructure for India's Multilingual Digital Future"</div>
+                <div class="hero-description">
+                    <span data-translate="header.description">Building an AI-powered voice agent layer for enterprises, startups, and governance in 20+ Indian languages.
+                    Designed for seamless automation of customer support, service access, and voice-based transactions at scale.</span>
+                    <br><br>
+                    ✅ Real-time AI Voice Agents in Hindi, Marathi, Tamil, Telugu, Bengali, and more<br>
+                    ✅ Ready-to-use AI voice agent templates (Customer Support, Sales, Appointment Booking)<br>
+                    ✅ AI voice agent integrations with WhatsApp, CRM, and Call Center systems
+                </div>
+                <div class="hero-cta">
+                    <a href="#trial" class="hero-btn-primary" onclick="scrollToTrial(); return false;">
+                        🔘 <span data-translate="btn.start_trial">Start Free Trial</span>
+                    </a>
+                    <a href="/book-demo.html" class="hero-btn-secondary">
+                        🔘 Book a Demo
+                    </a>
+                    <a href="#voice-samples" class="hero-btn-secondary" onclick="scrollToSection('voice-samples'); return false;">
+                        🔘 Listen to AI Voice agents conversation Samples
+                    </a>
+                </div>
+                <div class="hero-supported">
+                    🚀 Part of the
+                    <span class="company">Bharat Digital Stack Ecosystem</span>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-image"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Voice Samples Section -->
+    <section class="voice-samples" id="voice-samples">
+        <div class="voice-samples-content">
+            <div class="voice-samples-header">
+                <h2 class="voice-samples-title" data-translate="voice.title">🎧 Listen to AI Voice agents conversation Samples</h2>
+                <p class="voice-samples-subtitle" data-translate="voice.subtitle">Experience AI voice agents in different Indian languages</p>
+            </div>
+
+            <div class="voice-samples-grid" id="voiceSamplesGrid">
+                <!-- Voice samples will be dynamically generated based on supported languages -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest Updates Banner -->
+    <div class="updates-banner">
+        <div class="updates-content">
+            <div class="updates-label">
+                ⚡ LATEST UPDATES
+            </div>
+            <div>Launched Enterprise Multi-Agent Platform - 15th July 2025!</div>
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="about-content">
+            <div class="about-header">
+                <h2 class="about-title">🧾 About BHASHAI</h2>
+                <p class="about-mission">BHASHAI is a part of the "Bharat Bhasha AI Mission", committed to building a multilingual digital India by bridging the communication gap between businesses and their customers.</p>
+            </div>
+
+            <div class="about-grid">
+                <div class="about-card">
+                    <h3>Who We Are</h3>
+                    <p>A MeitY-aligned AI technology startup focused on regional voice automation.</p>
+                </div>
+
+                <div class="about-card">
+                    <h3>Vision</h3>
+                    <p>Enable every Indian business to serve its customers in their mother tongue using AI.</p>
+                </div>
+
+                <div class="about-card">
+                    <h3>Founding Story</h3>
+                    <p>Built by technologists, linguists, and entrepreneurs who saw rural and Tier 2/3 businesses struggle with English-based tools.</p>
+                </div>
+
+                <div class="about-card impact-metrics">
+                    <h3>Impact Metrics</h3>
+                    <div class="metrics-grid">
+                        <div class="metric">
+                            <span class="metric-icon">🌐</span>
+                            <span class="metric-number">20+</span>
+                            <span class="metric-label">Languages Supported</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-icon">☎️</span>
+                            <span class="metric-number">10M+</span>
+                            <span class="metric-label">Total Calls Answered</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-icon">🏆</span>
+                            <span class="metric-number">450+</span>
+                            <span class="metric-label">Enterprises Served</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quote Section -->
+    <section class="quote-section">
+        <div class="quote-content">
+            <div>
+                <div class="quote-text">
+                    With BhashAI's voice agents, we transformed our customer service. Now our customers can interact in Hindi, 
+                    and our AI handles 80% of inquiries automatically, improving satisfaction dramatically.
+                </div>
+                <div class="quote-author">
+                    Success Story from Leading E-commerce Platform | Customer Service (15th July 2025)
+                </div>
+            </div>
+            <div class="quote-image"></div>
+        </div>
+    </section>
+
+    <!-- Milestones Section -->
+    <section class="milestones">
+        <div class="milestones-container">
+            <div class="milestones-header">
+                <h2 class="milestones-title">BhashAI's Milestones at a Glance</h2>
+            </div>
+
+            <div class="milestones-grid">
+                <div class="milestone-card">
+                    <div class="milestone-icon voice"></div>
+                    <div class="milestone-number">20+</div>
+                    <div class="milestone-label">Languages Supported</div>
+                </div>
+
+                <div class="milestone-card">
+                    <div class="milestone-icon business"></div>
+                    <div class="milestone-number">20+</div>
+                    <div class="milestone-label">Language Services</div>
+                </div>
+
+                <div class="milestone-card">
+                    <div class="milestone-icon enterprise"></div>
+                    <div class="milestone-number">350+</div>
+                    <div class="milestone-label">Total AI Models</div>
+                </div>
+
+                <div class="milestone-card milestone-featured">
+                    <div class="milestone-icon mobile"></div>
+                    <div class="milestone-number">1M+</div>
+                    <div class="milestone-label">Mobile App Downloads</div>
+                </div>
+
+                <div class="milestone-card">
+                    <div class="milestone-icon growth"></div>
+                    <div class="milestone-number">3B+</div>
+                    <div class="milestone-label">Total Inferencing</div>
+                </div>
+
+                <div class="milestone-card">
+                    <div class="milestone-icon users"></div>
+                    <div class="milestone-number">450+</div>
+                    <div class="milestone-label">Enterprises Served</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="milestone-cta">
+            <a href="#trial" class="milestone-cta-link" onclick="scrollToTrial(); return false;">
+                Explore Real-Time Service Leaderboard →
+            </a>
+        </div>
+    </section>
+
+    <!-- Impact Section -->
+    <section class="impact">
+        <div class="impact-header">
+            <h2 class="impact-title">How we're making an impact</h2>
+            <p class="impact-subtitle">
+                Reimagining business operations using AI Voice as a medium across various sectors
+            </p>
+        </div>
+        <div class="impact-grid">
+            <div class="impact-card">
+                <div class="impact-icon">🏪</div>
+                <div class="impact-card-title">E-Commerce</div>
+                <div class="impact-solutions">4+ Solutions</div>
+            </div>
+
+            <div class="impact-card">
+                <div class="impact-icon">💼</div>
+                <div class="impact-card-title">Customer Service</div>
+                <div class="impact-solutions">4+ Solutions</div>
+            </div>
+
+            <div class="impact-card">
+                <div class="impact-icon">🏦</div>
+                <div class="impact-card-title">Banking</div>
+                <div class="impact-solutions">4+ Solutions</div>
+            </div>
+
+            <div class="impact-card">
+                <div class="impact-icon">🏢</div>
+                <div class="impact-card-title">Enterprise Services</div>
+                <div class="impact-solutions">4+ Solutions</div>
+            </div>
+
+            <div class="impact-card">
+                <div class="impact-icon">📈</div>
+                <div class="impact-card-title">Sales & Marketing</div>
+                <div class="impact-solutions">4+ Solutions</div>
+            </div>
+
+            <div class="impact-card">
+                <div class="impact-icon">🎓</div>
+                <div class="impact-card-title">Education</div>
+                <div class="impact-solutions">4+ Solutions</div>
+            </div>
+
+            <div class="impact-card">
+                <div class="impact-icon">📞</div>
+                <div class="impact-card-title">Contact Centers</div>
+                <div class="impact-solutions">4+ Solutions</div>
+            </div>
+
+            <div class="impact-card">
+                <div class="impact-icon">🏥</div>
+                <div class="impact-card-title">Healthcare</div>
+                <div class="impact-solutions">4+ Solutions</div>
+            </div>
+
+            <div class="impact-card">
+                <div class="impact-icon">🎯</div>
+                <div class="impact-card-title">Lead Generation</div>
+                <div class="impact-solutions">4+ Solutions</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="services">
+        <div class="services-header">
+            <h2 class="services-title">🛠 Services</h2>
+            <p class="services-subtitle">
+                Plug-and-play AI voice agent services designed for Indian industries.
+            </p>
+            <a href="/dashboard.html" class="services-link">Explore Services →</a>
+        </div>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">📞</div>
+                <div class="service-title">Inbound AI Voice Agent</div>
+                <div class="service-description">
+                    AI voice agents auto-answering customer calls in regional languages with 24/7 availability.
+                </div>
+                <a href="/dashboard.html" class="service-link">View More Details →</a>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">📤</div>
+                <div class="service-title">Outbound AI Voice Agent Campaigns</div>
+                <div class="service-description">
+                    AI voice agents auto-calling prospects, reminders, or surveys in regional languages.
+                </div>
+                <a href="/dashboard.html" class="service-link">View More Details →</a>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">📲</div>
+                <div class="service-title">WhatsApp + AI Voice Agent Automation</div>
+                <div class="service-description">
+                    Integrate AI voice agents with WhatsApp flows + voice calling for hybrid engagement.
+                </div>
+                <a href="/dashboard.html" class="service-link">View More Details →</a>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">📅</div>
+                <div class="service-title">Appointment & Booking AI Voice Agents</div>
+                <div class="service-description">
+                    AI voice agents automate appointment confirmations and rescheduling via voice.
+                </div>
+                <a href="/dashboard.html" class="service-link">View More Details →</a>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">🧾</div>
+                <div class="service-title">Document-Reading AI Voice Agents</div>
+                <div class="service-description">
+                    AI voice agents read out government forms, policies, or offers to illiterate users via call.
+                </div>
+                <a href="/dashboard.html" class="service-link">View More Details →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pillars Section -->
+    <section class="pillars">
+        <div class="pillars-title">Pillars of BhashAI Enterprise</div>
+        <div class="pillars-subtitle">
+            Reimagining business operations using AI Voice as a medium
+        </div>
+        <div class="pillars-showcase">
+            <div class="pillars-image">
+                Enterprise AI Voice Platform Demo
+                <br>
+                Multi-language • Real-time • Scalable
+            </div>
+            <button class="cta-button" onclick="scrollToTrial()">
+                🚀 Start Free Trial
+            </button>
+        </div>
+    </section>
+
+    <!-- Business Solutions Section -->
+    <section class="business-solutions" id="solutions">
+        <div class="solutions-header">
+            <h2 class="solutions-title">🧩 Solutions</h2>
+            <p class="solutions-subtitle">Tailored AI Voice agents for Indian sectors.</p>
+        </div>
+        <div class="solutions-grid">
+            <div class="solution-card">
+                <div class="solution-icon">🏥</div>
+                <div class="solution-title">Healthcare & Hospitals</div>
+                <div class="solution-description">
+                    AI voice agents for patient reminders, doctor appointment calls, vaccination updates.
+                </div>
+                <div class="solution-features">
+                    "AI voice agent automated patient care in regional languages"
+                </div>
+            </div>
+
+            <div class="solution-card">
+                <div class="solution-icon">🏪</div>
+                <div class="solution-title">Retail & E-Commerce</div>
+                <div class="solution-description">
+                    AI voice agents for order confirmations, delivery status, feedback collection.
+                </div>
+                <div class="solution-features">
+                    "Enhanced customer experience with AI voice agent automation"
+                </div>
+            </div>
+
+            <div class="solution-card">
+                <div class="solution-icon">🏛️</div>
+                <div class="solution-title">Public Sector / Governance</div>
+                <div class="solution-description">
+                    AI voice agents for helpline automation, multilingual citizen grievance handling.
+                </div>
+                <div class="solution-features">
+                    "Bridging the digital divide with AI voice agent governance"
+                </div>
+            </div>
+
+            <div class="solution-card">
+                <div class="solution-icon">🏫</div>
+                <div class="solution-title">Education</div>
+                <div class="solution-description">
+                    AI voice agents for student follow-ups, admission inquiries, result announcements.
+                </div>
+                <div class="solution-features">
+                    "Making education accessible through AI voice agent technology"
+                </div>
+            </div>
+
+            <div class="solution-card">
+                <div class="solution-icon">🧑‍🌾</div>
+                <div class="solution-title">Agritech & Rural Services</div>
+                <div class="solution-description">
+                    AI voice agents for farming advice, mandi prices, scheme awareness in local dialects.
+                </div>
+                <div class="solution-features">
+                    "Empowering farmers with AI voice agent enabled information"
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <div class="pricing-content">
+            <div class="pricing-header">
+                <h2 class="pricing-title">💰 Pricing</h2>
+                <p class="pricing-subtitle">Transparent, affordable plans for every Indian business.</p>
+            </div>
+
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-plan">⚙️ Basic Plan</div>
+                    <div class="pricing-price">₹999<span>/mo</span></div>
+                    <div class="pricing-features">
+                        <div class="feature">✓ 1 Language</div>
+                        <div class="feature">✓ 500 Calls/mo</div>
+                        <div class="feature">✓ Ready-to-use Templates</div>
+                    </div>
+                    <a href="#trial" class="pricing-btn" onclick="scrollToTrial(); return false;">Get Started</a>
+                </div>
+
+                <div class="pricing-card featured">
+                    <div class="pricing-plan">🏢 Pro Plan</div>
+                    <div class="pricing-price">₹4,999<span>/mo</span></div>
+                    <div class="pricing-features">
+                        <div class="feature">✓ Up to 3 Languages</div>
+                        <div class="feature">✓ 5,000 Calls/mo</div>
+                        <div class="feature">✓ CRM + WhatsApp Integration</div>
+                        <div class="feature">✓ Agent Customization</div>
+                    </div>
+                    <a href="#trial" class="pricing-btn" onclick="scrollToTrial(); return false;">Get Started</a>
+                </div>
+
+                <div class="pricing-card">
+                    <div class="pricing-plan">🏛 Enterprise/Government Plan</div>
+                    <div class="pricing-price">Custom Quote</div>
+                    <div class="pricing-features">
+                        <div class="feature">✓ Unlimited Calls</div>
+                        <div class="feature">✓ On-Premise Options</div>
+                        <div class="feature">✓ Local Dialect Support</div>
+                        <div class="feature">✓ 24/7 SLA Support</div>
+                    </div>
+                    <a href="/book-demo.html" class="pricing-btn">Contact Sales</a>
+                </div>
+            </div>
+
+            <div class="pricing-calculator">
+                <a href="#calculator" class="calculator-link">📊 Estimate Cost Based on Call Volume →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trial Signup Section -->
+    <section class="trial-signup" id="trial">
+        <div class="trial-container">
+            <div class="trial-content">
+                <h2>Start Your Free Trial Today!</h2>
+                <p>Join thousands of businesses using BhashAI to automate customer interactions with AI voice agents that speak Hindi, English, and regional languages.</p>
+                
+                <ul class="trial-benefits">
+                    <li>30-day free trial - No credit card required</li>
+                    <li>Unlimited AI voice agents in multiple languages</li>
+                    <li>WhatsApp & Voice call integration</li>
+                    <li>Real-time analytics and insights</li>
+                    <li>24/7 customer support</li>
+                    <li>Multi-channel deployment ready</li>
+                </ul>
+            </div>
+            
+            <div class="trial-form">
+                <h3>🚀 Create Your Free Account</h3>
+                <form id="trialForm" onsubmit="handleTrialSignup(event)">
+                    <div class="form-group">
+                        <label for="trialBusinessName">Business Name</label>
+                        <input type="text" id="trialBusinessName" name="businessName" placeholder="Your Business Name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="trialContactName">Contact Name</label>
+                        <input type="text" id="trialContactName" name="contactName" placeholder="Your Full Name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="trialEmail">Email Address</label>
+                        <input type="email" id="trialEmail" name="email" placeholder="your.email@company.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="trialPhone">Phone Number</label>
+                        <input type="tel" id="trialPhone" name="phone" placeholder="+91 98765 43210" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="trialBusinessType">Business Type</label>
+                        <select id="trialBusinessType" name="businessType" required>
+                            <option value="">Select Business Type</option>
+                            <option value="ecommerce">E-Commerce</option>
+                            <option value="banking">Banking & Finance</option>
+                            <option value="customer-service">Customer Service</option>
+                            <option value="healthcare">Healthcare</option>
+                            <option value="education">Education</option>
+                            <option value="real-estate">Real Estate</option>
+                            <option value="hospitality">Hospitality</option>
+                            <option value="retail">Retail</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn-trial">
+                        Start My Free Trial →
+                    </button>
+                    
+                    <div id="trialResult" class="trial-result"></div>
+                </form>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="contact-content">
+            <div class="contact-header">
+                <h2 class="contact-title">📞 Contact</h2>
+                <p class="contact-subtitle">We'd love to hear from you.</p>
+            </div>
+
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <h3>📍 Head Office:</h3>
+                        <p>Nagpur, Maharashtra<br>
+                        Bharat BhashAI HQ, HopeTech Campus</p>
+                    </div>
+
+                    <div class="contact-item">
+                        <h3>📬 Email:</h3>
+                        <p><a href="mailto:support@bhashai.com">support@bhashai.com</a></p>
+                    </div>
+
+                    <div class="contact-item">
+                        <h3>📞 Phone:</h3>
+                        <p><a href="tel:18002330000">18002330000</a></p>
+                    </div>
+
+                    <div class="contact-item">
+                        <h3>💬 WhatsApp Integration:</h3>
+                        <p>"Chat with an AI Agent Live"</p>
+                        <a href="#whatsapp" class="whatsapp-btn">Start WhatsApp Chat</a>
+                    </div>
+
+                    <div class="contact-item">
+                        <h3>📅 Book a Demo:</h3>
+                        <a href="/book-demo.html" class="demo-btn">Schedule Demo</a>
+                    </div>
+                </div>
+
+                <div class="contact-form">
+                    <h3>📤 Contact Form</h3>
+                    <form id="contactForm" onsubmit="handleContactForm(event)">
+                        <div class="form-group">
+                            <label for="contactName">Name</label>
+                            <input type="text" id="contactName" name="name" placeholder="Your Full Name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contactMobile">Mobile</label>
+                            <input type="tel" id="contactMobile" name="mobile" placeholder="+91 98765 43210" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contactBusinessType">Business Type</label>
+                            <select id="contactBusinessType" name="businessType" required>
+                                <option value="">Select Business Type</option>
+                                <option value="healthcare">Healthcare</option>
+                                <option value="retail">Retail & E-Commerce</option>
+                                <option value="government">Government/Public Sector</option>
+                                <option value="education">Education</option>
+                                <option value="agriculture">Agriculture & Rural</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contactLanguages">Languages Needed</label>
+                            <input type="text" id="contactLanguages" name="languages" placeholder="Hindi, English, Tamil, etc." required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contactMessage">Message</label>
+                            <textarea id="contactMessage" name="message" placeholder="Tell us about your requirements..." rows="4"></textarea>
+                        </div>
+
+                        <button type="submit" class="contact-submit-btn">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section class="final-cta">
+        <div class="cta-content">
+            <h2 class="cta-title">Ready to Get Started?</h2>
+            <p class="cta-subtitle">Transform Your Business with AI Voice Agent Automation!</p>
+            <p class="cta-description">
+                Join thousands of businesses already using BhashAI AI voice agents to automate customer interactions,
+                boost sales, and provide exceptional service in multiple Indian languages.
+            </p>
+            <a href="#trial" class="cta-button" onclick="scrollToTrial(); return false;">
+                🚀 START YOUR FREE TRIAL →
+            </a>
+        </div>
+    </section>
+
+    <!-- Eleven Labs Agent Embeds -->
+    <div class="elevenlabs-agents-container">
+        <h2 style="text-align: center; color: #1e293b; font-size: 2rem; margin-bottom: 2rem; font-weight: 700;">Choose an Agent for Tech Support</h2>
+        <div class="agents-grid">
+            <div class="agent-card">
+                <h3 class="agent-title">Wcl Support Agent</h3>
+                <p class="agent-description">Specializes in general inquiries and common technical issues.</p>
+                <button class="start-chat-btn" data-agent-id="agent_9601k0xgfjq2fjtb5nfmc82qwxfz">Start Chat</button>
+            </div>
+            <div class="agent-card">
+                <h3 class="agent-title">Ayushman Support Agent</h3>
+                <p class="agent-description">Expert in advanced troubleshooting and complex system configurations.</p>
+                <button class="start-chat-btn" data-agent-id="agent_5101k0xfqkeke8g9tjayvbnksqx5">Start Chat</button>
+            </div>
+            <div class="agent-card">
+                <h3 class="agent-title">Agent 3 Support</h3>
+                <p class="agent-description">Provides support for billing, account management, and service upgrades.</p>
+                <button class="start-chat-btn" data-agent-id="agent_01k0nvgrmjf3dt45p1z2xa8ag1">Start Chat</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatButtons = document.querySelectorAll('.start-chat-btn');
+            let currentActiveWidget = null; // To keep track of the currently open widget
+
+            chatButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const agentId = this.getAttribute('data-agent-id');
+
+                    if (agentId) {
+                        // Remove any existing widget if present
+                        if (currentActiveWidget) {
+                            currentActiveWidget.remove();
+                            currentActiveWidget = null;
+                        }
+
+                        // Create new elevenlabs-convai element
+                        const newWidget = document.createElement('elevenlabs-convai');
+                        newWidget.setAttribute('agent-id', agentId);
+
+                        // Append directly to the body
+                        document.body.appendChild(newWidget);
+                        currentActiveWidget = newWidget;
+
+                        console.log(`Dynamically loaded and attempting to open chat for agent: ${agentId}`);
+
+                        // Since there's no direct ElevenLabsConvaiWidget.open(agentId) API, we simulate a click
+                        // on the dynamically added widget's internal button after a short delay to ensure it's rendered.
+                        setTimeout(() => {
+                            const internalButton = newWidget.shadowRoot ? newWidget.shadowRoot.querySelector('button') : null;
+                            if (internalButton) {
+                                internalButton.click();
+                                console.log(`Triggered internal button click for dynamically loaded agent: ${agentId}`);
+                            } else {
+                                console.warn(`Internal button not found for dynamically loaded widget with agent-id: ${agentId}. Widget might not be fully loaded or structured differently.`);
+                            }
+                        }, 500); // Small delay to allow widget to render
+
+                    } else {
+                        console.warn('Agent ID not found for clicked button.');
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">BhashAI</div>
+                <p>Enterprise AI Voice Agent Platform for Business</p>
+                <p>Advanced AI Voice Agent Technology Division</p>
+                <p>Leading AI Voice Agent Platform and Solutions</p>
+                <br>
+                <p>📧 ceo@bhashai.com</p>
+                <p>📞 18002330000</p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Platform</h4>
+                <ul>
+                    <li><a href="/dashboard.html">Dashboard</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#solutions">Solutions</a></li>
+                    <li><a href="/book-demo.html">Book Demo</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Solutions</h4>
+                <ul>
+                    <li><a href="#solutions">E-Commerce</a></li>
+                    <li><a href="#solutions">Banking</a></li>
+                    <li><a href="#solutions">Customer Service</a></li>
+                    <li><a href="#solutions">Contact Centers</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Get The BhashAI App</h4>
+                <p>Download our mobile app for on-the-go access</p>
+                <div style="margin-top: 1rem;">
+                    <p>📱 Play Store | 🍎 App Store</p>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <p>Follow Us: 📘 Facebook | 🐦 Twitter | 📸 Instagram | 💼 LinkedIn</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 - Copyright All rights reserved. | Privacy Policy | Terms & Conditions | Contact Us</p>
+        </div>
+    </footer>
+
+    <!-- Product Navigation Section -->
+    
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.main-header');
+            if (window.scrollY > 100) {
+                header.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
+            } else {
+                header.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+            }
+        });
+
+        // Font size controls functionality
+        const fontBtns = document.querySelectorAll('.font-btn');
+        let currentFontSize = 16; // Default font size
+        
+        fontBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const body = document.body;
+                if (this.textContent === 'A-') {
+                    currentFontSize = Math.max(12, currentFontSize - 2);
+                } else if (this.textContent === 'A+') {
+                    currentFontSize = Math.min(20, currentFontSize + 2);
+                } else {
+                    currentFontSize = 16; // Reset to default
+                }
+                body.style.fontSize = currentFontSize + 'px';
+                
+                // Show feedback
+                showNotification(`Font size: ${currentFontSize}px`);
+            });
+        });
+        
+        // Language selector functionality
+        // Removed as per user request
+        
+        // Accessibility links functionality
+        document.querySelector('a[href="#"]').addEventListener('click', function(e) {
+            if (this.textContent.includes('Skip to main content')) {
+                e.preventDefault();
+                document.querySelector('.hero').scrollIntoView({ behavior: 'smooth' });
+                showNotification('Skipped to main content');
+            }
+        });
+        
+        // Screen reader access
+        const screenReaderLink = document.querySelector('a[href="#"]:nth-of-type(2)');
+        if (screenReaderLink) {
+            screenReaderLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                showNotification('Screen reader mode activated');
+                // Add screen reader optimizations
+                document.body.classList.add('screen-reader-mode');
+            });
+        }
+        
+        // Navigation smooth scrolling
+        const navLinks = document.querySelectorAll('.nav-links a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href.startsWith('#')) {
+                    e.preventDefault();
+                    const targetSection = document.querySelector(href);
+                    if (targetSection) {
+                        targetSection.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        // If section doesn't exist, show notification
+                        showNotification(`Section ${href} coming soon!`);
+                    }
+                }
+            });
+        });
+        
+        // Mobile app dropdown functionality
+        const mobileAppBtn = document.querySelector('.mobile-app-btn');
+        if (mobileAppBtn) {
+            mobileAppBtn.addEventListener('click', function(e) {
+                // Removed e.preventDefault() to allow default link behavior
+                // Removed showMobileAppOptions() as per user request
+            });
+        }
+        
+        // CTA button interactions
+        document.addEventListener('click', function(e) {
+            const target = e.target;
+            if (target.textContent.includes('Get Started') || target.textContent.includes('Dashboard')) {
+                e.preventDefault();
+                window.location.href = '/dashboard.html';
+            }
+            
+            // Handle service links
+            if (target.classList.contains('service-link') || target.classList.contains('services-link')) {
+                e.preventDefault();
+                // showNotification('Redirecting to services...'); // Removed as per user request
+                setTimeout(() => {
+                    window.location.href = '/dashboard.html';
+                }, 1000);
+            }
+        });
+        
+        // Notification system
+        function showNotification(message) {
+            // Remove existing notifications
+            const existingNotif = document.querySelector('.notification');
+            if (existingNotif) {
+                existingNotif.remove();
+            }
+            
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #059669;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                font-size: 14px;
+                font-weight: 500;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Mobile app options modal
+        function showMobileAppOptions() {
+            const modal = document.createElement('div');
+            modal.className = 'mobile-app-modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>📱 Download BHASHAI Mobile App</h3>
+                        <button class="close-modal" onclick="this.closest('.mobile-app-modal').remove()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="app-options">
+                            <a href="#" class="app-store-btn" onclick="downloadApp('ios')">
+                                <span>🍎</span>
+                                <div>
+                                    <div>Download on the</div>
+                                    <div><strong>App Store</strong></div>
+                                </div>
+                            </a>
+                            <a href="#" class="app-store-btn" onclick="downloadApp('android')">
+                                <span>🤖</span>
+                                <div>
+                                    <div>Get it on</div>
+                                    <div><strong>Google Play</strong></div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="app-features">
+                            <h4>Mobile App Features:</h4>
+                            <ul>
+                                <li>✅ Manage voice agents on the go</li>
+                                <li>✅ Real-time call monitoring</li>
+                                <li>✅ Push notifications for important events</li>
+                                <li>✅ Offline access to reports</li>
+                                <li>✅ Voice agent testing tools</li>
+                            </ul>
+                        </div>
+                        <div class="qr-code-section">
+                            <p>Scan QR code to download:</p>
+                            <div class="qr-placeholder">📱 QR Code</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Add modal styles
+            const style = document.createElement('style');
+            style.textContent = `
+                .mobile-app-modal {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.8);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 1000;
+                }
+                .modal-content {
+                    background: white;
+                    border-radius: 15px;
+                    padding: 2rem;
+                    max-width: 500px;
+                    width: 90%;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                }
+                .modal-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 1.5rem;
+                    border-bottom: 1px solid #eee;
+                    padding-bottom: 1rem;
+                }
+                .close-modal {
+                    background: none;
+                    border: none;
+                    font-size: 1.5rem;
+                    cursor: pointer;
+                    color: #666;
+                }
+                .app-options {
+                    display: flex;
+                    gap: 1rem;
+                    margin-bottom: 2rem;
+                }
+                .app-store-btn {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    padding: 1rem;
+                    border: 2px solid #4f46e5;
+                    border-radius: 10px;
+                    text-decoration: none;
+                    color: #4f46e5;
+                    flex: 1;
+                    transition: all 0.3s ease;
+                }
+                .app-store-btn:hover {
+                    background: #4f46e5;
+                    color: white;
+                }
+                .app-features ul {
+                    list-style: none;
+                    padding: 0;
+                }
+                .app-features li {
+                    padding: 0.5rem 0;
+                    border-bottom: 1px solid #f0f0f0;
+                }
+                .qr-placeholder {
+                    width: 100px;
+                    height: 100px;
+                    border: 2px dashed #ccc;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 1rem auto;
+                    border-radius: 10px;
+                }
+            `;
+            document.head.appendChild(style);
+            document.body.appendChild(modal);
+        }
+
+        function downloadApp(platform) {
+            const message = platform === 'ios' ?
+                'iOS app will be available soon! We\'ll notify you when it\'s ready.' :
+                'Android app will be available soon! We\'ll notify you when it\'s ready.';
+            showNotification(message);
+        }
+
+        // Initialize page
+        loadFontSizePreference();
+        showNotification('Welcome to BHASHAI Enterprise AI Platform!');
+
+        // Add trial form scroll to existing CTA buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update CTA buttons to point to trial form
+            const ctaButtons = document.querySelectorAll('.cta-button, .cta-link');
+            ctaButtons.forEach(btn => {
+                if (!btn.href || btn.href.includes('dashboard.html')) {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        scrollToTrial();
+                    });
+                }
+            });
+
+            // Add language selector functionality
+            const langSelector = document.querySelector('.lang-selector');
+            if (langSelector) {
+                langSelector.addEventListener('change', function(e) {
+                    const selectedLang = e.target.value;
+                    changeLanguage(selectedLang);
+                });
+            }
+        });
+
+        // Generate voice samples dynamically based on supported languages
+        function generateVoiceSamples() {
+            const voiceSamplesGrid = document.getElementById('voiceSamplesGrid');
+            if (!voiceSamplesGrid || !window.SUPPORTED_LANGUAGES) return;
+
+            // Select 4 main languages to showcase
+            const showcaseLanguages = ['en', 'hi', 'ta', 'bn'];
+
+            const voiceSampleTexts = {
+                'en': 'Hello, I\'m your AI voice agent. How can I help you today?',
+                'hi': 'नमस्ते, मैं आपका AI voice agent हूँ। आपकी कैसे मदद कर सकता हूँ?',
+                'ta': 'வணக்கம், நான் உங்கள் AI voice agent. உங்களுக்கு எப்படி உதவ முடியும்?',
+                'bn': 'নমস্কার, আমি আপনার AI voice agent। আমি কীভাবে আপনাকে সাহায্য করতে পারি?'
+            };
+
+            voiceSamplesGrid.innerHTML = showcaseLanguages.map(langCode => {
+                const lang = window.SUPPORTED_LANGUAGES[langCode];
+                const sampleText = voiceSampleTexts[langCode] || voiceSampleTexts['en'];
+
+                return `
+                    <div class="voice-sample-card">
+                        <div class="voice-sample-language">${lang.flag} ${lang.nativeName}</div>
+                        <div class="voice-sample-text">"${sampleText}"</div>
+                        <button class="play-sample-btn" onclick="playVoiceSample('${langCode}')">
+                            ▶️ <span data-translate="btn.play_sample">Play Sample</span>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Initialize multi-language system
+        function initializeLanguageSystem() {
+            // Wait for language manager to be available
+            if (window.languageManager) {
+                // Initialize the language manager
+                window.languageManager.init();
+
+                // Generate voice samples
+                generateVoiceSamples();
+            } else {
+                // Retry after a short delay
+                setTimeout(initializeLanguageSystem, 100);
+            }
+        }
+
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeLanguageSystem);
+        } else {
+            initializeLanguageSystem();
+        }
+
+
+    </script>
+</body>
+</html>

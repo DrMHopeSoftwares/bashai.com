@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal AI Agent Prompt Editor - BhashAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#7C3AED',
+                        accent: '#10B981',
+                        danger: '#EF4444',
+                        info: '#0EA5E9',
+                        warning: '#F59E0B',
+                        graybg: '#F9FAFB',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .provider-badge.relevance { background: #e3f2fd; color: #1976d2; }
+        .provider-badge.bolna { background: #e8f5e8; color: #2e7d32; }
+        .provider-badge.openai { background: #fff3e0; color: #f57c00; }
+    </style>
+</head>
+<body class="bg-graybg min-h-screen">
+    <div class="max-w-3xl mx-auto py-10 px-4">
+        <div class="bg-gradient-to-r from-primary to-secondary rounded-2xl shadow-lg p-8 mb-8 text-white text-center">
+            <h1 class="text-3xl font-bold mb-2 flex items-center justify-center gap-2">🤖 Universal AI Agent Prompt Editor</h1>
+            <p class="text-lg opacity-90">Multi-tenant prompt editing for BhashAI platform</p>
+        </div>
+        <div class="bg-white rounded-xl shadow p-6 mb-8">
+            <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">🎯 Select Agent to Edit</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label for="enterpriseSelect" class="block font-medium mb-1">Enterprise</label>
+                    <select id="enterpriseSelect" onchange="loadEnterpriseAgents()" class="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary">
+                        <option value="">Select Enterprise...</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="providerFilter" class="block font-medium mb-1">Provider</label>
+                    <select id="providerFilter" onchange="filterAgentsByProvider()" class="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary">
+                        <option value="">All Providers</option>
+                        <option value="relevance_ai">RelevanceAI</option>
+                        <option value="bolna">Bolna</option>
+                        <option value="openai_realtime">OpenAI Realtime</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="agentSelect" class="block font-medium mb-1">AI Agent</label>
+                    <select id="agentSelect" onchange="loadAgentPrompt()" class="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary">
+                        <option value="">Select Agent...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-2 mt-2">
+                <button class="btn btn-primary px-4 py-2" onclick="loadAgents()">🔄 Refresh Agents</button>
+                <button class="btn bg-info text-white px-4 py-2" onclick="showAgentDetails()">📊 Show Agent Details</button>
+            </div>
+        </div>
+        <div id="agentInfo" class="bg-blue-50 border-l-4 border-primary rounded-lg p-4 mb-6 hidden">
+            <h4 class="font-semibold mb-2 flex items-center gap-2">📋 Selected Agent Information</h4>
+            <div id="agentDetails"></div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-6 mb-8" id="promptEditor" style="display: none;">
+            <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">📝 System Prompt Editor</h3>
+            <div id="status" class="rounded-lg px-4 py-2 mb-4 hidden"></div>
+            <textarea id="promptTextarea" placeholder="Select an agent to load its prompt..." class="w-full h-64 rounded-lg border border-gray-300 p-4 font-mono text-base focus:ring-primary focus:border-primary resize-vertical"></textarea>
+            <div class="flex flex-wrap justify-between items-center text-sm text-gray-600 mt-2 mb-4 gap-2">
+                <span><strong>📊 Prompt Length:</strong> <span id="promptLength">0</span> characters</span>
+                <span><strong>📅 Last Updated:</strong> <span id="lastUpdated">-</span></span>
+                <span><strong>🏢 Enterprise:</strong> <span id="currentEnterprise">-</span></span>
+            </div>
+            <div class="flex flex-wrap justify-center gap-2 mt-4">
+                <button class="btn btn-primary px-4 py-2" onclick="loadCurrentPrompt()">🔄 Reload Prompt</button>
+                <button class="btn bg-accent text-white px-4 py-2" onclick="updatePrompt()">💾 Save Changes</button>
+                <button class="btn bg-info text-white px-4 py-2" onclick="testPrompt()">📞 Test Agent</button>
+                <button class="btn bg-warning text-gray-900 px-4 py-2" onclick="copyToClipboard()">📋 Copy Prompt</button>
+                <button class="btn bg-danger text-white px-4 py-2" onclick="resetPrompt()">↺ Reset to Original</button>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-6 mb-8" id="templates" style="display: none;">
+            <h4 class="font-semibold mb-3 flex items-center gap-2">📋 Quick Templates:</h4>
+            <div class="flex flex-wrap gap-2">
+                <button class="btn bg-gray-700 text-white text-xs px-3 py-1.5" onclick="addTemplate('multilingual')">Add Multi-language Support</button>
+                <button class="btn bg-gray-700 text-white text-xs px-3 py-1.5" onclick="addTemplate('professional')">Add Professional Tone</button>
+                <button class="btn bg-gray-700 text-white text-xs px-3 py-1.5" onclick="addTemplate('emergency')">Add Emergency Handling</button>
+                <button class="btn bg-gray-700 text-white text-xs px-3 py-1.5" onclick="addTemplate('scheduling')">Add Appointment Logic</button>
+                <button class="btn bg-gray-700 text-white text-xs px-3 py-1.5" onclick="addTemplate('healthcare')">Add Healthcare Guidelines</button>
+                <button class="btn bg-gray-700 text-white text-xs px-3 py-1.5" onclick="addTemplate('customer_service')">Add Customer Service</button>
+            </div>
+        </div>
+        <div class="bg-gradient-to-r from-primary to-secondary rounded-xl p-6 text-white mt-8">
+            <h4 class="font-semibold mb-2 flex items-center gap-2">🔧 Multi-tenant Features:</h4>
+            <ul class="list-disc pl-6 space-y-1 text-base opacity-90">
+                <li><strong>Enterprise Isolation:</strong> Only see agents from your enterprise</li>
+                <li><strong>Provider Support:</strong> Edit prompts for RelevanceAI, Bolna, and OpenAI agents</li>
+                <li><strong>Role-based Access:</strong> Admins can edit all agents, users can edit their own</li>
+                <li><strong>Audit Trail:</strong> All prompt changes are logged with user and timestamp</li>
+                <li><strong>Backup & Restore:</strong> Previous prompt versions are saved automatically</li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        function filterAgentsByProvider() {
+            const provider = document.getElementById('providerFilter').value;
+            const agentSelect = document.getElementById('agentSelect');
+            agentSelect.innerHTML = '<option value="">Loading agents...</option>';
+
+            if (provider === 'bolna') {
+                // Fetch agents from backend proxy endpoint
+                fetch('/api/bolna/agents')
+                    .then(res => res.json())
+                    .then(data => {
+                        if (Array.isArray(data)) {
+                            agentSelect.innerHTML = '<option value="">Select Agent...</option>' +
+                                data.map(agent => `<option value="${agent.id}">${agent.name}</option>`).join('');
+                        } else {
+                            agentSelect.innerHTML = '<option value="">No agents found</option>';
+                        }
+                    })
+                    .catch(() => {
+                        agentSelect.innerHTML = '<option value="">Failed to load agents</option>';
+                    });
+            } else if (provider === 'relevance_ai') {
+                // Fetch RelevanceAI agents from backend
+                fetch('/api/relevance-ai/agents')
+                    .then(res => res.json())
+                    .then(data => {
+                        if (Array.isArray(data)) {
+                            agentSelect.innerHTML = '<option value="">Select Agent...</option>' +
+                                data.map(agent => `<option value="${agent.id}">${agent.name}</option>`).join('');
+                        } else if (data.agents && Array.isArray(data.agents)) {
+                            agentSelect.innerHTML = '<option value="">Select Agent...</option>' +
+                                data.agents.map(agent => `<option value="${agent.id}">${agent.name}</option>`).join('');
+                        } else {
+                            agentSelect.innerHTML = '<option value="">No agents found</option>';
+                        }
+                    })
+                    .catch(() => {
+                        agentSelect.innerHTML = '<option value="">Failed to load agents</option>';
+                    });
+            } else {
+                agentSelect.innerHTML = '<option value="">Select Agent...</option>';
+            }
+        }
+
+        async function showAgentDetails() {
+            const provider = document.getElementById('providerFilter').value;
+            const agentId = document.getElementById('agentSelect').value;
+            const agentInfoDiv = document.getElementById('agentInfo');
+            const agentDetailsDiv = document.getElementById('agentDetails');
+            const promptEditor = document.getElementById('promptEditor');
+
+            if (!agentId) {
+                agentInfoDiv.classList.add('hidden');
+                promptEditor.style.display = 'none';
+                return;
+            }
+
+            let agent = null;
+            if (provider === 'bolna') {
+                try {
+                    const res = await fetch(`/api/bolna/agents/${agentId}`);
+                    agent = await res.json();
+                } catch (e) {
+                    agentDetailsDiv.innerHTML = '<div class="text-red-600">Failed to load agent details from Bolna API.</div>';
+                    agentInfoDiv.classList.remove('hidden');
+                    promptEditor.style.display = 'none';
+                    return;
+                }
+                agentDetailsDiv.innerHTML = `
+                    <div class="mb-4">
+                        <label class="block font-semibold mb-1">Agent Welcome Message</label>
+                        <textarea id="welcomeMessage" class="w-full border rounded p-2 mb-2" rows="2">${agent.welcome_message || ''}</textarea>
+                        <div class="text-xs text-gray-500 mb-2">This will be the initial message from the agent. You can use variables here using {variable_name}</div>
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1">Agent Prompt</label>
+                        <textarea id="agentPrompt" class="w-full border rounded p-2 mb-2" rows="4">${agent.prompt || ''}</textarea>
+                        <div class="text-xs text-gray-500 mb-2">Main prompt for the agent's behavior and logic.</div>
+                    </div>
+                    <button class="btn btn-primary px-4 py-2" onclick="saveAgentPrompt()">💾 Save Changes</button>
+                `;
+                agentInfoDiv.classList.remove('hidden');
+                promptEditor.style.display = 'none';
+            } else if (provider === 'relevance_ai') {
+                // Fetch RelevanceAI agent prompt from backend
+                try {
+                    const res = await fetch(`/api/relevance-ai/agents/${agentId}/prompt`);
+                    agent = await res.json();
+                } catch (e) {
+                    agentDetailsDiv.innerHTML = '<div class="text-red-600">Failed to load agent details from RelevanceAI API.</div>';
+                    agentInfoDiv.classList.remove('hidden');
+                    promptEditor.style.display = 'none';
+                    return;
+                }
+                agentDetailsDiv.innerHTML = `
+                    <div class="mb-4">
+                        <label class="block font-semibold mb-1">Welcome Message</label>
+                        <textarea id="welcomeMessage" class="w-full border rounded p-2 mb-2" rows="2">${agent.welcome_message || ''}</textarea>
+                        <div class="text-xs text-gray-500 mb-2">This will be the initial message from the agent. You can use variables here using {variable_name}</div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block font-semibold mb-1">Description</label>
+                        <input id="description" class="w-full border rounded p-2 mb-2" value="${agent.description || ''}" />
+                        <div class="text-xs text-gray-500 mb-2">Short description for the agent.</div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block font-semibold mb-1">Agent Prompt</label>
+                        <textarea id="agentPrompt" class="w-full border rounded p-2 mb-2" rows="6">${agent.system_prompt || ''}</textarea>
+                        <div class="text-xs text-gray-500 mb-2">Main prompt for the agent's behavior and logic.</div>
+                    </div>
+                    <button class="btn btn-primary px-4 py-2" onclick="saveAgentPrompt()">💾 Save Changes</button>
+                `;
+                agentInfoDiv.classList.remove('hidden');
+                promptEditor.style.display = 'none';
+            } else {
+                agentDetailsDiv.innerHTML = '<div class="text-gray-600">No details available for this provider.</div>';
+                agentInfoDiv.classList.remove('hidden');
+                promptEditor.style.display = 'none';
+            }
+        }
+
+        async function saveAgentPrompt() {
+            const provider = document.getElementById('providerFilter').value;
+            const agentId = document.getElementById('agentSelect').value;
+            if (provider === 'bolna') {
+                const welcomeMessage = document.getElementById('welcomeMessage').value;
+                const agentPrompt = document.getElementById('agentPrompt').value;
+                try {
+                    await fetch(`/api/bolna/agents/${agentId}/prompt`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ welcome_message: welcomeMessage, prompt: agentPrompt })
+                    });
+                    alert('Prompt updated successfully!');
+                } catch (e) {
+                    alert('Failed to update prompt on Bolna API.');
+                }
+            } else if (provider === 'relevance_ai') {
+                const welcomeMessage = document.getElementById('welcomeMessage').value;
+                const description = document.getElementById('description').value;
+                const agentPrompt = document.getElementById('agentPrompt').value;
+                try {
+                    await fetch(`/api/relevance-ai/agents/${agentId}/prompt`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            welcome_message: welcomeMessage,
+                            description: description,
+                            system_prompt: agentPrompt
+                        })
+                    });
+                    alert('Prompt updated successfully!');
+                } catch (e) {
+                    alert('Failed to update prompt on RelevanceAI API.');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head><title>Test Dashboard Access</title></head>
+<body>
+<h1>Testing Dashboard Access</h1>
+<script>
+// Set token manually
+localStorage.setItem('auth_token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYWRtaW4tMDAxIiwiZW1haWwiOiJhZG1pbkBiaGFzaGFpLmNvbSIsInJvbGUiOiJhZG1pbiIsInN0YXR1cyI6ImFjdGl2ZSIsImV4cCI6MTc1MjU3MDg2MH0.t4tdq4o0-cmWeZwTAhYsV2EZhL3DO3QqoQNK-KLVRmk');
+console.log('Token set, redirecting to dashboard...');
+setTimeout(() => {
+    window.location.href = '/dashboard.html';
+}, 1000);
+</script>
+</body>
+</html>
