@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Agent Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f8fafc;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            color: #333; /* Default text color */
+        }
+
+        .glass {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+        }
+
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .animated-gradient {
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hover-scale {
+            transition: all 0.3s ease;
+        }
+
+        .hover-scale:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .metric-card:hover::before {
+            left: 100%;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px; /* Adjusted padding as there is no sidebar */
+            background: #f0f2f5; /* Match body background for content area */
+            display: flex;
+            justify-content: center; /* Center content */
+            align-items: flex-start; /* Align content to start */
+            overflow-y: auto;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            border: 1px solid #e1e5e9; /* Subtle light border */
+            width: 100%; /* Take full width */
+            max-width: 800px; /* Set a max-width for better readability */
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        /* Table Styles for Agent List (if applicable, though removed from this page) */
+        .agents-table-container {
+            width: 100%;
+            overflow-x: auto; /* Enable horizontal scrolling if content overflows */
+        }
+
+        .agents-table {
+            width: 100%;
+            border-collapse: collapse; /* Remove space between cells */
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+
+        .agents-table th,
+        .agents-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .agents-table th {
+            background-color: #f8f8f8;
+            color: #555;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8em;
+        }
+
+        .agents-table tbody tr:hover {
+            background-color: #fdfdfd; /* Subtle hover effect */
+        }
+
+        .agents-table tbody tr:nth-child(even) {
+            background-color: #fafafa; /* Optional: stripe rows */
+        }
+
+        .agents-table td {
+            color: #444;
+        }
+
+        /* Action Buttons in Table (if applicable, though removed from this page) */
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 500;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            margin-right: 5px; /* Space between buttons */
+        }
+
+        .action-btn.call-btn-small {
+            background-color: #667eea; /* Blueish */
+            color: white;
+        }
+
+        .action-btn.call-btn-small:hover {
+            background-color: #5b6de0;
+            transform: translateY(-1px);
+        }
+
+        .action-btn.edit-btn-small {
+            background-color: #4CAF50; /* Greenish */
+            color: white;
+        }
+
+        .action-btn.edit-btn-small:hover {
+            background-color: #45a049;
+            transform: translateY(-1px);
+        }
+
+        .action-btn.audio-btn-small {
+            background-color: #ff9800; /* Orange for audio */
+            color: white;
+        }
+
+        .action-btn.audio-btn-small:hover {
+            background-color: #f57c00;
+            transform: translateY(-1px);
+        }
+
+        .action-btn.delete-btn-small {
+            background-color: #f44336; /* Red for delete */
+            color: white;
+        }
+
+        .action-btn.delete-btn-small:hover {
+            background-color: #d32f2f;
+            transform: translateY(-1px);
+        }
+
+        .action-btn.delete-btn-small:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .header-title .icon {
+            font-size: 2.5em;
+            margin-right: 15px;
+            color: #ff4081;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            font-weight: 300;
+            margin: 0;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="tel"],
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        input[type="tel"]:focus,
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .call-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .call-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .call-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .phone-format {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    
+
+    <div class="main-content">
+        <div class="container">
+            <div class="header-title">
+                <span class="icon">⚙️</span>
+                <h1>Update Agent Settings</h1>
+            </div>
+            
+            <div class="input-group">
+                <label for="firstMessage">First Message:</label>
+                <input type="text" id="firstMessage" placeholder="Welcome to Rafttar">
+            </div>
+
+            <div class="input-group">
+                <label for="prompt">Prompt:</label>
+                <textarea id="prompt" placeholder="Welcome to Rafttar"></textarea>
+            </div>
+
+            <button class="call-btn" onclick="updateAgentSettings()" id="updateAgentButton">
+                ⚙️ Update Agent Settings
+            </button>
+
+            <div id="status" class="status" style="display: none;"></div>
+
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = 'sk_40e74f16b0f3a495ccd02687bc37d0e33346ec6ae3bbd58c';
+
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+        }
+
+        let currentAgentId = getQueryParam('agent_id');
+        const agentIdDisplay = document.createElement('p');
+
+        if (currentAgentId) {
+            // Display current Agent ID
+            agentIdDisplay.style.fontSize = '0.9em';
+            agentIdDisplay.style.color = '#666';
+            agentIdDisplay.style.marginTop = '10px';
+            agentIdDisplay.innerHTML = `Current Agent ID: <code style="background: #e9ecef; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${currentAgentId}</code>`;
+            document.querySelector('.container').insertBefore(agentIdDisplay, document.querySelector('.input-group'));
+            loadAgentDetails(currentAgentId); // Load details if ID is present
+        } else {
+            agentIdDisplay.style.fontSize = '0.9em';
+            agentIdDisplay.style.color = '#e91e63';
+            agentIdDisplay.style.marginTop = '10px';
+            agentIdDisplay.innerHTML = 'No Agent ID provided in URL. Cannot load settings. Please navigate from the Create Agent page to select an agent.';
+            document.querySelector('.container').insertBefore(agentIdDisplay, document.querySelector('.input-group'));
+            document.getElementById('updateAgentButton').disabled = true; // Disable button if no ID
+        }
+
+        async function loadAgentDetails(agentId) {
+            showStatus('Loading agent details...', 'loading');
+            try {
+                const response = await fetch(`https://api.elevenlabs.io/v1/convai/agents/${agentId}`, {
+                    method: 'GET',
+                    headers: {
+                        'xi-api-key': API_KEY,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || `HTTP error! status: ${response.status}`);
+                }
+
+                document.getElementById('firstMessage').value = data.conversation_config?.agent?.first_message || '';
+                document.getElementById('prompt').value = data.conversation_config?.agent?.prompt?.prompt || '';
+                showStatus('Agent details loaded.', 'success');
+
+            } catch (error) {
+                console.error('Error loading agent details:', error);
+                showStatus(`❌ Error loading agent details: ${error.message}`, 'error');
+            }
+        }
+
+        function updateAgentSettings() {
+            const firstMessage = document.getElementById('firstMessage').value.trim();
+            const promptText = document.getElementById('prompt').value.trim();
+            const updateAgentButton = document.getElementById('updateAgentButton');
+
+            if (!firstMessage && !promptText) {
+                showStatus('Please enter at least one field (First Message or Prompt) to update.', 'error');
+                return;
+            }
+
+            updateAgentButton.disabled = true;
+            updateAgentButton.textContent = '🔄 Updating Agent...';
+            showStatus('Updating agent settings...', 'loading');
+
+            const apiUrl = `https://api.elevenlabs.io/v1/convai/agents/${currentAgentId}`;
+            
+            const requestData = {
+                conversation_config: {
+                    agent: {}
+                }
+            };
+
+            if (firstMessage) {
+                requestData.conversation_config.agent.first_message = firstMessage;
+            }
+            if (promptText) {
+                requestData.conversation_config.agent.prompt = { prompt: promptText };
+            }
+
+            fetch(apiUrl, {
+                method: 'PATCH',
+                headers: {
+                    'xi-api-key': API_KEY,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Agent settings updated successfully:', data);
+                showStatus('✅ Agent settings updated successfully!', 'success');
+
+                const curlCommand = `curl -X PATCH ${apiUrl} \
+     -H "xi-api-key: ${API_KEY}" \
+     -H "Content-Type: application/json" \
+     -d '${JSON.stringify(requestData).replace(/\'/g, "\'")}'`;
+                console.log('Equivalent curl command:', curlCommand);
+            })
+            .catch(error => {
+                console.error('Error updating agent settings:', error);
+                showStatus(`❌ Error updating agent settings: ${error.message}`, 'error');
+            })
+            .finally(() => {
+                updateAgentButton.disabled = false;
+                updateAgentButton.textContent = '⚙️ Update Agent Settings';
+            });
+        }
+    </script>
+   
+</body>
+</html> 
