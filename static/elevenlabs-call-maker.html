@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElevenLabs Call Maker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f8fafc;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            display: flex; /* Added for sidebar layout */
+            align-items: center; /* Center content vertically */
+            justify-content: center; /* Center content horizontally */
+            color: #333; /* Default text color, though sidebar is white */
+        }
+
+        .glass {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+        }
+
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .animated-gradient {
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hover-scale {
+            transition: all 0.3s ease;
+        }
+
+        .hover-scale:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .metric-card:hover::before {
+            left: 100%;
+        }
+
+        .sidebar {
+            width: 260px; /* Explicit width for the sidebar */
+            background: rgba(255, 255, 255, 0.05); /* Glassmorphism background */
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            color: white; /* Text color for sidebar items */
+            padding: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 30px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header .logo-icon {
+            font-size: 2em;
+            margin-right: 10px;
+            color: #fff;
+        }
+
+        .sidebar-header .logo-text {
+            font-size: 1.3em;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .sidebar-header .tagline {
+            font-size: 0.8em;
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        .enterprise-select {
+            width: calc(100% - 40px);
+            padding: 10px 15px;
+            margin: 0 20px 20px 20px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1em;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20256%20256%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M201.27%2099.64L128%20172.91%2054.73%2099.64z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 1em;
+            cursor: pointer;
+        }
+
+        .enterprise-select:focus {
+            outline: none;
+            border-color: #a0a0ff;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin: 4px 0;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .sidebar ul li a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .sidebar ul li a.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid #fff;
+            color: white; 
+            box-shadow: none; 
+        }
+
+        .sidebar ul li a.active .icon {
+            color: white;
+        }
+
+        .sidebar ul li a .icon {
+            margin-right: 15px;
+            font-size: 1.3em;
+        }
+
+        .sidebar .badge {
+            background-color: #e91e63;
+            color: white;
+            font-size: 0.75em;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin-left: auto;
+            font-weight: 600;
+        }
+
+        .sidebar .badge.premium {
+            background-color: #9c27b0;
+        }
+
+        .sidebar .badge.new {
+            background-color: #4caf50;
+        }
+
+        .main-content {
+            padding: 20px 0; /* Add vertical padding */
+            background: #f0f2f5; /* Match body background for content area */
+            display: flex;
+            justify-content: center; /* Center content horizontally */
+            align-items: center; /* Center content vertically */
+            overflow-y: auto;
+        }
+
+        .container {
+            background: white;
+            padding: 60px; /* Increased padding from 40px to 60px */
+            border-radius: 15px;
+            border: 1px solid #e1e5e9; /* Subtle light border */
+            width: calc(100% - 40px); /* Take full width minus padding */
+            max-width: 900px; /* Increased max-width from 700px to 900px */
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        /* Table Styles for Agent List (if applicable, though removed from this page) */
+        .agents-table-container {
+            width: 100%;
+            overflow-x: auto; /* Enable horizontal scrolling if content overflows */
+        }
+
+        .agents-table {
+            width: 100%;
+            border-collapse: collapse; /* Remove space between cells */
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+
+        .agents-table th,
+        .agents-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .agents-table th {
+            background-color: #f8f8f8;
+            color: #555;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8em;
+        }
+
+        .agents-table tbody tr:hover {
+            background-color: #fdfdfd; /* Subtle hover effect */
+        }
+
+        .agents-table tbody tr:nth-child(even) {
+            background-color: #fafafa; /* Optional: stripe rows */
+        }
+
+        .agents-table td {
+            color: #444;
+        }
+
+        /* Action Buttons in Table (if applicable, though removed from this page) */
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 500;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            margin-right: 5px; /* Space between buttons */
+        }
+
+        .action-btn.call-btn-small {
+            background-color: #667eea; /* Blueish */
+            color: white;
+        }
+
+        .action-btn.call-btn-small:hover {
+            background-color: #5b6de0;
+            transform: translateY(-1px);
+        }
+
+        .action-btn.edit-btn-small {
+            background-color: #4CAF50; /* Greenish */
+            color: white;
+        }
+
+        .action-btn.edit-btn-small:hover {
+            background-color: #45a049;
+            transform: translateY(-1px);
+        }
+
+        .action-btn.audio-btn-small {
+            background-color: #ff9800; /* Orange for audio */
+            color: white;
+        }
+
+        .action-btn.audio-btn-small:hover {
+            background-color: #f57c00;
+            transform: translateY(-1px);
+        }
+
+        .action-btn.delete-btn-small {
+            background-color: #f44336; /* Red for delete */
+            color: white;
+        }
+
+        .action-btn.delete-btn-small:hover {
+            background-color: #d32f2f;
+            transform: translateY(-1px);
+        }
+
+        .action-btn.delete-btn-small:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .header-title .icon {
+            font-size: 2.5em;
+            margin-right: 15px;
+            color: #ff4081;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            font-weight: 300;
+            margin: 0;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="tel"],
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        input[type="tel"]:focus,
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .call-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .call-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .call-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .phone-format {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+   
+
+    <div class="main-content">
+        <div class="container" id="settings-section">
+            <div class="header-title">
+                <span class="icon">📞</span>
+                <h1>Call Maker</h1>
+            </div>
+            
+            <div class="input-group">
+                <label for="phoneNumber">Phone Number:</label>
+                <input 
+                    type="tel" 
+                    id="phoneNumber" 
+                    placeholder="Enter phone number (e.g., +919665199823)"
+                    pattern="^\+[1-9]\d{1,14}$"
+                >
+                <div class="phone-format">Format: +[country code][number] (e.g., +919665199823)</div>
+            </div>
+
+            <button class="call-btn" onclick="makeCall()" id="callButton">
+                🚀 Make Call
+            </button>
+
+            <div id="status" class="status" style="display: none;"></div>
+
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = 'sk_40e74f16b0f3a495ccd02687bc37d0e33346ec6ae3bbd58c';
+        let currentAgentId = 'agent_01k0gqk4fpfd4tnfzjwmr2w2z6'; // Default or from URL
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+        }
+
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Get agent_id from URL if present
+        const urlAgentId = getQueryParam('agent_id');
+        if (urlAgentId) {
+            currentAgentId = urlAgentId;
+        }
+
+        // Display current Agent ID
+        const agentIdDisplay = document.createElement('p');
+        agentIdDisplay.style.fontSize = '0.9em';
+        agentIdDisplay.style.color = '#666';
+        agentIdDisplay.style.marginTop = '10px';
+        agentIdDisplay.innerHTML = `Current Agent ID: <code style="background: #e9ecef; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${currentAgentId}</code>`;
+        document.querySelector('.container').insertBefore(agentIdDisplay, document.querySelector('.input-group'));
+
+        function makeCall() {
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const callButton = document.getElementById('callButton');
+            const statusDiv = document.getElementById('status');
+
+            // Validate phone number
+            if (!phoneNumber) {
+                showStatus('Please enter a phone number', 'error');
+                return;
+            }
+
+            // Validate phone number format
+            const phoneRegex = /^\+[1-9]\d{1,14}$/;
+            if (!phoneRegex.test(phoneNumber)) {
+                showStatus('Please enter a valid phone number with country code (e.g., +919665199823)', 'error');
+                return;
+            }
+
+            // Disable button and show loading
+            callButton.disabled = true;
+            callButton.textContent = '🔄 Making Call...';
+            showStatus('Initiating call...', 'loading');
+
+            // Prepare the API request
+            const apiUrl = 'https://api.elevenlabs.io/v1/convai/twilio/outbound-call';
+            
+            const requestData = {
+                agent_id: currentAgentId, /* Use dynamic agentId */
+                agent_phone_number_id: 'phnum_2401k0v14mxdef4s7kxjwxke3n5j',
+                to_number: phoneNumber
+            };
+
+            // Make the API call
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'xi-api-key': API_KEY,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Call initiated successfully:', data);
+                showStatus('✅ Call initiated successfully! Check your phone for the incoming call.', 'success');
+                
+                // Log the curl command for reference
+                const curlCommand = `curl -X POST ${apiUrl} \
+     -H "xi-api-key: ${API_KEY}" \
+     -H "Content-Type: application/json" \
+     -d '{
+  "agent_id": "${requestData.agent_id}",
+  "agent_phone_number_id": "${requestData.agent_phone_number_id}",
+  "to_number": "${phoneNumber}"
+}'`;
+                console.log('Equivalent curl command:', curlCommand);
+            })
+            .catch(error => {
+                console.error('Error making call:', error);
+                showStatus(`❌ Error making call: ${error.message}`, 'error');
+            })
+            .finally(() => {
+                // Re-enable button
+                callButton.disabled = false;
+                callButton.textContent = '🚀 Make Call';
+            });
+        }
+
+        // Allow Enter key to trigger call
+        document.getElementById('phoneNumber').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                makeCall();
+            }
+        });
+
+        // Auto-format phone number
+        document.getElementById('phoneNumber').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value && !value.startsWith('+')) {
+                value = '+' + value;
+            }
+            e.target.value = value;
+        });
+    </script>
+</body>
+</html> 
